@@ -1,0 +1,144 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "friendships",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "member_uids",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "state",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "updated_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "pings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "receiver_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "pings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "member_uids",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "place_states",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "favorite",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "favorite_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "place_states",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "saved",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "saved_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "public_profiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "searchable",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "profile_visibility",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "display_name_lower",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "public_profiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "searchable",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "profile_visibility",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "username_lower",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "author_uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "items",
+      "fieldPath": "check_in_id",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    }
+  ]
+}

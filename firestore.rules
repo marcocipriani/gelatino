@@ -1,0 +1,280 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function acceptedFriend(uidA, uidB) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/friend_access/$(uidA)/members/$(uidB));
+    }
+
+    function onlyUserEditableFields() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'display_name',
+        'username',
+        'bio',
+        'city',
+        'favorite_place_id',
+        'favorite_flavor_id',
+        'favorite_flavor_ids',
+        'profile_visibility',
+        'searchable',
+        'theme_mode',
+        'default_collection_view',
+        'reduced_motion',
+        'notifications_enabled',
+        'avatar_path',
+      ]);
+    }
+
+    function validUserCreate() {
+      return request.resource.data.keys().hasAll(['points'])
+        && request.resource.data.keys().hasOnly([
+          'display_name',
+          'username',
+          'bio',
+          'city',
+          'favorite_place_id',
+          'favorite_flavor_id',
+          'favorite_flavor_ids',
+          'profile_visibility',
+          'searchable',
+          'theme_mode',
+          'default_collection_view',
+          'reduced_motion',
+          'notifications_enabled',
+          'avatar_path',
+          'points',
+        ])
+        && request.resource.data.points == 0;
+    }
+
+    function validPlaceState() {
+      return request.resource.data.keys().hasOnly([
+        'saved',
+        'saved_at',
+        'favorite',
+        'favorite_at',
+        'liked',
+        'liked_at',
+        'note',
+        'updated_at',
+      ])
+        && (!('saved' in request.resource.data)
+          || request.resource.data.saved is bool)
+        && (!('favorite' in request.resource.data)
+          || request.resource.data.favorite is bool)
+        && (!('liked' in request.resource.data)
+          || request.resource.data.liked is bool)
+        && (!('note' in request.resource.data)
+          || (request.resource.data.note is string
+            && request.resource.data.note.size() <= 500));
+    }
+
+    function validPlaceCreate() {
+      return request.resource.data.keys().hasAll([
+        'name',
+        'address',
+        'location',
+        'geohash',
+        'added_by_uid',
+        'created_at',
+      ])
+        && request.resource.data.keys().hasOnly([
+          'name',
+          'address',
+          'location',
+          'geohash',
+          'added_by_uid',
+          'created_at',
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.address is string
+        && request.resource.data.address.size() > 0
+        && request.resource.data.location is latlng
+        && request.resource.data.geohash is string
+        && request.resource.data.added_by_uid == request.auth.uid
+        && request.resource.data.created_at == request.time;
+    }
+
+    function validFlavorCreate() {
+      return request.resource.data.keys().hasAll([
+        'name',
+        'name_lower',
+        'added_by_uid',
+        'created_at',
+      ])
+        && request.resource.data.keys().hasOnly([
+          'name',
+          'name_lower',
+          'color_hex',
+          'added_by_uid',
+          'created_at',
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name_lower is string
+        && request.resource.data.name_lower.size() > 0
+        && (!('color_hex' in request.resource.data)
+          || request.resource.data.color_hex == null
+          || (request.resource.data.color_hex is string
+            && request.resource.data.color_hex.matches('^#[0-9A-Fa-f]{6}$')))
+        && request.resource.data.added_by_uid == request.auth.uid
+        && request.resource.data.created_at == request.time;
+    }
+
+    function validPingCreate() {
+      return request.resource.data.keys().hasAll([
+        'member_uids',
+        'sender_id',
+        'receiver_id',
+        'status',
+        'created_at',
+        'responded_at',
+      ])
+        && request.resource.data.keys().hasOnly([
+          'member_uids',
+          'sender_id',
+          'receiver_id',
+          'status',
+          'created_at',
+          'responded_at',
+        ])
+        && request.resource.data.sender_id == request.auth.uid
+        && request.resource.data.receiver_id is string
+        && request.resource.data.receiver_id != request.auth.uid
+        && request.resource.data.member_uids is list
+        && request.resource.data.member_uids.size() == 2
+        && request.resource.data.member_uids.toSet()
+          == [request.resource.data.sender_id, request.resource.data.receiver_id].toSet()
+        && acceptedFriend(
+          request.resource.data.sender_id,
+          request.resource.data.receiver_id,
+        )
+        && request.resource.data.status == 'pending'
+        && request.resource.data.created_at == request.time
+        && request.resource.data.responded_at == null;
+    }
+
+    function validPingResponse() {
+      return resource.data.status == 'pending'
+        && resource.data.receiver_id == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status',
+          'responded_at',
+        ])
+        && (request.resource.data.status == 'accepted'
+          || request.resource.data.status == 'declined')
+        && request.resource.data.responded_at == request.time;
+    }
+
+    match /users/{uid} {
+      allow get, list: if isOwner(uid);
+      allow create: if isOwner(uid) && validUserCreate();
+      allow update: if isOwner(uid) && onlyUserEditableFields();
+      allow delete: if false;
+
+      match /place_states/{placeId} {
+        allow get, list: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validPlaceState();
+        allow delete: if isOwner(uid);
+      }
+
+      match /place_visit_stats/{placeId} {
+        allow read, write: if false;
+      }
+
+      match /fcm_tokens/{token} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['platform', 'updated_at'])
+          && request.resource.data.platform in ['android', 'ios', 'web']
+          && request.resource.data.updated_at == request.time;
+      }
+    }
+
+    match /public_profiles/{uid} {
+      allow get: if signedIn()
+        && (isOwner(uid)
+          || resource.data.profile_visibility == 'public'
+          || (resource.data.profile_visibility == 'friends'
+            && acceptedFriend(request.auth.uid, uid)));
+      allow list: if signedIn()
+        && resource.data.searchable == true
+        && resource.data.profile_visibility == 'public';
+      allow write: if false;
+    }
+
+    match /friendships/{pairId} {
+      allow get, list: if signedIn()
+        && request.auth.uid in resource.data.member_uids;
+      allow write: if false;
+    }
+
+    match /friend_access/{uid}/members/{otherUid} {
+      allow read, write: if false;
+    }
+
+    match /check_ins/{checkInId} {
+      allow get: if signedIn()
+        && (resource.data.user_id == request.auth.uid
+          || acceptedFriend(request.auth.uid, resource.data.user_id));
+      allow list: if signedIn()
+        && resource.data.user_id == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /check_in_accounting/{checkInId} {
+      allow read, write: if false;
+    }
+
+    match /feeds/{uid}/items/{checkInId} {
+      allow get, list: if isOwner(uid);
+      allow write: if false;
+    }
+
+    match /place_aggregates/{placeId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /places/{placeId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && validPlaceCreate();
+      allow update, delete: if false;
+    }
+
+    match /flavors/{flavorId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && validFlavorCreate();
+      allow update, delete: if false;
+    }
+
+    match /gelato_types/{gelatoTypeId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /pings/{pingId} {
+      allow get: if signedIn()
+        && request.auth.uid in resource.data.member_uids;
+      allow list: if signedIn()
+        && (resource.data.receiver_id == request.auth.uid
+          || request.auth.uid in resource.data.member_uids);
+      allow create: if signedIn() && validPingCreate();
+      allow update: if signedIn() && validPingResponse();
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

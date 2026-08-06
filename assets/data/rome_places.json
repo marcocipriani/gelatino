@@ -1,0 +1,1844 @@
+[
+  {
+    "name": "4F",
+    "address": "Via delle Quattro Fontane, 00184 Roma",
+    "latitude": 41.901599,
+    "longitude": 12.491217
+  },
+  {
+    "name": "Adelina Gelato",
+    "address": "Via del Corso 33, Roma",
+    "latitude": 41.908421,
+    "longitude": 12.477446
+  },
+  {
+    "name": "Al 7º gusto",
+    "address": "Via Monte Urano 9, 00138 Roma",
+    "latitude": 41.984434,
+    "longitude": 12.514005
+  },
+  {
+    "name": "Al vicoletto",
+    "address": "Circonvallazione Cornelia, 00167 Roma",
+    "latitude": 41.899176,
+    "longitude": 12.426979
+  },
+  {
+    "name": "Alaska Gelateria",
+    "address": "Via di Villa Severini 30, Roma",
+    "latitude": 41.947603,
+    "longitude": 12.470351
+  },
+  {
+    "name": "Bar Latteria",
+    "address": "Via Benedetta 7, Roma",
+    "latitude": 41.891505,
+    "longitude": 12.469721
+  },
+  {
+    "name": "Bartoccio",
+    "address": "Via Alessandria, 00198 Roma",
+    "latitude": 41.913065,
+    "longitude": 12.504198
+  },
+  {
+    "name": "Billy's Ice",
+    "address": "Largo dei Colli Albani 22, 00179 Roma",
+    "latitude": 41.869805,
+    "longitude": 12.529794
+  },
+  {
+    "name": "Blue Ice",
+    "address": "Via dei Baullari, 00186 Roma",
+    "latitude": 41.896393,
+    "longitude": 12.47259
+  },
+  {
+    "name": "Blue Ice",
+    "address": "Via Ottaviano, 00192 Roma",
+    "latitude": 41.906799,
+    "longitude": 12.457676
+  },
+  {
+    "name": "Blue Ice",
+    "address": "Via Tuscolana 765, 00175 Roma",
+    "latitude": 41.86047,
+    "longitude": 12.556207
+  },
+  {
+    "name": "Blue Ice",
+    "address": "Via Gasperina 141, 00173 Roma",
+    "latitude": 41.832494,
+    "longitude": 12.5992
+  },
+  {
+    "name": "Blue Ice",
+    "address": "Via del Campo, 00172 Roma",
+    "latitude": 41.876953,
+    "longitude": 12.578327
+  },
+  {
+    "name": "Bonetti",
+    "address": "Piazza del Foro Romano, Roma",
+    "latitude": 41.716473,
+    "longitude": 12.443362
+  },
+  {
+    "name": "Bridgerton",
+    "address": "Corso Vittorio Emanuele Secondo, 00186 Roma",
+    "latitude": 41.896648,
+    "longitude": 12.474108
+  },
+  {
+    "name": "Brivido Gelateria",
+    "address": "Via Giovanni Battista Bodoni 62b, 00153 Roma",
+    "latitude": 41.87935,
+    "longitude": 12.47586
+  },
+  {
+    "name": "Buccianti",
+    "address": "Via Giustiniani, 00186 Roma",
+    "latitude": 41.899525,
+    "longitude": 12.476018
+  },
+  {
+    "name": "Cafe Cancelliere",
+    "address": "Via Amedeo Crivellucci, 00186 Roma",
+    "latitude": 41.868025,
+    "longitude": 12.526532
+  },
+  {
+    "name": "Cafe ristorante",
+    "address": "Via del Babuino, 00187 Roma",
+    "latitude": 41.909044,
+    "longitude": 12.478167
+  },
+  {
+    "name": "Caffè Roma Gelateria",
+    "address": "Piazza di Trevi 100, 00187 Roma",
+    "latitude": 41.900778,
+    "longitude": 12.483032
+  },
+  {
+    "name": "Capitan Cono",
+    "address": "Piazza Testaccio, 00153 Roma",
+    "latitude": 41.879873,
+    "longitude": 12.476684
+  },
+  {
+    "name": "Casa del Gelato",
+    "address": "Viale dell'Industria, 00142 Roma",
+    "latitude": 41.836957,
+    "longitude": 12.47618
+  },
+  {
+    "name": "Casa del gelato Adrian'S",
+    "address": "Viale Ettore Franceschini 75, 00155 Roma",
+    "latitude": 41.911465,
+    "longitude": 12.574792
+  },
+  {
+    "name": "Casa del gelato Gervasio",
+    "address": "Via Quintiliolo 4, 00131 Roma",
+    "latitude": 41.941185,
+    "longitude": 12.62351
+  },
+  {
+    "name": "Chiosco Grattachecca",
+    "address": "Via Magnagrecia, Roma",
+    "latitude": 41.884233,
+    "longitude": 12.509048
+  },
+  {
+    "name": "Chiosco Grattachecca",
+    "address": "Lungomare Duilio, 00112 Roma",
+    "latitude": 41.722377,
+    "longitude": 12.296107
+  },
+  {
+    "name": "Cholo",
+    "address": "Viale dei Misenati, 00122 Roma",
+    "latitude": 41.730303,
+    "longitude": 12.278763
+  },
+  {
+    "name": "Ciuri Ciuri",
+    "address": "Via Leonina 18, 00184 Roma",
+    "latitude": 41.894814,
+    "longitude": 12.491981
+  },
+  {
+    "name": "Come il Latte",
+    "address": "Via Silvio Spaventa 24/26, 00187 Roma",
+    "latitude": 41.907123,
+    "longitude": 12.496046
+  },
+  {
+    "name": "Cream & Friends",
+    "address": "Via Tuscolana 1060, Roma",
+    "latitude": 41.858934,
+    "longitude": 12.558044
+  },
+  {
+    "name": "Crem Caramel",
+    "address": "Via Martana 31, 00141 Roma",
+    "latitude": 41.939128,
+    "longitude": 12.528483
+  },
+  {
+    "name": "Crema & Cioccolato",
+    "address": "Via Antonio Capetti 14, Roma",
+    "latitude": 41.91069,
+    "longitude": 12.661787
+  },
+  {
+    "name": "Crema & Cioccolato",
+    "address": "Via Alessandro Severo 177, Roma",
+    "latitude": 41.854121,
+    "longitude": 12.486178
+  },
+  {
+    "name": "Crema & Cioccolato",
+    "address": "Via Mattè Trucco 42, Roma",
+    "latitude": 41.903924,
+    "longitude": 12.657991
+  },
+  {
+    "name": "Crema & cioccolato",
+    "address": "Via Francesco Donati 62, 00126 Roma",
+    "latitude": 41.77891,
+    "longitude": 12.342189
+  },
+  {
+    "name": "Crema e cioccolato",
+    "address": "Via Flavio Stilicone 13, 00175 Roma",
+    "latitude": 41.861701,
+    "longitude": 12.55604
+  },
+  {
+    "name": "Crema e cioccolato",
+    "address": "Via Statilio Ottato 83, 00175 Roma",
+    "latitude": 41.856843,
+    "longitude": 12.568802
+  },
+  {
+    "name": "Cremeria Aurelia",
+    "address": "Via Aurelia 388, 00165 Roma",
+    "latitude": 41.897846,
+    "longitude": 12.431156
+  },
+  {
+    "name": "Cremeria Monteforte",
+    "address": "Via della Rotonda 22, 00186 Roma",
+    "latitude": 41.898827,
+    "longitude": 12.476374
+  },
+  {
+    "name": "Cremeria Nonno Lillo",
+    "address": "Viale degli Ammiragli 102, Roma",
+    "latitude": 41.90639,
+    "longitude": 12.444134
+  },
+  {
+    "name": "Da Giovanni",
+    "address": "Piazza dei Re di Roma 50, 00183 Roma",
+    "latitude": 41.882549,
+    "longitude": 12.513929
+  },
+  {
+    "name": "Da Quinto",
+    "address": "Via di Tor Millina 15, Roma",
+    "latitude": 41.899229,
+    "longitude": 12.471875
+  },
+  {
+    "name": "Da Romeo",
+    "address": "Via della Croce 82, 00186 Roma",
+    "latitude": 41.906423,
+    "longitude": 12.480461
+  },
+  {
+    "name": "Daniel Gelo",
+    "address": "Via Gabriello Chiabrera 40;42, Roma",
+    "latitude": 41.855658,
+    "longitude": 12.479451
+  },
+  {
+    "name": "Desiderio",
+    "address": "Via Gino Capponi 172, 00179 Roma",
+    "latitude": 41.873269,
+    "longitude": 12.51771
+  },
+  {
+    "name": "Di Noto",
+    "address": "Piazza Colonna 356, Roma",
+    "latitude": 41.900604,
+    "longitude": 12.480141
+  },
+  {
+    "name": "Diverso",
+    "address": "Viale Antonio Ciamarra 98, 00173 Roma",
+    "latitude": 41.849874,
+    "longitude": 12.591504
+  },
+  {
+    "name": "Dolce gelo",
+    "address": "Via Mattia Battistini 109, Roma",
+    "latitude": 41.9071,
+    "longitude": 12.415763
+  },
+  {
+    "name": "Don Nino",
+    "address": "Viale Eritrea 109, 00199 Roma",
+    "latitude": 41.928102,
+    "longitude": 12.515618
+  },
+  {
+    "name": "Don Nino",
+    "address": "Piazza dei Crociferi, 00187 Roma",
+    "latitude": 41.900922,
+    "longitude": 12.482939
+  },
+  {
+    "name": "Don Nino",
+    "address": "Piazza della Madonna dei Monti, 00184 Roma",
+    "latitude": 41.894758,
+    "longitude": 12.490889
+  },
+  {
+    "name": "Duse",
+    "address": "Via Eleonora Duse, 00197 Roma",
+    "latitude": 41.927683,
+    "longitude": 12.491935
+  },
+  {
+    "name": "Elisa",
+    "address": "Via delle Fratte di Trastevere, 00153 Roma",
+    "latitude": 41.887974,
+    "longitude": 12.471375
+  },
+  {
+    "name": "Emmi Gelati",
+    "address": "Via di Casal de' Pazzi 110, 00156 Roma",
+    "latitude": 41.929571,
+    "longitude": 12.567427
+  },
+  {
+    "name": "Er Pozzo der Gelato",
+    "address": "Via del Fontanile Anagnino, 00118 Roma",
+    "latitude": 41.814772,
+    "longitude": 12.605492
+  },
+  {
+    "name": "Farini 32",
+    "address": "Via Farini 32, 00185 Roma",
+    "latitude": 41.898742,
+    "longitude": 12.499075
+  },
+  {
+    "name": "Fatamorgana",
+    "address": "Piazza degli Zingari 5, 00184 Roma",
+    "latitude": 41.895619,
+    "longitude": 12.493245
+  },
+  {
+    "name": "Fatamorgana",
+    "address": "Via Lago di Lesina 9/11, 00199 Roma",
+    "latitude": 41.926551,
+    "longitude": 12.510454
+  },
+  {
+    "name": "Fatamorgana",
+    "address": "Via Belsiana 96, 00187 Roma",
+    "latitude": 41.905989,
+    "longitude": 12.478966
+  },
+  {
+    "name": "Fatamorgana Centro Storico",
+    "address": "Via dei Chiavari 37, 00186 Roma",
+    "latitude": 41.894708,
+    "longitude": 12.474264
+  },
+  {
+    "name": "Fatamorgana Trastevere",
+    "address": "Via Roma Libera 11, 00153 Roma",
+    "latitude": 41.886502,
+    "longitude": 12.469195
+  },
+  {
+    "name": "Fattore Gelato",
+    "address": "Via Andrea Doria, 00192 Roma",
+    "latitude": 41.909433,
+    "longitude": 12.451583
+  },
+  {
+    "name": "Fattori",
+    "address": "Via Alberto da Giussano 80, 00176 Roma",
+    "latitude": 41.888279,
+    "longitude": 12.534799
+  },
+  {
+    "name": "Fior di Luna",
+    "address": "Via della Lungaretta 96, 00153 Roma",
+    "latitude": 41.889607,
+    "longitude": 12.472643
+  },
+  {
+    "name": "Fiordiluna Gelato & Cioccolato",
+    "address": "Via della Lungaretta 96, 00153 Roma",
+    "latitude": 41.889607,
+    "longitude": 12.472643
+  },
+  {
+    "name": "Flor Gelato",
+    "address": "Via Cavour 337, Roma",
+    "latitude": 41.893576,
+    "longitude": 12.488523
+  },
+  {
+    "name": "Formaessenza",
+    "address": "Via Enrico Fermi, 00146 Roma",
+    "latitude": 41.86454,
+    "longitude": 12.472668
+  },
+  {
+    "name": "Freddo",
+    "address": "Piazza Tuscolo 7, 00183 Roma",
+    "latitude": 41.880224,
+    "longitude": 12.508731
+  },
+  {
+    "name": "Frigidarium",
+    "address": "Via del Governo Vecchio 112, 00186 Roma",
+    "latitude": 41.89825,
+    "longitude": 12.470448
+  },
+  {
+    "name": "Frulallà",
+    "address": "Via Leone Quarto, 00192 Roma",
+    "latitude": 41.909909,
+    "longitude": 12.454822
+  },
+  {
+    "name": "Gelando",
+    "address": "Via Cesare Ricotti 10, 00159 Roma",
+    "latitude": 41.898582,
+    "longitude": 12.535495
+  },
+  {
+    "name": "GelAngelo",
+    "address": "Via Cassia 927, 00189 Roma",
+    "latitude": 41.971461,
+    "longitude": 12.433465
+  },
+  {
+    "name": "Gelarmony",
+    "address": "Viale America, 00144 Roma",
+    "latitude": 41.831423,
+    "longitude": 12.463222
+  },
+  {
+    "name": "Gelarmony",
+    "address": "Via Tuscolana, 00175 Roma",
+    "latitude": 41.861851,
+    "longitude": 12.553562
+  },
+  {
+    "name": "Gelarmony",
+    "address": "Via Marcantonio Colonna 34, 00192 Roma",
+    "latitude": 41.909548,
+    "longitude": 12.467094
+  },
+  {
+    "name": "Gelarte",
+    "address": "Viale Eritrea, 00199 Roma",
+    "latitude": 41.927381,
+    "longitude": 12.515579
+  },
+  {
+    "name": "Gelartica",
+    "address": "Largo Vercelli 6, 00182 Roma",
+    "latitude": 41.882237,
+    "longitude": 12.515231
+  },
+  {
+    "name": "Gelatando",
+    "address": "Via Merulana, 00185 Roma",
+    "latitude": 41.889601,
+    "longitude": 12.503103
+  },
+  {
+    "name": "Gelataus",
+    "address": "Via di Bravetta, 00164 Roma",
+    "latitude": 41.884296,
+    "longitude": 12.423996
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via della Stamperia 90, 00187 Roma",
+    "latitude": 41.900863,
+    "longitude": 12.483685
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via Teodoro Valfrè, 00165 Roma",
+    "latitude": 41.894039,
+    "longitude": 12.438291
+  },
+  {
+    "name": "GELATERIA",
+    "address": "Via Livorno, 00162 Roma",
+    "latitude": 41.915378,
+    "longitude": 12.523456
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via Liberiana 20, 00185 Roma",
+    "latitude": 41.897341,
+    "longitude": 12.497675
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via Cavour 289, 00184 Roma",
+    "latitude": 41.893903,
+    "longitude": 12.489817
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via di Casalotti 59, 00166 Roma",
+    "latitude": 41.916045,
+    "longitude": 12.374187
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via dei Pastini 135, 00186 Roma",
+    "latitude": 41.899346,
+    "longitude": 12.477403
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via Ottavio Gigli, 00168 Roma",
+    "latitude": 41.942673,
+    "longitude": 12.421084
+  },
+  {
+    "name": "Gelateria",
+    "address": "Piazza di Santa Maria in Trastevere, 00153 Roma",
+    "latitude": 41.889769,
+    "longitude": 12.470346
+  },
+  {
+    "name": "Gelateria",
+    "address": "Via di San Cosimato 14, Roma",
+    "latitude": 41.888098,
+    "longitude": 12.470478
+  },
+  {
+    "name": "Gelateria Alpina",
+    "address": "Piazza Enrico Fermi 23, 00146 Roma",
+    "latitude": 41.863772,
+    "longitude": 12.46987
+  },
+  {
+    "name": "Gelateria Angelini",
+    "address": "Via Radicofani 210, 00138 Roma",
+    "latitude": 41.972765,
+    "longitude": 12.515236
+  },
+  {
+    "name": "Gelateria Artigianale",
+    "address": "Piazza di Sant'Anastasia, 00153 Roma",
+    "latitude": 41.888005,
+    "longitude": 12.483845
+  },
+  {
+    "name": "Gelateria artigianale",
+    "address": "Via delle Cave 15, 00181 Roma",
+    "latitude": 41.871652,
+    "longitude": 12.52766
+  },
+  {
+    "name": "Gelateria Artigianale Creperia",
+    "address": "Piazza di Santa Maria Liberatrice, 00153 Roma",
+    "latitude": 41.88013,
+    "longitude": 12.476047
+  },
+  {
+    "name": "Gelateria artigianale e…",
+    "address": "Via Pietro Rosa 27, 00122 Roma",
+    "latitude": 41.729936,
+    "longitude": 12.28456
+  },
+  {
+    "name": "Gelateria Bis",
+    "address": "Via Tor de' Schiavi, 00171 Roma",
+    "latitude": 41.893783,
+    "longitude": 12.559157
+  },
+  {
+    "name": "Gelateria CamBIOvita",
+    "address": "Via del Governo Vecchio 54, Roma",
+    "latitude": 41.898241,
+    "longitude": 12.470758
+  },
+  {
+    "name": "Gelateria Candy Cream",
+    "address": "Piazza Pietro Thouar, Roma",
+    "latitude": 41.942804,
+    "longitude": 12.421372
+  },
+  {
+    "name": "Gelateria Consoli",
+    "address": "Via Caio Canuleio 59, Roma",
+    "latitude": 41.852402,
+    "longitude": 12.561643
+  },
+  {
+    "name": "Gelateria Corona",
+    "address": "Largo Arenula 27, Roma",
+    "latitude": 41.894511,
+    "longitude": 12.476085
+  },
+  {
+    "name": "Gelateria Cucurucho",
+    "address": "Via Bernardino Passeri 2, Roma",
+    "latitude": 41.87541,
+    "longitude": 12.467941
+  },
+  {
+    "name": "Gelateria Da Carletto al Borghetto",
+    "address": "Via dei Pescatori 23, 00122 Lido di Ostia, Roma",
+    "latitude": 41.722034,
+    "longitude": 12.302736
+  },
+  {
+    "name": "Gelateria dei Gracchi",
+    "address": "Via dei Gracchi 272, 00192 Roma",
+    "latitude": 41.909188,
+    "longitude": 12.46687
+  },
+  {
+    "name": "Gelateria dei Gracchi",
+    "address": "Via di Ripetta 261, 00186 Roma",
+    "latitude": 41.909652,
+    "longitude": 12.476115
+  },
+  {
+    "name": "Gelateria dei Gracchi",
+    "address": "Via di San Pantaleo 61, Roma",
+    "latitude": 41.897296,
+    "longitude": 12.472561
+  },
+  {
+    "name": "Gelateria del Eros",
+    "address": "Via Fontanellato 68, 00142 Roma",
+    "latitude": 41.847125,
+    "longitude": 12.484694
+  },
+  {
+    "name": "Gelateria Del Monte",
+    "address": "Borgo Pio, 00193 Roma",
+    "latitude": 41.903941,
+    "longitude": 12.45912
+  },
+  {
+    "name": "Gelateria del Parco",
+    "address": "Largo Vittorio Gassman, 00197 Roma",
+    "latitude": 41.91722,
+    "longitude": 12.487396
+  },
+  {
+    "name": "Gelateria del Teatro",
+    "address": "Via dei Coronari 65/66, 00186 Roma",
+    "latitude": 41.900469,
+    "longitude": 12.46957
+  },
+  {
+    "name": "Gelateria dell' Angeletto",
+    "address": "Via dell'Angeletto 15, 00184 Roma",
+    "latitude": 41.894794,
+    "longitude": 12.491512
+  },
+  {
+    "name": "Gelateria della Palma",
+    "address": "Via della Maddalena 19-23, Roma",
+    "latitude": 41.900681,
+    "longitude": 12.476505
+  },
+  {
+    "name": "Gelateria di san crispino",
+    "address": "Piazza della Maddalena, 00186 Roma",
+    "latitude": 41.899948,
+    "longitude": 12.476487
+  },
+  {
+    "name": "Gelateria Diamante",
+    "address": "Via Diego Simonetti, 00122 Roma",
+    "latitude": 41.738115,
+    "longitude": 12.28919
+  },
+  {
+    "name": "Gelateria Fratelli Vecchio",
+    "address": "Via di Tor Pignattara 13a, 00177 Roma",
+    "latitude": 41.879845,
+    "longitude": 12.542288
+  },
+  {
+    "name": "Gelateria Giuffrè",
+    "address": "Viale di Trastevere 255, 00153 Roma",
+    "latitude": 41.875577,
+    "longitude": 12.466029
+  },
+  {
+    "name": "Gelateria Glauco",
+    "address": "Viale della Pineta di Ostia 30g, 00122 Lido di Ostia, Roma",
+    "latitude": 41.728401,
+    "longitude": 12.283481
+  },
+  {
+    "name": "Gelateria Guttilla",
+    "address": "Via Nomentana 271, Roma",
+    "latitude": 41.915378,
+    "longitude": 12.509877
+  },
+  {
+    "name": "Gelateria i Golosoni",
+    "address": "Piazza Augusto Albini 39,40,41, Roma",
+    "latitude": 41.864523,
+    "longitude": 12.483996
+  },
+  {
+    "name": "Gelateria Il Dolce Sorriso",
+    "address": "Via Torcegno 41, 00124 Roma",
+    "latitude": 41.737047,
+    "longitude": 12.37605
+  },
+  {
+    "name": "Gelateria Jimmy Zabaione",
+    "address": "Via Ugo Ojetti 83, 00137 Roma",
+    "latitude": 41.944416,
+    "longitude": 12.550409
+  },
+  {
+    "name": "Gelateria La Paloma",
+    "address": "Via di Sant'Andrea delle Fratte 13, Roma",
+    "latitude": 41.903209,
+    "longitude": 12.483387
+  },
+  {
+    "name": "Gelateria la Romana",
+    "address": "Via Venti Settembre 60, 00187 Roma",
+    "latitude": 41.907794,
+    "longitude": 12.498973
+  },
+  {
+    "name": "Gelateria la Romana",
+    "address": "Via Cola di Rienzo 2, 00193 Roma",
+    "latitude": 41.909167,
+    "longitude": 12.470613
+  },
+  {
+    "name": "Gelateria Lante",
+    "address": "Piazza Federico Marcello Lante 12, 00147 Roma",
+    "latitude": 41.853069,
+    "longitude": 12.502791
+  },
+  {
+    "name": "Gelateria Mamo'",
+    "address": "Piazza Ragusa 43, 00182 Roma",
+    "latitude": 41.881127,
+    "longitude": 12.523215
+  },
+  {
+    "name": "Gelateria Mastro Cono",
+    "address": "Via del Corso 10, Roma",
+    "latitude": 41.909355,
+    "longitude": 12.477103
+  },
+  {
+    "name": "Gelateria Maximo",
+    "address": "Viale Aventino 30, 00153 Roma",
+    "latitude": 41.883052,
+    "longitude": 12.48695
+  },
+  {
+    "name": "Gelateria Miami 3",
+    "address": "Via Silvio D'Amico 22, 00145 Roma",
+    "latitude": 41.851651,
+    "longitude": 12.478215
+  },
+  {
+    "name": "Gelateria Millennium",
+    "address": "Piazza Santa Maria delle Grazie 2a, 00136 Roma",
+    "latitude": 41.907099,
+    "longitude": 12.449897
+  },
+  {
+    "name": "Gelateria Mioni",
+    "address": "Via Michele Buonori 52, 00133 Roma",
+    "latitude": 41.867708,
+    "longitude": 12.631474
+  },
+  {
+    "name": "Gelateria Monti",
+    "address": "Via dei Monti di Primavalle, 00167 Roma",
+    "latitude": 41.906954,
+    "longitude": 12.413752
+  },
+  {
+    "name": "Gelateria Olive Dolci",
+    "address": "Via Emanuele Filiberto 140, Roma",
+    "latitude": 41.888494,
+    "longitude": 12.507873
+  },
+  {
+    "name": "Gelateria Panna e Liquirizia",
+    "address": "Via Magnanapoli 5b, 00187 Roma",
+    "latitude": 41.896142,
+    "longitude": 12.48522
+  },
+  {
+    "name": "Gelateria Pupi di Zucchero",
+    "address": "Via Marcantonio Colonna 36, 00192 Roma",
+    "latitude": 41.909584,
+    "longitude": 12.467076
+  },
+  {
+    "name": "Gelateria Quadrani",
+    "address": "Via Cecilio Stazio, 00100 Roma",
+    "latitude": 41.923214,
+    "longitude": 12.445637
+  },
+  {
+    "name": "Gelateria Reale",
+    "address": "Via di Tor San Giovanni 123, 00139 Roma",
+    "latitude": 41.980525,
+    "longitude": 12.5616
+  },
+  {
+    "name": "Gelateria Salus",
+    "address": "Ciclabile Lungomare di Ostia, 00121 Roma",
+    "latitude": 41.73015,
+    "longitude": 12.274502
+  },
+  {
+    "name": "Gelateria Santa Maria Maggiore",
+    "address": "Via Cavour 93a, 00184 Roma",
+    "latitude": 41.897207,
+    "longitude": 12.495639
+  },
+  {
+    "name": "gelateria Shabry",
+    "address": "Viale Marx 175, 00137 roma",
+    "latitude": 41.937123,
+    "longitude": 12.558894
+  },
+  {
+    "name": "Gelateria Siciliana",
+    "address": "Via Tunisi, 00192 Roma",
+    "latitude": 41.907505,
+    "longitude": 12.452785
+  },
+  {
+    "name": "Gelateria Splash",
+    "address": "Via Eurialo 102, 00181 Roma",
+    "latitude": 41.872139,
+    "longitude": 12.527655
+  },
+  {
+    "name": "Gelateria Steccolecco",
+    "address": "Via del Portico d'Ottavia 6, Roma",
+    "latitude": 41.893104,
+    "longitude": 12.47722
+  },
+  {
+    "name": "Gelateria Tavola Calda",
+    "address": "Via Cicerone 70, Roma",
+    "latitude": 41.908181,
+    "longitude": 12.467916
+  },
+  {
+    "name": "Gelateria Tony",
+    "address": "Piazza San Giovanni di Dio 1, Roma",
+    "latitude": 41.873995,
+    "longitude": 12.447095
+  },
+  {
+    "name": "Gelateria Torcè",
+    "address": "Viale dell'Arte 9a, 00144 Roma",
+    "latitude": 41.832738,
+    "longitude": 12.476307
+  },
+  {
+    "name": "Gelateria Torcè",
+    "address": "Piazza Euclide 25, 00197 Roma",
+    "latitude": 41.926919,
+    "longitude": 12.480514
+  },
+  {
+    "name": "Gelateria Wonderful Ice Cream",
+    "address": "Via Nazionale 19/a, 00184 Roma",
+    "latitude": 41.900911,
+    "longitude": 12.493732
+  },
+  {
+    "name": "Gelateria Zoryani",
+    "address": "Via Cipro 4f, 00136 Roma",
+    "latitude": 41.90823,
+    "longitude": 12.447481
+  },
+  {
+    "name": "Gelaterie GAE",
+    "address": "Viale dell'Aeronautica 47, 00144 Roma",
+    "latitude": 41.826249,
+    "longitude": 12.475934
+  },
+  {
+    "name": "Gelatiera di Ilia",
+    "address": "Via della Marina 30, Roma",
+    "latitude": 41.730768,
+    "longitude": 12.276928
+  },
+  {
+    "name": "Gelato Baciato",
+    "address": "Largo delle Sette Chiese 12, 00145 Roma",
+    "latitude": 41.860791,
+    "longitude": 12.486078
+  },
+  {
+    "name": "Gelato d'Essai",
+    "address": "Via Tor de' Schaivi 295, Roma",
+    "latitude": 41.891244,
+    "longitude": 12.559994
+  },
+  {
+    "name": "Gelato in Trevi s.a.s.",
+    "address": "Via di San Vincenzo 31, Roma",
+    "latitude": 41.90059,
+    "longitude": 12.483625
+  },
+  {
+    "name": "Gelato San Lorenzo",
+    "address": "Via Tiburtina 6, 00185 Roma",
+    "latitude": 41.896952,
+    "longitude": 12.511821
+  },
+  {
+    "name": "Gelato Sicily",
+    "address": "Via Luciano Manara 64, 00153 Roma",
+    "latitude": 41.887967,
+    "longitude": 12.471193
+  },
+  {
+    "name": "Gelato sulle Nuvole",
+    "address": "Via Giuseppe Zanardelli 30, Roma",
+    "latitude": 41.900788,
+    "longitude": 12.472239
+  },
+  {
+    "name": "Gelato Vale",
+    "address": "Corso Vittorio Emanuele Secondo 37, Roma",
+    "latitude": 41.89605,
+    "longitude": 12.477782
+  },
+  {
+    "name": "Gelatomania",
+    "address": "Via Portuense 760, 00148 Roma",
+    "latitude": 41.851194,
+    "longitude": 12.424634
+  },
+  {
+    "name": "Gellatteria del Viale",
+    "address": "Piazza Giuseppe Gioachino Belli, 00153 Roma",
+    "latitude": 41.889882,
+    "longitude": 12.473974
+  },
+  {
+    "name": "Gelosi per Natura",
+    "address": "Via Eschilo, 00124 Roma",
+    "latitude": 41.762038,
+    "longitude": 12.371414
+  },
+  {
+    "name": "Gelosia",
+    "address": "Via Igea, 00135 Roma",
+    "latitude": 41.934552,
+    "longitude": 12.441172
+  },
+  {
+    "name": "Gelosia",
+    "address": "Piazza di Tor San Michele, 00121 Roma",
+    "latitude": 41.731267,
+    "longitude": 12.275413
+  },
+  {
+    "name": "Geló",
+    "address": "Via di Santa Maria Ausiliatrice 52, 00181 Roma",
+    "latitude": 41.873251,
+    "longitude": 12.528213
+  },
+  {
+    "name": "Ghiottonerie Tre Tre",
+    "address": "Via delle Fornaci 33a, Roma",
+    "latitude": 41.898912,
+    "longitude": 12.456363
+  },
+  {
+    "name": "Gia Gelato",
+    "address": "Via Tiburtina, 00159 Roma",
+    "latitude": 41.908422,
+    "longitude": 12.535176
+  },
+  {
+    "name": "Giolitti",
+    "address": "Via degli Uffici del Vicario 40, 00186 Roma",
+    "latitude": 41.901057,
+    "longitude": 12.477248
+  },
+  {
+    "name": "Giulivo",
+    "address": "Via dei Castani 92a, 00172 Roma",
+    "latitude": 41.882744,
+    "longitude": 12.566889
+  },
+  {
+    "name": "Glauco",
+    "address": "Via Panisperna 245, 00184 Roma",
+    "latitude": 41.896323,
+    "longitude": 12.49064
+  },
+  {
+    "name": "GORI Gelato",
+    "address": "Piazza Menenio Agrippa 8, 00141 Roma",
+    "latitude": 41.934873,
+    "longitude": 12.536188
+  },
+  {
+    "name": "Grattacheccaro",
+    "address": "Lungotevere Maresciallo Diaz, 00194 Roma",
+    "latitude": 41.936741,
+    "longitude": 12.466004
+  },
+  {
+    "name": "Grattacheccaro \"Alla Fonte d'Oro\"",
+    "address": "Lungotevere Raffaello Sanzio, 00186 Roma",
+    "latitude": 41.89034,
+    "longitude": 12.473875
+  },
+  {
+    "name": "Grattacheccaro \"Sora Lella\"",
+    "address": "Via di Porta Cavalleggeri, 00193 Roma",
+    "latitude": 41.900383,
+    "longitude": 12.455767
+  },
+  {
+    "name": "Grattacheccaro \"Sora Maria\"",
+    "address": "Via Trionfale, 00192 Roma",
+    "latitude": 41.911904,
+    "longitude": 12.452946
+  },
+  {
+    "name": "Green bar",
+    "address": "Via del Trullo 257, 00148 Roma",
+    "latitude": 41.84452,
+    "longitude": 12.436483
+  },
+  {
+    "name": "Grezzo",
+    "address": "Piazza Mattei 14, 00186 Roma",
+    "latitude": 41.893853,
+    "longitude": 12.477322
+  },
+  {
+    "name": "Grom",
+    "address": "Via Agonale 1, Roma",
+    "latitude": 41.900192,
+    "longitude": 12.473232
+  },
+  {
+    "name": "Grom",
+    "address": "Via Tuscolana 1370, Roma",
+    "latitude": 41.855392,
+    "longitude": 12.564453
+  },
+  {
+    "name": "Grom",
+    "address": "Corso Vittorio Emanuele Secondo, 00186 Roma",
+    "latitude": 41.896324,
+    "longitude": 12.476216
+  },
+  {
+    "name": "Grom",
+    "address": "Via Flaminia, 00197 Roma",
+    "latitude": 41.912137,
+    "longitude": 12.475912
+  },
+  {
+    "name": "Grom",
+    "address": "Galleria Termini, 00185 Roma",
+    "latitude": 41.900509,
+    "longitude": 12.501568
+  },
+  {
+    "name": "Grom",
+    "address": "Via Laurentina 865, 00143 Roma",
+    "latitude": 41.808626,
+    "longitude": 12.485731
+  },
+  {
+    "name": "Grom",
+    "address": "Strada Provinciale 29 Colligiana, Roma",
+    "latitude": 41.817385,
+    "longitude": 12.459509
+  },
+  {
+    "name": "Guttilla",
+    "address": "Via dei Gracchi, 00192 Roma",
+    "latitude": 41.907882,
+    "longitude": 12.462439
+  },
+  {
+    "name": "Günter Gelato",
+    "address": "Via dei Pettinari, 00186 Roma",
+    "latitude": 41.89308,
+    "longitude": 12.471798
+  },
+  {
+    "name": "Günther Gelato",
+    "address": "Piazza di Sant'Eustachio 47, 00186 Roma",
+    "latitude": 41.898447,
+    "longitude": 12.475369
+  },
+  {
+    "name": "Hedera",
+    "address": "Borgo Pio 179, 00193 Roma",
+    "latitude": 41.903787,
+    "longitude": 12.461568
+  },
+  {
+    "name": "I Gemelli",
+    "address": "Via Mario Musco 44/46, 00147 Roma",
+    "latitude": 41.848987,
+    "longitude": 12.487827
+  },
+  {
+    "name": "I Mannari",
+    "address": "Via di Grotta Perfetta, Roma",
+    "latitude": 41.848228,
+    "longitude": 12.486947
+  },
+  {
+    "name": "Iamotti",
+    "address": "Via Trionfale 122, Roma",
+    "latitude": 41.91374,
+    "longitude": 12.451423
+  },
+  {
+    "name": "Ice Dream Factory",
+    "address": "Piazza Camerino 7, 00182 Roma",
+    "latitude": 41.88732,
+    "longitude": 12.519102
+  },
+  {
+    "name": "Iceberg Gelateria Caffetteria",
+    "address": "Via della Pisana 185, 00163 Roma",
+    "latitude": 41.879879,
+    "longitude": 12.417043
+  },
+  {
+    "name": "Il Cannolo Siciliano",
+    "address": "Via Quattro Novembre 95a, Roma",
+    "latitude": 41.896179,
+    "longitude": 12.485398
+  },
+  {
+    "name": "Il Capriccio di Carla",
+    "address": "Via Agostino Depretis 61, Roma",
+    "latitude": 41.899525,
+    "longitude": 12.495277
+  },
+  {
+    "name": "Il cono d'oro",
+    "address": "Via dei Malatesta 4 a, 00164 Roma",
+    "latitude": 41.881508,
+    "longitude": 12.425378
+  },
+  {
+    "name": "Il frutto proibito",
+    "address": "Via Danilo Stiepovich 25, 00121 Roma",
+    "latitude": 41.740346,
+    "longitude": 12.273371
+  },
+  {
+    "name": "Il Gelatario",
+    "address": "Via Tuscolana 325, 00181 Roma",
+    "latitude": 41.875711,
+    "longitude": 12.527622
+  },
+  {
+    "name": "Il Gelato",
+    "address": "Piazza di Santa Maria in Trastevere 4, Roma",
+    "latitude": 41.889763,
+    "longitude": 12.470445
+  },
+  {
+    "name": "Il gelato di Alessandra",
+    "address": "Via Gorgona 28, 00139 Roma",
+    "latitude": 41.947059,
+    "longitude": 12.526302
+  },
+  {
+    "name": "Il Gelato di Dei",
+    "address": "Via Leonardo Bufalini 22, 00176 Roma",
+    "latitude": 41.881997,
+    "longitude": 12.539016
+  },
+  {
+    "name": "Il Gelato di San Crispino",
+    "address": "Via della Panetteria 42, 00187 Roma",
+    "latitude": 41.90163,
+    "longitude": 12.484676
+  },
+  {
+    "name": "il Gelatone",
+    "address": "Via dei Serpenti 130, Roma",
+    "latitude": 41.895668,
+    "longitude": 12.490338
+  },
+  {
+    "name": "Il maestro del Gelato",
+    "address": "Via delle Muratte 75, Roma",
+    "latitude": 41.900421,
+    "longitude": 12.482024
+  },
+  {
+    "name": "Il mio gelato",
+    "address": "Via Salaria 40, 00198 Roma",
+    "latitude": 41.912058,
+    "longitude": 12.497999
+  },
+  {
+    "name": "Il Pellicano",
+    "address": "Piazza Eugenio Biffi 10, Roma",
+    "latitude": 41.866669,
+    "longitude": 12.489877
+  },
+  {
+    "name": "Il Pellicano",
+    "address": "Piazzale di Ponte Milvio 19, Roma",
+    "latitude": 41.937538,
+    "longitude": 12.465737
+  },
+  {
+    "name": "Il principe del gelato 2",
+    "address": "Via Roberto Malatesta, 00177 Roma",
+    "latitude": 41.88695,
+    "longitude": 12.542843
+  },
+  {
+    "name": "K2",
+    "address": "Via Britannia 51, Roma",
+    "latitude": 41.878553,
+    "longitude": 12.508624
+  },
+  {
+    "name": "L'Angolo del Gelato",
+    "address": "Via Trionfale 75c, 00136 Roma",
+    "latitude": 41.914516,
+    "longitude": 12.450228
+  },
+  {
+    "name": "L'angolo Gelato",
+    "address": "Via Alessandro Piola Caselli, 00122 Roma",
+    "latitude": 41.736708,
+    "longitude": 12.290453
+  },
+  {
+    "name": "L'Orso Bianco",
+    "address": "Via Carlo Alberto 7, 00185 Roma",
+    "latitude": 41.89669,
+    "longitude": 12.500122
+  },
+  {
+    "name": "L'orso yogurt",
+    "address": "Via Massa di San Giuliano 360/b, 00132 Roma",
+    "latitude": 41.908873,
+    "longitude": 12.689698
+  },
+  {
+    "name": "La Botega",
+    "address": "Via delle Sette Chiese 107d, 00147 Roma",
+    "latitude": 41.860379,
+    "longitude": 12.493185
+  },
+  {
+    "name": "La bottega del gelato",
+    "address": "Via dei Pastini 18, Roma",
+    "latitude": 41.899608,
+    "longitude": 12.47844
+  },
+  {
+    "name": "La boutique del gelato",
+    "address": "Via Publio Valerio 37, 00175 Roma",
+    "latitude": 41.856867,
+    "longitude": 12.566326
+  },
+  {
+    "name": "La Fabbrica di Gelato",
+    "address": "Piazza Conca d'Oro 41, 00141 Roma",
+    "latitude": 41.938879,
+    "longitude": 12.527978
+  },
+  {
+    "name": "La Gelateria del Pigneto",
+    "address": "Via Pesaro 11, 00176 Roma",
+    "latitude": 41.88978,
+    "longitude": 12.524963
+  },
+  {
+    "name": "La Gelateria di Giulio",
+    "address": "Via della Casetta Mattei, 00148 Roma",
+    "latitude": 41.855357,
+    "longitude": 12.419627
+  },
+  {
+    "name": "La Gourmandise",
+    "address": "Via Felice Cavallotti 36b, 00152 Roma",
+    "latitude": 41.879019,
+    "longitude": 12.46221
+  },
+  {
+    "name": "La Nazionale",
+    "address": "Via Nazionale 206/207, 00184 Roma",
+    "latitude": 41.900163,
+    "longitude": 12.492142
+  },
+  {
+    "name": "La Romana",
+    "address": "Via Ostiense 48, 00155 Roma",
+    "latitude": 41.872183,
+    "longitude": 12.479872
+  },
+  {
+    "name": "La Romana",
+    "address": "Via Magnagrecia 47, 00183 Roma",
+    "latitude": 41.884124,
+    "longitude": 12.509391
+  },
+  {
+    "name": "La Rotonda",
+    "address": "Via Calcinaia 69, 00139 Roma",
+    "latitude": 41.956663,
+    "longitude": 12.518311
+  },
+  {
+    "name": "La Strega Nocciola",
+    "address": "Via della Vite 100, 00187 Roma",
+    "latitude": 41.904063,
+    "longitude": 12.482619
+  },
+  {
+    "name": "La yogurteria",
+    "address": "Via Appia Nuova 143/c, 00183 Roma",
+    "latitude": 41.881365,
+    "longitude": 12.515017
+  },
+  {
+    "name": "Le Bontique",
+    "address": "Via Tuscolana, 00175 Roma",
+    "latitude": 41.859397,
+    "longitude": 12.558163
+  },
+  {
+    "name": "Le Chat il gelato giusto",
+    "address": "Piazza Cesario Console 6, 00122 Roma",
+    "latitude": 41.727192,
+    "longitude": 12.285501
+  },
+  {
+    "name": "Le Dolci Tentazioni",
+    "address": "Via Mario Menghini 71, 00179 Roma",
+    "latitude": 41.868473,
+    "longitude": 12.527347
+  },
+  {
+    "name": "Le granite",
+    "address": "Piazza della Madonna dei Monti, 00184 Roma",
+    "latitude": 41.894778,
+    "longitude": 12.490944
+  },
+  {
+    "name": "Lemongrass",
+    "address": "Viale Giulio Cesare 56, 00165 Roma",
+    "latitude": 41.909538,
+    "longitude": 12.457712
+  },
+  {
+    "name": "Lemongrass",
+    "address": "Via Ottaviano 29, Roma",
+    "latitude": 41.907057,
+    "longitude": 12.457698
+  },
+  {
+    "name": "Lubrano",
+    "address": "Via Cesare Algranati, 00157 Roma",
+    "latitude": 41.909459,
+    "longitude": 12.54409
+  },
+  {
+    "name": "Lubrano",
+    "address": "Via dei Castani 68, 00172 Roma",
+    "latitude": 41.882025,
+    "longitude": 12.56681
+  },
+  {
+    "name": "Lucciano’s #ilmaestrodelgelato",
+    "address": "Via delle Muratte, 00187 Roma",
+    "latitude": 41.900416,
+    "longitude": 12.481865
+  },
+  {
+    "name": "Mamo'",
+    "address": "Via Lorenzo il Magnifico, 00162 Roma",
+    "latitude": 41.911579,
+    "longitude": 12.526451
+  },
+  {
+    "name": "Maravè",
+    "address": "Campo de' Fiori 51, Roma",
+    "latitude": 41.895471,
+    "longitude": 12.472722
+  },
+  {
+    "name": "Mela e Cannella",
+    "address": "Via Oderisi da Gubbio 71, 00146 Roma",
+    "latitude": 41.866369,
+    "longitude": 12.465941
+  },
+  {
+    "name": "Miami",
+    "address": "Piazza Francesco Cucchi 8, 00152 Roma",
+    "latitude": 41.885655,
+    "longitude": 12.458757
+  },
+  {
+    "name": "MILKY Gelateria Naturale",
+    "address": "Viale Guglielmo Marconi 187, 00146 Roma",
+    "latitude": 41.865324,
+    "longitude": 12.469291
+  },
+  {
+    "name": "Mimì",
+    "address": "Via Monte Giberto 7, 00138 Roma",
+    "latitude": 41.97924,
+    "longitude": 12.515951
+  },
+  {
+    "name": "Mister Ice",
+    "address": "Via Efeso 45, Roma",
+    "latitude": 41.854051,
+    "longitude": 12.473562
+  },
+  {
+    "name": "Mo's Gelaterie",
+    "address": "Via Cola di Rienzo, 00192 Roma",
+    "latitude": 41.907492,
+    "longitude": 12.463783
+  },
+  {
+    "name": "Mon Amour",
+    "address": "Via del Casale Agostinelli 139, 00118 Roma",
+    "latitude": 41.814731,
+    "longitude": 12.601072
+  },
+  {
+    "name": "Neve di Latte",
+    "address": "Via Luigi Poletti 6, 00196 Roma",
+    "latitude": 41.929805,
+    "longitude": 12.465105
+  },
+  {
+    "name": "Neve di Latte",
+    "address": "Via Federico Cesi, 00186 Roma",
+    "latitude": 41.906398,
+    "longitude": 12.470634
+  },
+  {
+    "name": "Neve di Latte",
+    "address": "Piazza Carlo Alberto Scotti 12, 00151 Roma",
+    "latitude": 41.869371,
+    "longitude": 12.445878
+  },
+  {
+    "name": "Neve di Latte",
+    "address": "Via dei Banchi Vecchi 140, 00186 Roma",
+    "latitude": 41.897541,
+    "longitude": 12.467789
+  },
+  {
+    "name": "Old Bridge Gelateria",
+    "address": "Viale dei Bastioni di Michelangelo 5, 00192 Roma",
+    "latitude": 41.906386,
+    "longitude": 12.456445
+  },
+  {
+    "name": "Old Bridge Gelateria",
+    "address": "Via di San Bartolomeo de' Vaccinari, 00186 Roma",
+    "latitude": 41.892299,
+    "longitude": 12.474976
+  },
+  {
+    "name": "OldBridge Gelateria Trastevere",
+    "address": "Via della Scala, 00120 Roma",
+    "latitude": 41.890742,
+    "longitude": 12.46854
+  },
+  {
+    "name": "Opera Italiana",
+    "address": "Via Torino 130, 00184 Roma",
+    "latitude": 41.901336,
+    "longitude": 12.495782
+  },
+  {
+    "name": "Orso Goloso",
+    "address": "Via Vittorio Piccinini 13, Roma",
+    "latitude": 41.98342,
+    "longitude": 12.408337
+  },
+  {
+    "name": "Otaleg",
+    "address": "Via di San Cosimato 14a, 00153 Roma",
+    "latitude": 41.888174,
+    "longitude": 12.470463
+  },
+  {
+    "name": "Otaleg",
+    "address": "Viale dei Quattro Venti 70, 00152 Roma",
+    "latitude": 41.883033,
+    "longitude": 12.458524
+  },
+  {
+    "name": "Otaleg gelateria",
+    "address": "Viale dei Colli Portuensi, 00151 Roma",
+    "latitude": 41.861787,
+    "longitude": 12.443094
+  },
+  {
+    "name": "Palazzo del Freddo Giovanni Fassi",
+    "address": "Via Principe Eugenio 65, 00185 Roma",
+    "latitude": 41.893592,
+    "longitude": 12.508134
+  },
+  {
+    "name": "Panna & Co",
+    "address": "Via Marmorata 115, Roma",
+    "latitude": 41.88051,
+    "longitude": 12.47763
+  },
+  {
+    "name": "Panna e cioccolato",
+    "address": "Via delle Albizzie 31, 00172 Roma",
+    "latitude": 41.884171,
+    "longitude": 12.561889
+  },
+  {
+    "name": "Parrini",
+    "address": "Via dei Georgofili 106, 00147 Roma",
+    "latitude": 41.852074,
+    "longitude": 12.493456
+  },
+  {
+    "name": "Pasticceria Gelateria Siciliana",
+    "address": "Piazza di San Cosimato, Roma",
+    "latitude": 41.887847,
+    "longitude": 12.470491
+  },
+  {
+    "name": "Pasticceria Il Giglio",
+    "address": "Via di Casalotti 40, 00166 Roma",
+    "latitude": 41.918123,
+    "longitude": 12.376706
+  },
+  {
+    "name": "Pellegrino",
+    "address": "Via del Pellegrino, 00186 Roma",
+    "latitude": 41.897308,
+    "longitude": 12.46811
+  },
+  {
+    "name": "Pera e Cioccolato",
+    "address": "Piazza della Visione, 00123 Roma",
+    "latitude": 42.003381,
+    "longitude": 12.382456
+  },
+  {
+    "name": "Petrini",
+    "address": "Piazza dell'Alberone 16a, Roma",
+    "latitude": 41.876207,
+    "longitude": 12.521547
+  },
+  {
+    "name": "Pico Gelato",
+    "address": "Largo Ventuno Aprile 1, 00162 Roma",
+    "latitude": 41.917701,
+    "longitude": 12.519785
+  },
+  {
+    "name": "Ping Pong Ice",
+    "address": "Via Calpurnio Fiamma 9a, 00174 Roma",
+    "latitude": 41.859136,
+    "longitude": 12.559304
+  },
+  {
+    "name": "Pompi",
+    "address": "Via della Croce 88, 00187 Roma",
+    "latitude": 41.90645,
+    "longitude": 12.480509
+  },
+  {
+    "name": "Porfiri",
+    "address": "Via di Tor San Giovanni 171/173, 00139 Roma",
+    "latitude": 41.981705,
+    "longitude": 12.563617
+  },
+  {
+    "name": "Procopio",
+    "address": "Piazza dei Re di Roma 39, 00183 Roma",
+    "latitude": 41.882061,
+    "longitude": 12.513198
+  },
+  {
+    "name": "Ragusto Ice Cream",
+    "address": "Via di Santa Dorotea, 00120 Roma",
+    "latitude": 41.891897,
+    "longitude": 12.468633
+  },
+  {
+    "name": "Ribes",
+    "address": "Via Giuseppe Gioachino Belli 43-45, Roma",
+    "latitude": 41.906773,
+    "longitude": 12.469166
+  },
+  {
+    "name": "Rivareno",
+    "address": "Via Magnagrecia 25, 00183 Roma",
+    "latitude": 41.884703,
+    "longitude": 12.509635
+  },
+  {
+    "name": "San Lorenzo",
+    "address": "Via Alessandria, 00198 Roma",
+    "latitude": 41.910953,
+    "longitude": 12.501273
+  },
+  {
+    "name": "Sicily",
+    "address": "Piazza Rondanini 35, 00186 Roma",
+    "latitude": 41.9,
+    "longitude": 12.476325
+  },
+  {
+    "name": "Smile",
+    "address": "Via Giuseppe Gregoraci 57/a, 00173 Roma",
+    "latitude": 41.844158,
+    "longitude": 12.599339
+  },
+  {
+    "name": "Soft Ippocrate",
+    "address": "Viale Ippocrate 22, Roma",
+    "latitude": 41.909108,
+    "longitude": 12.520387
+  },
+  {
+    "name": "Sora Lella",
+    "address": "Piazza di San Bartolomeo all'Isola, 00153 Roma",
+    "latitude": 41.890717,
+    "longitude": 12.477928
+  },
+  {
+    "name": "Steccolecco",
+    "address": "Viale della Moschea 7, Roma",
+    "latitude": 41.93004,
+    "longitude": 12.484262
+  },
+  {
+    "name": "Steccolecco",
+    "address": "Via Riano 1, Roma",
+    "latitude": 41.9389,
+    "longitude": 12.46905
+  },
+  {
+    "name": "Stop&Go",
+    "address": "Viale Tito Labieno 6, 00174 Roma",
+    "latitude": 41.853534,
+    "longitude": 12.567128
+  },
+  {
+    "name": "Strawberry Fields - Gelato D'essai",
+    "address": "Viale Battista Bardanzellu 77, Roma",
+    "latitude": 41.915517,
+    "longitude": 12.575506
+  },
+  {
+    "name": "Sweet Ice",
+    "address": "Via di Acilia 29, 00125 Roma",
+    "latitude": 41.783822,
+    "longitude": 12.364966
+  },
+  {
+    "name": "Sweet Life",
+    "address": "Corso Vittorio Emanuele II 270, Roma",
+    "latitude": 41.898049,
+    "longitude": 12.468248
+  },
+  {
+    "name": "Sweety Gelato",
+    "address": "Via Flaminia 492, Roma",
+    "latitude": 41.938264,
+    "longitude": 12.468732
+  },
+  {
+    "name": "Sweety Gelato",
+    "address": "Via del Biscione 9, Roma",
+    "latitude": 41.895631,
+    "longitude": 12.472924
+  },
+  {
+    "name": "Tempesta di Gusti",
+    "address": "Via del Pigneto 191, 00176 Roma",
+    "latitude": 41.888283,
+    "longitude": 12.529565
+  },
+  {
+    "name": "Terra",
+    "address": "Via Merulana, 00184 Roma",
+    "latitude": 41.89672,
+    "longitude": 12.499469
+  },
+  {
+    "name": "The Gelatist",
+    "address": "Via Nazionale 160, 00184 Roma",
+    "latitude": 41.896893,
+    "longitude": 12.487138
+  },
+  {
+    "name": "The Gelatist",
+    "address": "Via del Tritone 90, 00187 Roma",
+    "latitude": 41.903158,
+    "longitude": 12.486422
+  },
+  {
+    "name": "The Gelatist",
+    "address": "Via Tuscolana 989, 00175 Roma",
+    "latitude": 41.854645,
+    "longitude": 12.566601
+  },
+  {
+    "name": "The Gelatist",
+    "address": "Via del Corso 74, Roma",
+    "latitude": 41.907028,
+    "longitude": 12.477986
+  },
+  {
+    "name": "The Gelatist",
+    "address": "Via del Corso 293, 00186 Roma",
+    "latitude": 41.896918,
+    "longitude": 12.482219
+  },
+  {
+    "name": "The Gelatist",
+    "address": "Via delle Quattro Fontane, 00817 Roma",
+    "latitude": 41.900834,
+    "longitude": 12.492894
+  },
+  {
+    "name": "Time Out",
+    "address": "Viale dei Misenati, 00122 Roma",
+    "latitude": 41.730084,
+    "longitude": 12.279276
+  },
+  {
+    "name": "Tiramisù",
+    "address": "Via Appiano, 00136 Roma",
+    "latitude": 41.913147,
+    "longitude": 12.44097
+  },
+  {
+    "name": "Tony",
+    "address": "Via Luigi Ronzoni, 00151 Roma",
+    "latitude": 41.866522,
+    "longitude": 12.44445
+  },
+  {
+    "name": "Torcè",
+    "address": "Viale dell'Aeronautica 105, Roma",
+    "latitude": 41.826356,
+    "longitude": 12.477325
+  },
+  {
+    "name": "Torcè",
+    "address": "Viale Aventino 59, 00153 Roma",
+    "latitude": 41.881429,
+    "longitude": 12.485793
+  },
+  {
+    "name": "Tropical Ice",
+    "address": "Via Nomentana 115, 00198 Roma",
+    "latitude": 41.911594,
+    "longitude": 12.504272
+  },
+  {
+    "name": "Vacanze Romane",
+    "address": "Piazza d'Aracoeli, 00186 Roma",
+    "latitude": 41.894383,
+    "longitude": 12.480869
+  },
+  {
+    "name": "Venchi",
+    "address": "Via della Croce 25/26, Roma",
+    "latitude": 41.9062,
+    "longitude": 12.480122
+  },
+  {
+    "name": "Venchi",
+    "address": "Via del Corso 335, 00186 Roma",
+    "latitude": 41.900086,
+    "longitude": 12.480701
+  },
+  {
+    "name": "Verde pistacchio",
+    "address": "Via Nazionale 239, 00184 Roma",
+    "latitude": 41.90131,
+    "longitude": 12.493906
+  },
+  {
+    "name": "Very Buono",
+    "address": "Via di San Giovanni in Laterano 120, 00184 Roma",
+    "latitude": 41.888977,
+    "longitude": 12.497769
+  },
+  {
+    "name": "Yo Yogurt",
+    "address": "Via Luigi Condorelli, 00144 Roma",
+    "latitude": 41.817238,
+    "longitude": 12.459815
+  },
+  {
+    "name": "Yogurteria",
+    "address": "Largo dei Librari 86, 00186 Roma",
+    "latitude": 41.894708,
+    "longitude": 12.473723
+  },
+  {
+    "name": "Yogurteria",
+    "address": "Via Giosuè Carducci 24, Roma",
+    "latitude": 41.905846,
+    "longitude": 12.493048
+  },
+  {
+    "name": "YoYogurt",
+    "address": "Via Laurentina 865, 00143 Roma",
+    "latitude": 41.807889,
+    "longitude": 12.48579
+  }
+]

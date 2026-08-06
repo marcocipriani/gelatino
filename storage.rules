@@ -1,0 +1,55 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isAcceptedFriend(uidA, uidB) {
+      return signedIn()
+        && firestore.exists(/databases/(default)/documents/friend_access/$(uidA)/members/$(uidB));
+    }
+
+    function canonicalCheckInBelongsTo(userId, checkInId) {
+      return firestore.get(/databases/(default)/documents/check_ins/$(checkInId)).data.user_id
+        == userId;
+    }
+
+    function isJpegAtMost(maxBytes) {
+      return request.resource != null
+        && request.resource.contentType == 'image/jpeg'
+        && request.resource.size <= maxBytes;
+    }
+
+    match /staging/{userId}/{fileName} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && fileName.matches('^[A-Za-z0-9_-]{20,64}\\.jpg$')
+        && isJpegAtMost(5 * 1024 * 1024);
+      allow delete: if isOwner(userId);
+    }
+
+    match /check_ins/{userId}/{checkInId}/{fileName} {
+      allow read: if signedIn()
+        && canonicalCheckInBelongsTo(userId, checkInId)
+        && (isOwner(userId) || isAcceptedFriend(request.auth.uid, userId));
+      allow write: if false;
+    }
+
+    match /avatars/{userId}/{fileName} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(userId)
+        && fileName.matches('^[A-Za-z0-9_-]+\\.jpg$')
+        && isJpegAtMost(2 * 1024 * 1024);
+      allow delete: if isOwner(userId);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

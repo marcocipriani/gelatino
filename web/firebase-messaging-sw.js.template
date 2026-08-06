@@ -1,0 +1,22 @@
+// Firebase Cloud Messaging service worker.
+// Standard compat initialization — no custom message handling.
+// The FCM JS SDK auto-displays background messages that carry a
+// `notification` payload (which is all our triggers send); registering our
+// own onBackgroundMessage handler on top of that double-fires the
+// notification, so we deliberately leave this to the SDK default.
+//
+// Copia questo file in `web/firebase-messaging-sw.js` e incolla i valori
+// della tua web app Firebase (gli stessi che `flutterfire configure` scrive
+// in `lib/firebase_options.dart`, blocco `web`).
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: 'LA_TUA_API_KEY_WEB',
+  authDomain: 'IL_TUO_PROGETTO.firebaseapp.com',
+  projectId: 'IL_TUO_PROGETTO',
+  messagingSenderId: 'IL_TUO_SENDER_ID',
+  appId: 'IL_TUO_APP_ID_WEB',
+});
+
+firebase.messaging();
