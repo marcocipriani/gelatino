@@ -30,6 +30,7 @@ import 'photo_step.dart';
 import 'place_step.dart';
 import 'share_step.dart';
 import '../../constants/app_strings.dart';
+import '../../services/storage_service.dart' show checkInPhotoMaxWidth;
 
 final class CheckInFlow extends ConsumerStatefulWidget {
   const CheckInFlow({
@@ -451,8 +452,10 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
     try {
       final picked = await picker.pickImage(
         source: source,
-        maxWidth: 1600,
-        maxHeight: 1600,
+        // Width only, like the upload, so portrait photos keep their height.
+        // Decoding a larger image only to shrink it again is the slow part on
+        // web, where compression runs on the UI thread.
+        maxWidth: checkInPhotoMaxWidth.toDouble(),
         imageQuality: 90,
       );
       if (picked == null || !_isSnapshotCurrent(lifecycle)) return;

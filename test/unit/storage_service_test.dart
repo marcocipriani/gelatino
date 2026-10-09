@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
 import 'package:gelatino/services/storage_service.dart';
 
 void main() {
@@ -10,6 +11,30 @@ void main() {
   final png = base64Decode(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
   );
+
+  test('bakes EXIF orientation into pixels and drops all EXIF', () {
+    final source = img.Image(width: 4, height: 2)
+      ..exif.imageIfd.orientation = 6
+      ..exif.imageIfd['Make'] = img.IfdValueAscii('Phone');
+    final encoded = encodeJpegForUpload(
+      JpegUploadJob(img.encodeJpg(source), maxWidth: 1024, quality: 70),
+    )!;
+
+    final decoded = img.decodeJpg(encoded)!;
+    expect((decoded.width, decoded.height), (2, 4));
+    expect(decoded.exif.isEmpty, isTrue);
+  });
+
+  test('downscales to the max width and never upscales', () {
+    JpegUploadJob job(int width) => JpegUploadJob(
+      img.encodeJpg(img.Image(width: width, height: width ~/ 2)),
+      maxWidth: 100,
+      quality: 70,
+    );
+
+    expect(img.decodeJpg(encodeJpegForUpload(job(400))!)!.width, 100);
+    expect(img.decodeJpg(encodeJpegForUpload(job(60))!)!.width, 60);
+  });
 
   test('uploads a real JPEG to the exact private staging path', () async {
     final gateway = _RecordingStorageGateway();

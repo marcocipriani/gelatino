@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img;
 import '../firebase/firebase_providers.dart';
@@ -30,6 +30,59 @@ final class FirebaseStorageObjectGateway implements StorageObjectGateway {
       _storage.ref().child(path).getData(maxBytes);
 }
 
+/// Upload widths. The pickers request the same bound so the client never
+/// decodes more pixels than it keeps.
+const int checkInPhotoMaxWidth = 1024;
+const int avatarMaxWidth = 512;
+
+final class JpegUploadJob {
+  const JpegUploadJob(
+    this.bytes, {
+    required this.maxWidth,
+    required this.quality,
+  });
+
+  final Uint8List bytes;
+  final int maxWidth;
+  final int quality;
+}
+
+/// Top-level so [compute] can run it in a background isolate. Returns null
+/// when the bytes are not a decodable image.
+///
+/// The EXIF orientation is baked into the pixels and all EXIF is then dropped:
+/// phone photos carry GPS coordinates and device details that must not reach
+/// friends who can read the published photo.
+@visibleForTesting
+Uint8List? encodeJpegForUpload(JpegUploadJob job) {
+  img.Image? image;
+  try {
+    image = img.decodeImage(job.bytes);
+  } catch (_) {
+    return null;
+  }
+  if (image == null) return null;
+  final orientation = image.exif.imageIfd.orientation;
+  if (orientation != null && orientation != 1) {
+    image = img.bakeOrientation(image);
+  }
+  if (image.width > job.maxWidth) {
+    image = img.copyResize(
+      image,
+      width: job.maxWidth,
+      interpolation: img.Interpolation.average,
+    );
+  }
+  image.exif = img.ExifData();
+  return Uint8List.fromList(img.encodeJpg(image, quality: job.quality));
+}
+
+Future<Uint8List?> _encodeInBackground(JpegUploadJob job) =>
+    compute(encodeJpegForUpload, job);
+
+Future<Uint8List?> _encodeInline(JpegUploadJob job) async =>
+    encodeJpegForUpload(job);
+
 final class StorageImageFailure implements Exception {
   const StorageImageFailure();
 
@@ -39,31 +92,32 @@ final class StorageImageFailure implements Exception {
 
 class StorageService {
   StorageService(FirebaseStorage storage)
-    : _gateway = FirebaseStorageObjectGateway(storage);
+    : _gateway = FirebaseStorageObjectGateway(storage),
+      _encodeJpeg = _encodeInBackground;
 
-  StorageService.forTesting(this._gateway);
+  /// Encodes inline: a real isolate never completes under the fake clock of
+  /// widget tests.
+  StorageService.forTesting(this._gateway) : _encodeJpeg = _encodeInline;
 
   final StorageObjectGateway _gateway;
+  final Future<Uint8List?> Function(JpegUploadJob job) _encodeJpeg;
 
-  /// Resizes (never upscales) and re-encodes to JPEG. JPEG keeps photos small
-  /// (tens of KB) instead of the multi-MB PNGs the old path produced, which is
-  /// what was burning through the Storage quota.
-  Uint8List _compressToJpeg(
+  /// Resizes (never upscales) and re-encodes to JPEG off the UI thread.
+  /// JPEG keeps photos small (tens of KB) instead of the multi-MB PNGs the old
+  /// path produced, which is what was burning through the Storage quota.
+  ///
+  /// `compute` runs inline on web, where isolates are unavailable; there the
+  /// picker already delivers an image at the target size, so the work is small.
+  Future<Uint8List> _compressToJpeg(
     Uint8List bytes, {
-    int maxWidth = 1024,
-    int quality = 70,
-  }) {
-    final img.Image? decoded;
-    try {
-      decoded = img.decodeImage(bytes);
-    } catch (_) {
-      throw const StorageImageFailure();
-    }
-    if (decoded == null) throw const StorageImageFailure();
-    final resized = decoded.width > maxWidth
-        ? img.copyResize(decoded, width: maxWidth)
-        : decoded;
-    return Uint8List.fromList(img.encodeJpg(resized, quality: quality));
+    required int maxWidth,
+    required int quality,
+  }) async {
+    final encoded = await _encodeJpeg(
+      JpegUploadJob(bytes, maxWidth: maxWidth, quality: quality),
+    );
+    if (encoded == null) throw const StorageImageFailure();
+    return encoded;
   }
 
   Future<String> uploadStagingPhoto({
@@ -75,7 +129,11 @@ class StorageService {
     if (!RegExp(r'^[A-Za-z0-9_-]{20,64}$').hasMatch(checkInId)) {
       throw const FormatException('checkInId: invalid');
     }
-    final jpegBytes = _compressToJpeg(bytes, maxWidth: 1024, quality: 70);
+    final jpegBytes = await _compressToJpeg(
+      bytes,
+      maxWidth: checkInPhotoMaxWidth,
+      quality: 70,
+    );
     final path = 'staging/$uid/$checkInId.jpg';
     return _gateway.put(
       path,
@@ -112,7 +170,11 @@ class StorageService {
     if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(version)) {
       throw const FormatException('version: invalid');
     }
-    final jpegBytes = _compressToJpeg(bytes, maxWidth: 512, quality: 75);
+    final jpegBytes = await _compressToJpeg(
+      bytes,
+      maxWidth: avatarMaxWidth,
+      quality: 75,
+    );
     final path = 'avatars/$uid/$version.jpg';
     return _gateway.put(
       path,
