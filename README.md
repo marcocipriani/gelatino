@@ -91,7 +91,8 @@ Mi piace → **Fragola** · Preferiti → **Sorbetto** · Salvati/da provare →
 *   Tile vettoriale OpenStreetMap o satellitare ArcGIS.
 
 ### 6. Creazione Check-in (`CheckInScreen`)
-*   **Upload JPEG compresso** (pacchetto `image`, ridimensionamento + `cache-control`) su Firebase Storage — leggero, evita sprechi di quota.
+*   **Upload JPEG compresso** (pacchetto `image`, ridimensionamento + `cache-control`) su Firebase Storage — leggero, evita sprechi di quota. La compressione gira in un isolate (inline su web), applica l'orientamento EXIF ai pixel e rimuove tutti i metadati EXIF (GPS incluso).
+*   **Cache su disco** (mobile/desktop) per foto e avatar pubblicati: i path sono versionati e immutabili, quindi un riavvio non riscarica il feed. Svuotata al logout.
 *   Associazione a gelateria esistente/nuova; gusti con chip interattivi; sequenza aptica al successo.
 *   **Formato del gelato:** catalogo Firestore con chip personalizzate, selezione singola obbligatoria e lista espandibile.
 

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../services/media_cache/media_disk_cache.dart';
 import '../services/storage_service.dart';
 
 const int checkInMediaMaxBytes = 5 * 1024 * 1024;
@@ -34,13 +36,24 @@ final class AuthenticatedMediaKey {
 /// re-download the whole object on the way back. Photos are capped at 1024px /
 /// quality 70 upstream, so a long feed holds single-digit megabytes.
 ///
+/// Immutable objects are also persisted by [MediaDiskCache], so they survive
+/// app restarts without another Storage download (and its rules lookups).
+///
 /// Two retries with backoff cover transient network failures; past that the
 /// keyed provider is invalidated by the manual retry affordance in
 /// `AuthenticatedStorageImage`.
-final mediaBytesProvider = FutureProvider
-    .family<Uint8List?, AuthenticatedMediaKey>((ref, key) {
-      return ref
-          .watch(storageServiceProvider)
-          .readAuthenticatedObject(key.path, maxBytes: key.maxBytes);
-    }, retry: (retryCount, error) =>
-        retryCount < 2 ? Duration(seconds: 1 << retryCount) : null);
+final mediaBytesProvider =
+    FutureProvider.family<Uint8List?, AuthenticatedMediaKey>(
+      (ref, key) async {
+        final cache = ref.watch(mediaDiskCacheProvider);
+        final cached = await cache.read(key.path, maxBytes: key.maxBytes);
+        if (cached != null) return cached;
+        final bytes = await ref
+            .watch(storageServiceProvider)
+            .readAuthenticatedObject(key.path, maxBytes: key.maxBytes);
+        if (bytes != null) unawaited(cache.write(key.path, bytes));
+        return bytes;
+      },
+      retry: (retryCount, error) =>
+          retryCount < 2 ? Duration(seconds: 1 << retryCount) : null,
+    );

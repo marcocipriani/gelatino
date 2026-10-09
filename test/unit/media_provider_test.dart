@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gelatino/providers/media_provider.dart';
+import 'package:gelatino/services/media_cache/media_disk_cache.dart';
 import 'package:gelatino/services/storage_service.dart';
 
 void main() {
@@ -97,6 +98,23 @@ void main() {
     },
   );
 
+  test('disk cache hit skips Storage and a miss is written back', () async {
+    final gateway = _MediaGateway()..result = Uint8List.fromList([7]);
+    final cache = _MemoryCache()
+      ..entries['avatars/alice/v1.jpg'] = Uint8List.fromList([1]);
+    final container = _container(gateway, cache: cache);
+    addTearDown(container.dispose);
+    const hit = AuthenticatedMediaKey('avatars/alice/v1.jpg', 20);
+    const miss = AuthenticatedMediaKey('avatars/alice/v2.jpg', 20);
+
+    expect(await container.read(mediaBytesProvider(hit).future), [1]);
+    expect(await container.read(mediaBytesProvider(miss).future), [7]);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(gateway.reads.map((read) => read.path), [miss.path]);
+    expect(cache.entries[miss.path], [7]);
+  });
+
   test('retry invalidates only the failed request key', () async {
     final gateway = _MediaGateway()..result = Uint8List.fromList([1]);
     final container = _container(gateway);
@@ -130,13 +148,32 @@ void main() {
   });
 }
 
-ProviderContainer _container(_MediaGateway gateway) => ProviderContainer(
+ProviderContainer _container(
+  _MediaGateway gateway, {
+  MediaDiskCache cache = const NoMediaDiskCache(),
+}) => ProviderContainer(
   overrides: [
     storageServiceProvider.overrideWithValue(
       StorageService.forTesting(gateway),
     ),
+    mediaDiskCacheProvider.overrideWithValue(cache),
   ],
 );
+
+final class _MemoryCache implements MediaDiskCache {
+  final entries = <String, Uint8List>{};
+
+  @override
+  Future<Uint8List?> read(String path, {required int maxBytes}) async =>
+      entries[path];
+
+  @override
+  Future<void> write(String path, Uint8List bytes) async =>
+      entries[path] = bytes;
+
+  @override
+  Future<void> clear() async => entries.clear();
+}
 
 final class _MediaGateway implements StorageObjectGateway {
   final List<({String path, int maxBytes})> reads = [];
