@@ -163,12 +163,23 @@ Infine pubblica le regole e gli indici:
 firebase deploy --only firestore:rules,firestore:indexes,storage --project IL_TUO_PROGETTO
 ```
 
+Su web foto e avatar si leggono con `getData()` (nessun download token
+pubblico), che il browser blocca se il bucket non ha una policy CORS. Senza
+questo passo le immagini restano sull'icona di errore. Aggiorna le origini in
+[storage.cors.json](storage.cors.json) se usi altri domini, poi:
+
+```bash
+gcloud storage buckets update gs://IL_TUO_BUCKET --cors-file=storage.cors.json
+# in locale usa la stessa porta dichiarata nel file:
+flutter run -d chrome --web-port 5000
+```
+
 ### Esecuzione & Test
 ```bash
 flutter analyze
 flutter test
 flutter run            # dispositivo/simulatore
-flutter run -d chrome  # web
+flutter run -d chrome --web-port 5000  # web (porta ammessa dal CORS)
 
 cd functions && npm install && npm test   # test delle Cloud Functions
 ```

@@ -1,0 +1,19 @@
+[
+  {
+    "origin": [
+      "https://gelatino.web.app",
+      "https://gelatino.firebaseapp.com",
+      "http://localhost:5000"
+    ],
+    "method": ["GET", "HEAD"],
+    "responseHeader": [
+      "Authorization",
+      "Content-Type",
+      "Cache-Control",
+      "X-Firebase-Storage-Version",
+      "X-Firebase-GMPID",
+      "X-Firebase-AppCheck"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]
