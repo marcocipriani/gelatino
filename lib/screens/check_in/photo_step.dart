@@ -11,6 +11,7 @@ final class PhotoStep extends StatelessWidget {
     required this.bytes,
     required this.hasStagedPhoto,
     required this.isUploading,
+    this.uploadProgress,
     required this.photoMissing,
     required this.uploadFailed,
     required this.onCamera,
@@ -25,6 +26,7 @@ final class PhotoStep extends StatelessWidget {
   final Uint8List? bytes;
   final bool hasStagedPhoto;
   final bool isUploading;
+  final double? uploadProgress;
   final bool photoMissing;
   final bool uploadFailed;
   final VoidCallback? onCamera;
@@ -104,7 +106,9 @@ final class PhotoStep extends StatelessWidget {
         ],
       ),
       const SizedBox(height: 12),
-      if (isUploading)
+      if (isUploading && uploadProgress != null)
+        _UploadProgress(fraction: uploadProgress!)
+      else if (isUploading)
         const Row(
           children: <Widget>[
             SizedBox.square(
@@ -136,4 +140,30 @@ final class PhotoStep extends StatelessWidget {
         ),
     ],
   );
+}
+
+final class _UploadProgress extends StatelessWidget {
+  const _UploadProgress({required this.fraction});
+
+  final double fraction;
+
+  @override
+  Widget build(BuildContext context) {
+    final percent = (fraction.clamp(0.0, 1.0) * 100).round();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            key: const ValueKey<String>('check-in-upload-progress'),
+            value: fraction.clamp(0.0, 1.0),
+            minHeight: 6,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(AppStrings.checkInUploadingPercent(percent)),
+      ],
+    );
+  }
 }

@@ -34,6 +34,7 @@ final class CheckInFlowState {
     this.isInitializing = true,
     this.isSaving = false,
     this.isUploading = false,
+    this.uploadProgress,
     this.isPublishing = false,
     this.isResolvingPlace = false,
     this.isDirty = false,
@@ -51,6 +52,10 @@ final class CheckInFlowState {
   final bool isInitializing;
   final bool isSaving;
   final bool isUploading;
+
+  /// Fraction of the staging upload sent, while [isUploading]. Null before
+  /// the bytes start moving (compression) and when the platform reports none.
+  final double? uploadProgress;
   final bool isPublishing;
   final bool isResolvingPlace;
   final bool isDirty;
@@ -77,6 +82,7 @@ final class CheckInFlowState {
     bool? isInitializing,
     bool? isSaving,
     bool? isUploading,
+    Object? uploadProgress = _flowUnset,
     bool? isPublishing,
     bool? isResolvingPlace,
     bool? isDirty,
@@ -95,6 +101,9 @@ final class CheckInFlowState {
     isInitializing: isInitializing ?? this.isInitializing,
     isSaving: isSaving ?? this.isSaving,
     isUploading: isUploading ?? this.isUploading,
+    uploadProgress: identical(uploadProgress, _flowUnset)
+        ? this.uploadProgress
+        : uploadProgress as double?,
     isPublishing: isPublishing ?? this.isPublishing,
     isResolvingPlace: isResolvingPlace ?? this.isResolvingPlace,
     isDirty: isDirty ?? this.isDirty,

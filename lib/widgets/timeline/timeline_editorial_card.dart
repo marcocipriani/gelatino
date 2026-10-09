@@ -27,11 +27,15 @@ final class TimelineEditorialCard extends StatelessWidget {
     final username = item.userSnapshot['display_name'] as String;
     final avatarPath = item.userSnapshot['avatar_path'] as String?;
     final placeName = item.placeSnapshot['name'] as String;
+    final photoColor = item.photoColor;
     final photo = ColoredBox(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: photoColor == null
+          ? Theme.of(context).colorScheme.surfaceContainerHighest
+          : Color(photoColor),
       child: AuthenticatedCheckInPhoto(
         path: item.photoStoragePath,
         semanticLabel: AppStrings.timelinePhotoSemantic(placeName),
+        placeholderColor: photoColor == null ? null : Color(photoColor),
       ),
     );
     final metadata = _TimelineMetadata(item: item, placeName: placeName);
@@ -100,14 +104,20 @@ final class TimelineEditorialCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    AspectRatio(aspectRatio: 16 / 9, child: photo),
+                    AspectRatio(
+                      aspectRatio: AppLayout.checkInPhotoAspectRatio,
+                      child: photo,
+                    ),
                     metadata,
                   ],
                 ),
               ),
             )
           else ...<Widget>[
-            AspectRatio(aspectRatio: 16 / 9, child: photo),
+            AspectRatio(
+                      aspectRatio: AppLayout.checkInPhotoAspectRatio,
+                      child: photo,
+                    ),
             metadata,
           ],
         ],

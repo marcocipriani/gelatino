@@ -12,6 +12,7 @@ import 'package:gelatino/services/storage_service.dart';
 import 'package:gelatino/widgets/authenticated_check_in_photo.dart';
 import 'package:gelatino/widgets/authenticated_storage_image.dart';
 import 'package:gelatino/widgets/avatar_image_provider.dart';
+import 'package:gelatino/widgets/check_in_photo_prefetch.dart';
 import 'package:gelatino/widgets/skeleton_loader.dart';
 
 void main() {
@@ -44,6 +45,59 @@ void main() {
       path: 'check_ins/alice/id/1.jpg',
       maxBytes: 123,
     ));
+  });
+
+  testWidgets('prefetch reads each new photo once with the check-in cap', (
+    tester,
+  ) async {
+    final gateway = _ImageGateway()..result = _onePixelPng();
+    await tester.pumpWidget(
+      _app(gateway, const CheckInPhotoPrefetch(paths: <String>['a/1.jpg'])),
+    );
+    await tester.pumpWidget(
+      _app(
+        gateway,
+        const CheckInPhotoPrefetch(paths: <String>['a/1.jpg', 'b/1.jpg']),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(gateway.reads, [
+      (path: 'a/1.jpg', maxBytes: checkInMediaMaxBytes),
+      (path: 'b/1.jpg', maxBytes: checkInMediaMaxBytes),
+    ]);
+  });
+
+  testWidgets('placeholder colour replaces the skeleton while loading', (
+    tester,
+  ) async {
+    final pending = Completer<Uint8List?>();
+    final gateway = _ImageGateway()..pending = pending;
+    await tester.pumpWidget(
+      _app(
+        gateway,
+        const AuthenticatedStorageImage(
+          path: 'check_ins/alice/id/1.jpg',
+          maxBytes: 123,
+          semanticLabel: 'Gelato',
+          width: 120,
+          height: 160,
+          placeholderColor: Color(0xFFC81428),
+        ),
+      ),
+    );
+
+    final placeholder = find.byKey(
+      const ValueKey<String>('media-color-placeholder'),
+    );
+    expect(placeholder, findsOneWidget);
+    expect(tester.widget<ColoredBox>(placeholder).color, const Color(0xFFC81428));
+    expect(find.byType(SkeletonBox), findsNothing);
+
+    pending.complete(_onePixelPng());
+    await tester.pumpAndSettle();
+    expect(placeholder, findsNothing);
+    expect(find.byType(Image), findsOneWidget);
   });
 
   testWidgets(
@@ -245,7 +299,10 @@ void main() {
     await tester.pump();
 
     final avatar = tester.widget<CircleAvatar>(find.byType(CircleAvatar));
-    expect(avatar.backgroundImage, isA<NetworkImage>());
+    expect(
+      (avatar.backgroundImage! as ResizeImage).imageProvider,
+      isA<NetworkImage>(),
+    );
     expect(gateway.reads, isEmpty);
   });
 

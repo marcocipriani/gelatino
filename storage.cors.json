@@ -3,9 +3,14 @@
     "origin": [
       "https://gelatino.web.app",
       "https://gelatino.firebaseapp.com",
+      "https://mcweb-gelatino.web.app",
+      "https://mcweb-gelatino.firebaseapp.com",
       "http://localhost:5000"
     ],
-    "method": ["GET", "HEAD"],
+    "method": [
+      "GET",
+      "HEAD"
+    ],
     "responseHeader": [
       "Authorization",
       "Content-Type",

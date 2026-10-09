@@ -20,9 +20,44 @@ void main() {
       JpegUploadJob(img.encodeJpg(source), maxWidth: 1024, quality: 70),
     )!;
 
-    final decoded = img.decodeJpg(encoded)!;
+    final decoded = img.decodeJpg(encoded.bytes)!;
     expect((decoded.width, decoded.height), (2, 4));
     expect(decoded.exif.isEmpty, isTrue);
+  });
+
+  test('reports the average colour and tags the staging upload', () async {
+    final red = img.Image(width: 16, height: 16)
+      ..clear(img.ColorRgb8(200, 20, 40));
+    final result = encodeJpegForUpload(
+      JpegUploadJob(img.encodeJpg(red, quality: 100), maxWidth: 64, quality: 90),
+    )!;
+    final hex = int.parse(result.averageColorHex.substring(1), radix: 16);
+    expect((hex >> 16) & 0xFF, closeTo(200, 6));
+    expect((hex >> 8) & 0xFF, closeTo(20, 6));
+    expect(hex & 0xFF, closeTo(40, 6));
+
+    final gateway = _RecordingStorageGateway();
+    await StorageService.forTesting(
+      gateway,
+    ).uploadStagingPhoto(bytes: png, uid: 'alice', checkInId: id);
+    expect(
+      gateway.puts.single.metadata.customMetadata?[stagingPhotoColorMetadataKey],
+      matches(RegExp(r'^#[0-9A-F]{6}$')),
+    );
+  });
+
+  test('staging upload reports progress through capable gateways', () async {
+    final gateway = _ProgressGateway();
+    final seen = <double>[];
+    final path = await StorageService.forTesting(gateway).uploadStagingPhoto(
+      bytes: png,
+      uid: 'alice',
+      checkInId: id,
+      onProgress: seen.add,
+    );
+
+    expect(path, 'staging/alice/$id.jpg');
+    expect(seen, [0.5, 1.0]);
   });
 
   test('downscales to the max width and never upscales', () {
@@ -32,8 +67,8 @@ void main() {
       quality: 70,
     );
 
-    expect(img.decodeJpg(encodeJpegForUpload(job(400))!)!.width, 100);
-    expect(img.decodeJpg(encodeJpegForUpload(job(60))!)!.width, 60);
+    expect(img.decodeJpg(encodeJpegForUpload(job(400))!.bytes)!.width, 100);
+    expect(img.decodeJpg(encodeJpegForUpload(job(60))!.bytes)!.width, 60);
   });
 
   test('uploads a real JPEG to the exact private staging path', () async {
@@ -182,5 +217,20 @@ final class _RecordingStorageGateway implements StorageObjectGateway {
     reads.add((path: path, maxBytes: maxBytes));
     if (readError case final error?) throw error;
     return readResult;
+  }
+}
+
+final class _ProgressGateway extends _RecordingStorageGateway
+    implements ProgressReportingStorageGateway {
+  @override
+  Future<String> putWithProgress(
+    String path,
+    Uint8List bytes,
+    SettableMetadata metadata,
+    void Function(double fraction) onProgress,
+  ) async {
+    onProgress(0.5);
+    onProgress(1.0);
+    return put(path, bytes, metadata);
   }
 }

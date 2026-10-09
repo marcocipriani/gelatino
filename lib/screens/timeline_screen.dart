@@ -184,6 +184,11 @@ final class _TimelineScrollFeed extends StatelessWidget {
       child: CustomScrollView(
         key: const ValueKey<String>('timeline-feed-scroll'),
         physics: const AlwaysScrollableScrollPhysics(),
+        // About two cards below the fold are built early, so their photos are
+        // already loading when they scroll into view. `scrollCacheExtent` is
+        // not available on the oldest Flutter this project supports (3.44).
+        // ignore: deprecated_member_use
+        cacheExtent: 1600,
         slivers: <Widget>[
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(

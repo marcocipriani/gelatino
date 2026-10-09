@@ -113,6 +113,7 @@ class CheckIn {
       'name',
     });
     final flavorSnapshots = _flavorSnapshots(data, allowEmpty: false);
+    parsePhotoColor(data);
     return CheckIn._(
       id: doc.id,
       userId: userId,
@@ -203,7 +204,11 @@ const Set<String> _canonicalKeys = <String>{
 
 /// Written since backdating shipped. Documents from before it have no
 /// `consumed_at` and must keep parsing, so it can never join [_canonicalKeys].
-const Set<String> _canonicalOptionalKeys = <String>{'consumed_at'};
+/// `photo_color` likewise only exists on check-ins published after it shipped.
+const Set<String> _canonicalOptionalKeys = <String>{
+  'consumed_at',
+  'photo_color',
+};
 
 const Set<String> _canonicalOnlyKeys = <String>{
   'user_snapshot',
@@ -213,6 +218,7 @@ const Set<String> _canonicalOnlyKeys = <String>{
   'updated_at',
   'schema_version',
   'consumed_at',
+  'photo_color',
 };
 
 Map<String, dynamic> _documentData(DocumentSnapshot doc) {

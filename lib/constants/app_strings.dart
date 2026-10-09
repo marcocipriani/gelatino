@@ -232,6 +232,12 @@ class AppStrings {
   static const String checkInTitle = 'Nuovo check-in';
   static const String checkInCamera = 'Fotocamera';
   static const String checkInGallery = 'Galleria';
+  static const String checkInCropTitle = 'Inquadra la foto';
+  static const String checkInCropHint =
+      'Trascina e avvicina con due dita: i tuoi amici la vedranno così.';
+  static const String checkInCropConfirm = 'Usa questa inquadratura';
+  static const String checkInCropFrameSemantic =
+      'Anteprima dell’inquadratura della foto';
   static const String checkInPlaceLabel = 'Nome gelateria';
   static const String checkInAddressLabel = 'Indirizzo (opzionale)';
   static const String checkInFlavorsTitle = 'Gusti scelti';
@@ -264,6 +270,8 @@ class AppStrings {
       'Puoi risalire al massimo a cinque anni fa.';
   static const String checkInRetryUpload = 'Riprova caricamento';
   static const String checkInCompressing = 'Compressione e caricamento privato…';
+  static String checkInUploadingPercent(int percent) =>
+      'Caricamento privato… $percent%';
   static const String checkInUploadInterrupted =
       'Caricamento privato interrotto.';
   static const String checkInPrivatePhotoNotFound = 'Foto privata non trovata.';

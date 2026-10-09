@@ -81,7 +81,7 @@ Mi piace → **Fragola** · Preferiti → **Sorbetto** · Salvati/da provare →
 *   **Gusti preferiti:** gestore completo dei gusti (vedi sotto), accento Sorbetto.
 
 ### 4. Bacheca (`TimelineScreen`)
-*   Feed dei check-in propri e degli amici. Card editoriali 3:4, rating, note, chip gusti **colorate dal colore del gusto**.
+*   Feed dei check-in propri e degli amici. Card editoriali con foto 16:9, rating, note, chip gusti **colorate dal colore del gusto**.
 
 ### 5. Gelaterie (`PlacesTab`)
 *   **Dual-View:** pills Lista/Mappa in alto; **ricerca e filtri sotto** le pills.
@@ -92,7 +92,10 @@ Mi piace → **Fragola** · Preferiti → **Sorbetto** · Salvati/da provare →
 
 ### 6. Creazione Check-in (`CheckInScreen`)
 *   **Upload JPEG compresso** (pacchetto `image`, ridimensionamento + `cache-control`) su Firebase Storage — leggero, evita sprechi di quota. La compressione gira in un isolate (inline su web), applica l'orientamento EXIF ai pixel e rimuove tutti i metadati EXIF (GPS incluso).
-*   **Cache su disco** (mobile/desktop) per foto e avatar pubblicati: i path sono versionati e immutabili, quindi un riavvio non riscarica il feed. Svuotata al logout.
+*   **Inquadratura 16:9** dopo la scelta della foto (trascina e zoom): è lo stesso formato della card in bacheca, quindi l'autore vede esattamente cosa vedranno gli amici.
+*   **Progresso dell'upload** in percentuale durante il caricamento privato.
+*   **Colore medio della foto** calcolato in fase di compressione, salvato come `photo_color` dal server e usato come placeholder nella card mentre la foto si carica.
+*   **Cache delle immagini** per foto e avatar pubblicati (path versionati, immutabili): su disco in mobile/desktop, in Cache Storage sul web. Svuotata al logout. La bacheca precarica le foto delle card successive.
 *   Associazione a gelateria esistente/nuova; gusti con chip interattivi; sequenza aptica al successo.
 *   **Formato del gelato:** catalogo Firestore con chip personalizzate, selezione singola obbligatoria e lista espandibile.
 
@@ -187,9 +190,37 @@ cd functions && npm install && npm test   # test delle Cloud Functions
 
 ### Compilazione & Deploy Web (Firebase)
 ```bash
-flutter build web --release
+flutter build web --release --dart-define=APP_CHECK_WEB_KEY=LA_TUA_SITE_KEY
 firebase deploy --only hosting --project IL_TUO_PROGETTO
 ```
+
+**Ordine di deploy:** client prima, poi Functions. I check-in nuovi hanno il
+campo opzionale `photo_color`, che le versioni dell'app precedenti non
+riconoscono.
+
+### App Check
+
+L'app attiva App Check all'avvio (reCAPTCHA Enterprise su web, Play Integrity
+su Android, DeviceCheck su iOS, provider di debug nelle build di debug).
+L'attivazione da sola non blocca nulla. Per arrivare all'enforcement:
+
+1. Firebase Console → App Check: registra le app. Per il web crea una chiave
+   reCAPTCHA Enterprise e passala in build con `APP_CHECK_WEB_KEY` (senza
+   chiave, su web App Check resta spento).
+2. Nelle build di debug il token di debug compare nei log: registralo in
+   console.
+3. Controlla in console le metriche delle richieste verificate. Quando quasi
+   tutto il traffico è verificato, attiva l'enforcement per Firestore e
+   Storage dalla console e per le callable con `ENFORCE_APP_CHECK=true` in
+   `functions/.env`, poi rideploya le Functions.
+
+### Telemetria errori immagine
+
+Gli errori di caricamento, decodifica e upload delle immagini arrivano alla
+callable `reportClientFailure` e finiscono in Cloud Logging come
+`client_media_failure`, con solo tipo, codice d'errore e piattaforma: niente
+path, niente cookie. Per un grafico crea una metrica basata sui log con il
+filtro `jsonPayload.message="client_media_failure"`.
 
 ---
 

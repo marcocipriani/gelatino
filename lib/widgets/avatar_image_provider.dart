@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/media_provider.dart';
+import '../services/media_telemetry.dart';
 
 ImageProvider<Object>? avatarImageProvider(String? source) {
   if (source == null || source.isEmpty) return null;
@@ -62,33 +63,50 @@ final class AuthenticatedAvatar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Avatars are stored at 512px but drawn at 32–96dp: decoding at display
+    // size keeps a list of them from holding full bitmaps in memory. The
+    // margin covers non-square sources, which `cover` scales by the short side.
+    final decodeWidth =
+        (radius * 2 * MediaQuery.devicePixelRatioOf(context) * 1.5).ceil();
+    Widget avatar(ImageProvider<Object>? image) => _avatar(
+      image == null
+          ? null
+          : ResizeImage.resizeIfNeeded(decodeWidth, null, image),
+      onError: (error, _) => ref
+          .read(mediaTelemetryProvider)
+          .report(MediaFailureKind.decode, error),
+    );
     final selectedBytes = bytes;
     if (selectedBytes != null) {
-      return _avatar(MemoryImage(selectedBytes));
+      return avatar(MemoryImage(selectedBytes));
     }
     final legacyImage = avatarImageProvider(source);
-    if (legacyImage != null) return _avatar(legacyImage);
+    if (legacyImage != null) return avatar(legacyImage);
     final path = source;
-    if (!isCanonicalAvatarPath(path)) return _avatar(null);
+    if (!isCanonicalAvatarPath(path)) return avatar(null);
     final mediaKey = AuthenticatedMediaKey(path!, avatarMediaMaxBytes);
     return ref
         .watch(mediaBytesProvider(mediaKey))
         .when(
-          data: (authenticatedBytes) => _avatar(
+          data: (authenticatedBytes) => avatar(
             authenticatedBytes == null ? null : MemoryImage(authenticatedBytes),
           ),
-          loading: () => _avatar(null),
+          loading: () => avatar(null),
           error: (error, stackTrace) {
             debugPrint('Authenticated avatar failed: $error');
-            return _avatar(null);
+            return avatar(null);
           },
         );
   }
 
-  Widget _avatar(ImageProvider<Object>? image) => CircleAvatar(
+  Widget _avatar(
+    ImageProvider<Object>? image, {
+    ImageErrorListener? onError,
+  }) => CircleAvatar(
     radius: radius,
     backgroundColor: backgroundColor,
     backgroundImage: image,
+    onBackgroundImageError: image == null ? null : onError,
     child: image == null
         ? Icon(icon, size: iconSize ?? radius, color: iconColor)
         : null,

@@ -9,11 +9,13 @@ final class AuthenticatedCheckInPhoto extends StatelessWidget {
     required this.path,
     required this.semanticLabel,
     this.fit = BoxFit.cover,
+    this.placeholderColor,
   });
 
   final String path;
   final String semanticLabel;
   final BoxFit fit;
+  final Color? placeholderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,7 @@ final class AuthenticatedCheckInPhoto extends StatelessWidget {
       maxBytes: checkInMediaMaxBytes,
       semanticLabel: semanticLabel,
       fit: fit,
+      placeholderColor: placeholderColor,
     );
   }
 }

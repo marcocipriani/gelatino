@@ -22,9 +22,8 @@ abstract interface class MediaDiskCache {
 bool isImmutableMediaPath(String path) =>
     path.startsWith('check_ins/') || path.startsWith('avatars/');
 
-/// No-op cache: the default, so tests never touch the filesystem. Also what
-/// web gets, where the browser HTTP cache honours the objects' `immutable`
-/// Cache-Control.
+/// No-op cache: the default, so tests never touch the filesystem or browser
+/// storage, and the fallback where neither exists.
 final class NoMediaDiskCache implements MediaDiskCache {
   const NoMediaDiskCache();
 

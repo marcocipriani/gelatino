@@ -12,6 +12,7 @@ import '../repositories/check_in_draft_repository.dart';
 import '../repositories/check_in_label_repository.dart';
 import '../repositories/check_in_publication_repository.dart';
 import '../repositories/check_in_repository.dart';
+import '../services/media_telemetry.dart';
 import '../services/storage_service.dart';
 import 'auth_provider.dart';
 import 'check_in_flow_state.dart';
@@ -227,6 +228,7 @@ final class CheckInFlowController extends Notifier<CheckInFlowState> {
       photoBytes: Uint8List.fromList(bytes),
       photoMissing: false,
       isUploading: true,
+      uploadProgress: null,
       failure: null,
     );
     try {
@@ -260,7 +262,11 @@ final class CheckInFlowController extends Notifier<CheckInFlowState> {
       state = state.copyWith(failure: failure, photoMissing: true);
       return;
     }
-    state = state.copyWith(isUploading: true, failure: null);
+    state = state.copyWith(
+      isUploading: true,
+      uploadProgress: null,
+      failure: null,
+    );
     await _queuePhotoUpload(
       generation: generation,
       photoVersion: photoVersion,
@@ -345,23 +351,41 @@ final class CheckInFlowController extends Notifier<CheckInFlowState> {
     try {
       final path = await ref
           .read(storageServiceProvider)
-          .uploadStagingPhoto(bytes: bytes, uid: uid, checkInId: checkInId);
+          .uploadStagingPhoto(
+            bytes: bytes,
+            uid: uid,
+            checkInId: checkInId,
+            onProgress: (fraction) {
+              if (_isPhotoCurrent(generation, photoVersion)) {
+                state = state.copyWith(uploadProgress: fraction);
+              }
+            },
+          );
       if (!_isPhotoCurrent(generation, photoVersion)) return false;
       await _persist(
         _requireDraft().copyWith(stagingObjectPath: path, updatedAt: _now()),
       );
       if (_isPhotoCurrent(generation, photoVersion)) {
-        state = state.copyWith(isUploading: false, photoMissing: false);
+        state = state.copyWith(
+          isUploading: false,
+          uploadProgress: null,
+          photoMissing: false,
+        );
       }
       return true;
     } catch (error) {
+      ref.read(mediaTelemetryProvider).report(MediaFailureKind.upload, error);
       final failure = _wrap(
         CheckInFlowFailureKind.photo,
         'Caricamento della foto interrotto. Riprova.',
         error,
       );
       if (_isPhotoCurrent(generation, photoVersion)) {
-        state = state.copyWith(isUploading: false, failure: failure);
+        state = state.copyWith(
+          isUploading: false,
+          uploadProgress: null,
+          failure: failure,
+        );
       }
       return false;
     }
