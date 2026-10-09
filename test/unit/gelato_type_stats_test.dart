@@ -4,36 +4,16 @@ import 'package:gelatino/models/gelato_type.dart';
 import 'package:gelatino/utils/gelato_type_stats.dart';
 
 CheckIn typedCheckIn(String id, String typeId, DateTime createdAt) {
-  return CheckIn.legacy(
+  return CheckIn.forTesting(
     id: id.padRight(20, '_'),
-    userId: 'user',
-    userSummary: const {},
-    placeId: 'place',
-    placeName: 'Gelateria',
-    photoUrl: 'photo.jpg',
-    isLivePhoto: false,
-    rating: 5,
     gelatoType: GelatoType(id: typeId, name: typeId, sortOrder: 0),
-    flavors: const [],
-    likedByUids: const [],
-    wishlistedByUids: const [],
     createdAt: createdAt,
   );
 }
 
 CheckIn legacyCheckIn() {
-  return CheckIn.legacy(
+  return CheckIn.forTesting(
     id: 'legacy'.padRight(20, '_'),
-    userId: 'user',
-    userSummary: const {},
-    placeId: 'place',
-    placeName: 'Gelateria',
-    photoUrl: 'photo.jpg',
-    isLivePhoto: false,
-    rating: 5,
-    flavors: const [],
-    likedByUids: const [],
-    wishlistedByUids: const [],
     createdAt: DateTime(2026, 1, 1),
   );
 }

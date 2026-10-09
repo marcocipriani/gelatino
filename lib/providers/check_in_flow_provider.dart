@@ -14,10 +14,12 @@ import '../repositories/check_in_publication_repository.dart';
 import '../repositories/check_in_repository.dart';
 import '../services/storage_service.dart';
 import 'auth_provider.dart';
+import 'check_in_flow_state.dart';
 import 'check_in_providers.dart';
 import 'location_provider.dart';
 import 'place_providers.dart';
 
+export 'check_in_flow_state.dart';
 export 'check_in_providers.dart' show checkInRepositoryProvider;
 
 typedef CheckInClock = DateTime Function();
@@ -49,118 +51,6 @@ final checkInPublicationRepositoryProvider =
         SharedPreferencesDraftPreferences(preferences),
       );
     });
-
-enum CheckInFlowFailureKind {
-  initialization,
-  persistence,
-  photo,
-  place,
-  publication,
-}
-
-final class CheckInFlowFailure implements Exception {
-  const CheckInFlowFailure({
-    required this.kind,
-    required this.message,
-    required this.cause,
-  });
-
-  final CheckInFlowFailureKind kind;
-  final String message;
-  final Object cause;
-
-  @override
-  String toString() => message;
-}
-
-const Object _flowUnset = Object();
-
-final class CheckInFlowState {
-  const CheckInFlowState({
-    this.draft,
-    this.photoBytes,
-    this.isInitializing = true,
-    this.isSaving = false,
-    this.isUploading = false,
-    this.isPublishing = false,
-    this.isResolvingPlace = false,
-    this.isDirty = false,
-    this.photoMissing = false,
-    this.published = false,
-    this.publishedPendingClear = false,
-    this.publicationCallingPendingRetry = false,
-    this.publicationFailedPendingClear = false,
-    this.publicationDraftId,
-    this.failure,
-  });
-
-  final CheckInDraft? draft;
-  final Uint8List? photoBytes;
-  final bool isInitializing;
-  final bool isSaving;
-  final bool isUploading;
-  final bool isPublishing;
-  final bool isResolvingPlace;
-  final bool isDirty;
-  final bool photoMissing;
-  final bool published;
-  final bool publishedPendingClear;
-  final bool publicationCallingPendingRetry;
-  final bool publicationFailedPendingClear;
-  final String? publicationDraftId;
-  final CheckInFlowFailure? failure;
-
-  bool get isPublicationLocked =>
-      isPublishing ||
-      publicationCallingPendingRetry ||
-      publicationFailedPendingClear ||
-      publishedPendingClear ||
-      published;
-
-  bool get isEditorLocked => isPublicationLocked || isResolvingPlace;
-
-  CheckInFlowState copyWith({
-    Object? draft = _flowUnset,
-    Object? photoBytes = _flowUnset,
-    bool? isInitializing,
-    bool? isSaving,
-    bool? isUploading,
-    bool? isPublishing,
-    bool? isResolvingPlace,
-    bool? isDirty,
-    bool? photoMissing,
-    bool? published,
-    bool? publishedPendingClear,
-    bool? publicationCallingPendingRetry,
-    bool? publicationFailedPendingClear,
-    Object? publicationDraftId = _flowUnset,
-    Object? failure = _flowUnset,
-  }) => CheckInFlowState(
-    draft: identical(draft, _flowUnset) ? this.draft : draft as CheckInDraft?,
-    photoBytes: identical(photoBytes, _flowUnset)
-        ? this.photoBytes
-        : photoBytes as Uint8List?,
-    isInitializing: isInitializing ?? this.isInitializing,
-    isSaving: isSaving ?? this.isSaving,
-    isUploading: isUploading ?? this.isUploading,
-    isPublishing: isPublishing ?? this.isPublishing,
-    isResolvingPlace: isResolvingPlace ?? this.isResolvingPlace,
-    isDirty: isDirty ?? this.isDirty,
-    photoMissing: photoMissing ?? this.photoMissing,
-    published: published ?? this.published,
-    publishedPendingClear: publishedPendingClear ?? this.publishedPendingClear,
-    publicationCallingPendingRetry:
-        publicationCallingPendingRetry ?? this.publicationCallingPendingRetry,
-    publicationFailedPendingClear:
-        publicationFailedPendingClear ?? this.publicationFailedPendingClear,
-    publicationDraftId: identical(publicationDraftId, _flowUnset)
-        ? this.publicationDraftId
-        : publicationDraftId as String?,
-    failure: identical(failure, _flowUnset)
-        ? this.failure
-        : failure as CheckInFlowFailure?,
-  );
-}
 
 final checkInFlowProvider = NotifierProvider.autoDispose
     .family<CheckInFlowController, CheckInFlowState, String>(
@@ -722,10 +612,11 @@ final class CheckInFlowController extends Notifier<CheckInFlowState> {
   Future<PublishCheckInResult> _beginPublication() async {
     final generation = _generation;
     state = state.copyWith(isPublishing: true, failure: null);
+    final CheckInDraft draft;
     try {
       final pendingSave = _latestSave;
       if (pendingSave != null) await pendingSave;
-      final draft = _requireDraft();
+      draft = _requireDraft();
       await ref
           .read(checkInPublicationRepositoryProvider)
           .save(uid, CheckInPublicationMarker.calling(draft.id));
@@ -738,7 +629,6 @@ final class CheckInFlowController extends Notifier<CheckInFlowState> {
         isPublishing: true,
       );
       _publicationDraftId = draft.id;
-      return _callAndPersistPublished(draft, generation);
     } catch (error) {
       if (error is CheckInFlowFailure) {
         if (_isCurrent(generation)) {
@@ -760,6 +650,9 @@ final class CheckInFlowController extends Notifier<CheckInFlowState> {
       }
       throw failure;
     }
+    // Outside the try on purpose: the call owns its failure handling and must
+    // keep `publicationCallingPendingRetry` set if it fails mid-flight.
+    return _callAndPersistPublished(draft, generation);
   }
 
   Future<PublishCheckInResult> _retryCallingPublication() async {
