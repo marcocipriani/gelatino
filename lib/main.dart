@@ -20,6 +20,8 @@ import 'providers/theme_provider.dart';
 import 'router.dart';
 import 'theme/app_theme.dart';
 import 'constants/app_strings.dart';
+import 'services/media_cache/media_disk_cache.dart';
+import 'services/media_cache/platform_media_disk_cache.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +67,9 @@ void main() async {
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        mediaDiskCacheProvider.overrideWithValue(
+          createPlatformMediaDiskCache(),
+        ),
         checkInLabelRepositoryProvider.overrideWithValue(
           PersistentCheckInLabelRepository(
             SharedPreferencesDraftPreferences(sharedPreferences),

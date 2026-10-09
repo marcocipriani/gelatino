@@ -45,8 +45,8 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
-      maxWidth: 512,
-      maxHeight: 512,
+      maxWidth: avatarMaxWidth.toDouble(),
+      maxHeight: avatarMaxWidth.toDouble(),
       imageQuality: 80,
     );
     if (pickedFile != null) {

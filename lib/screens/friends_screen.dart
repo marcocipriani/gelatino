@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+export 'friends/friends_relationships.dart';
+
 import '../design/app_tokens.dart';
 import '../design/responsive.dart';
 import '../models/friendship.dart';
@@ -18,43 +20,12 @@ import '../repositories/gelato_invite_repository.dart';
 import '../widgets/app_page.dart';
 import '../widgets/editorial_header.dart';
 import '../widgets/friends/leaderboard_section.dart';
+import 'friends/friends_relationships.dart';
+import 'friends/friends_remote_person_card.dart';
 import 'friends/friends_sections.dart';
 import '../constants/app_strings.dart';
 
-Uri buildExternalInviteUri(String uid) =>
-    Uri.https('gelatino.web.app', '/join', <String, String>{'by': uid});
-
-enum FriendSearchRelationshipStatus {
-  accepted('Amico', false),
-  incomingPending(AppStrings.relationshipToAccept, false),
-  outgoingPending(AppStrings.relationshipPending, false),
-  available(AppStrings.add, true);
-
-  const FriendSearchRelationshipStatus(this.label, this.canSendRequest);
-
-  final String? label;
-  final bool canSendRequest;
-}
-
 enum _RelationshipLookupState { ready, loading, error }
-
-FriendSearchRelationshipStatus friendSearchRelationshipStatus(
-  String candidateUid, {
-  required Set<String> acceptedUids,
-  required Set<String> incomingPendingUids,
-  required Set<String> outgoingPendingUids,
-}) {
-  if (acceptedUids.contains(candidateUid)) {
-    return FriendSearchRelationshipStatus.accepted;
-  }
-  if (incomingPendingUids.contains(candidateUid)) {
-    return FriendSearchRelationshipStatus.incomingPending;
-  }
-  if (outgoingPendingUids.contains(candidateUid)) {
-    return FriendSearchRelationshipStatus.outgoingPending;
-  }
-  return FriendSearchRelationshipStatus.available;
-}
 
 class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({super.key});
@@ -566,7 +537,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                   targetUid: request.requesterUid,
                   builder: () => Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: _RemotePersonCard(
+                    child: FriendsRemotePersonCard(
                       uid: request.requesterUid,
                       fallbackTitle: AppStrings.friendsNewRequest,
                       actions: [
@@ -645,7 +616,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                   targetUid: invite.senderId,
                   builder: () => Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: _RemotePersonCard(
+                    child: FriendsRemotePersonCard(
                       uid: invite.senderId,
                       fallbackTitle: AppStrings.inviteTitle,
                       subtitle: AppStrings.friendsInviteSubtitle,
@@ -1021,47 +992,5 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   void _retryInvites(String uid) {
     ref.invalidate(pendingIncomingGelatoInvitesForUidProvider(uid));
     ref.invalidate(pendingIncomingGelatoInvitesProvider);
-  }
-}
-
-final class _RemotePersonCard extends ConsumerWidget {
-  const _RemotePersonCard({
-    required this.uid,
-    required this.fallbackTitle,
-    required this.actions,
-    required this.onOpen,
-    this.subtitle = AppStrings.profileGelatinoFallback,
-    this.failure,
-  });
-
-  final String uid;
-  final String fallbackTitle;
-  final String subtitle;
-  final List<Widget> actions;
-  final VoidCallback onOpen;
-  final Widget? failure;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ref
-        .watch(publicProfileProvider(uid))
-        .when(
-          data: (profile) => FriendsPersonCard(
-            uid: uid,
-            name: profile?.displayName ?? fallbackTitle,
-            subtitle: subtitle,
-            avatarPath: profile?.avatarPath,
-            actions: actions,
-            onOpen: onOpen,
-            failure: failure,
-          ),
-          loading: () => const FriendsSkeleton(rows: 1),
-          error: (error, stackTrace) => FriendsStatePanel(
-            title: AppStrings.profileUnavailable,
-            message: AppStrings.friendsPersonLoadError,
-            actionLabel: AppStrings.retry,
-            onAction: () => ref.invalidate(publicProfileProvider(uid)),
-          ),
-        );
   }
 }

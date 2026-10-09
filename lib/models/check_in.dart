@@ -1,53 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'firestore_parsing.dart';
 import 'flavor.dart';
 import 'gelato_type.dart';
 
 class CheckIn {
-  /// Transitional constructor for legacy screens/tests. Remove in Client Task 6.
-  CheckIn.legacy({
-    required this.id,
-    required this.userId,
-    required Map<String, dynamic> userSummary,
-    required this.placeId,
-    required String placeName,
-    required String photoUrl,
-    required bool isLivePhoto,
-    this.reviewText,
-    required this.rating,
-    this.gelatoType,
-    required List<Flavor> flavors,
-    required List<String> likedByUids,
-    required List<String> wishlistedByUids,
-    GeoPoint? location,
-    required this.createdAt,
-    List<String> taggedUserUids = const <String>[],
-    Map<String, String> taggedUserNames = const <String, String>{},
-    this.updatedAt,
-  }) : flavors = List<Flavor>.unmodifiable(flavors),
-       _consumedAt = null,
-       userSnapshot = _legacyUserToCanonical(userSummary),
-       placeSnapshot = Map<String, dynamic>.unmodifiable(<String, dynamic>{
-         'name': placeName,
-         'address': '',
-       }),
-       photoStoragePath = photoUrl,
-       taggedUserIds = List<String>.unmodifiable(taggedUserUids),
-       schemaVersion = 1,
-       _legacyUserSummary = Map<String, dynamic>.unmodifiable(userSummary),
-       _legacyPlaceName = placeName,
-       _legacyPhotoUrl = photoUrl,
-       _legacyIsLivePhoto = isLivePhoto,
-       _legacyLikedByUids = List<String>.unmodifiable(likedByUids),
-       _legacyWishlistedByUids = List<String>.unmodifiable(wishlistedByUids),
-       _legacyLocation = location,
-       _legacyTaggedUserNames = Map<String, String>.unmodifiable(
-         taggedUserNames,
-       ) {
-    _requireCheckInId(id, 'document id');
-  }
-
   const CheckIn._({
     required this.id,
     required this.userId,
@@ -64,14 +22,6 @@ class CheckIn {
     required this.updatedAt,
     required this.schemaVersion,
     this._consumedAt,
-    this._legacyUserSummary,
-    this._legacyPlaceName,
-    this._legacyPhotoUrl,
-    this._legacyIsLivePhoto = false,
-    this._legacyLikedByUids = const <String>[],
-    this._legacyWishlistedByUids = const <String>[],
-    this._legacyLocation,
-    this._legacyTaggedUserNames = const <String, String>{},
   });
 
   final String id;
@@ -97,30 +47,41 @@ class CheckIn {
   /// cursor; this is the date the UI shows.
   DateTime get consumedAt => _consumedAt ?? createdAt;
 
-  final Map<String, dynamic>? _legacyUserSummary;
-  final String? _legacyPlaceName;
-  final String? _legacyPhotoUrl;
-  final bool _legacyIsLivePhoto;
-  final List<String> _legacyLikedByUids;
-  final List<String> _legacyWishlistedByUids;
-  final GeoPoint? _legacyLocation;
-  final Map<String, String> _legacyTaggedUserNames;
-
-  // Transitional read-only accessors. Remove in Client Tasks 5-7.
-  Map<String, dynamic> get userSummary =>
-      _legacyUserSummary ??
-      <String, dynamic>{
-        'username': userSnapshot['display_name'],
-        'avatar_url': userSnapshot['avatar_path'],
-      };
-  String get placeName => _legacyPlaceName ?? placeSnapshot['name'] as String;
-  String get photoUrl => _legacyPhotoUrl ?? photoStoragePath;
-  bool get isLivePhoto => _legacyIsLivePhoto;
-  List<String> get likedByUids => _legacyLikedByUids;
-  List<String> get wishlistedByUids => _legacyWishlistedByUids;
-  GeoPoint? get location => _legacyLocation;
-  List<String> get taggedUserUids => taggedUserIds;
-  Map<String, String> get taggedUserNames => _legacyTaggedUserNames;
+  /// Builds a check-in without a Firestore snapshot, for tests only.
+  @visibleForTesting
+  factory CheckIn.forTesting({
+    required String id,
+    String userId = 'user',
+    String placeId = 'place',
+    GelatoType? gelatoType,
+    List<Flavor> flavors = const <Flavor>[],
+    int rating = 5,
+    required DateTime createdAt,
+    DateTime? consumedAt,
+  }) {
+    _requireCheckInId(id, 'document id');
+    return CheckIn._(
+      id: id,
+      userId: userId,
+      userSnapshot: const <String, dynamic>{
+        'display_name': '',
+        'username': '',
+        'avatar_path': null,
+      },
+      placeId: placeId,
+      placeSnapshot: const <String, dynamic>{'name': '', 'address': ''},
+      photoStoragePath: 'check_ins/$userId/$id/1.jpg',
+      rating: rating,
+      gelatoType: gelatoType,
+      flavors: List<Flavor>.unmodifiable(flavors),
+      reviewText: null,
+      taggedUserIds: const <String>[],
+      createdAt: createdAt,
+      updatedAt: null,
+      schemaVersion: 2,
+      consumedAt: consumedAt,
+    );
+  }
 
   factory CheckIn.fromFirestore(DocumentSnapshot doc) {
     final data = _documentData(doc);
@@ -192,7 +153,12 @@ class CheckIn {
     final userSummary = _legacyUserSnapshot(data);
     final type = _optionalLegacyGelatoType(data);
     final taggedIds = stringList(data, 'tagged_user_uids');
-    final names = _stringValuesMap(data, 'tagged_user_names');
+    // Fields the v1 schema carried but nothing reads any more are still
+    // shape-checked, so a malformed legacy row keeps being rejected.
+    _stringValuesMap(data, 'tagged_user_names');
+    _requireBool(data, 'is_live_photo');
+    stringList(data, 'liked_by_uids');
+    stringList(data, 'wishlisted_by_uids');
     final location = data['location'];
     if (location != null && location is! GeoPoint) {
       throw const FormatException('location: expected GeoPoint or null');
@@ -215,14 +181,6 @@ class CheckIn {
       createdAt: requireTimestamp(data, 'created_at'),
       updatedAt: null,
       schemaVersion: 1,
-      legacyUserSummary: userSummary,
-      legacyPlaceName: requireString(data, 'place_name'),
-      legacyPhotoUrl: requireString(data, 'photo_url'),
-      legacyIsLivePhoto: _requireBool(data, 'is_live_photo'),
-      legacyLikedByUids: stringList(data, 'liked_by_uids'),
-      legacyWishlistedByUids: stringList(data, 'wishlisted_by_uids'),
-      legacyLocation: location as GeoPoint?,
-      legacyTaggedUserNames: names,
     );
   }
 }
