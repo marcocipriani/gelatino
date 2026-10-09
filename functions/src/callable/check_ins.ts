@@ -2,12 +2,13 @@ import {getApps, initializeApp} from 'firebase-admin/app';
 import {getFirestore} from 'firebase-admin/firestore';
 import {getStorage} from 'firebase-admin/storage';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
+import {callableOptions} from './options';
 import {
   deletePublishedCheckIn,
   publishCheckIn,
 } from '../services/check_ins';
 
-const options = {region: 'europe-west1', enforceAppCheck: false} as const;
+const options = callableOptions;
 const CHECK_IN_ID_PATTERN = /^[A-Za-z0-9_-]{20,64}$/;
 
 function callerUid(auth: {uid: string} | undefined): string {

@@ -48,6 +48,7 @@ const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
 const PATH_SEGMENT_PATTERN = /^[^/\u0000-\u001f\u007f]{1,128}$/u;
 
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
+const STAGING_COLOR_METADATA_KEY = 'dominant_color';
 
 /// Stable machine-readable causes the app maps to actionable messages.
 /// Never rename one without updating `_messageForReason` in
@@ -313,7 +314,14 @@ async function validateStagingPhoto(
   ) {
     failed('Staging photo metadata is invalid', 'photo_invalid');
   }
-  return file;
+  // Set by the client from the pixels it encoded; purely cosmetic, so a
+  // missing or malformed value is dropped instead of failing the publish.
+  const color = metadata.metadata?.[STAGING_COLOR_METADATA_KEY];
+  const photoColor =
+    typeof color === 'string' && HEX_COLOR_PATTERN.test(color)
+      ? color.toUpperCase()
+      : undefined;
+  return {file, photoColor};
 }
 
 export async function publishCheckIn(
@@ -462,11 +470,12 @@ export async function publishCheckIn(
   });
 
   let stagingFile;
+  let photoColor: string | undefined;
   try {
-    stagingFile = await validateStagingPhoto(
+    ({file: stagingFile, photoColor} = await validateStagingPhoto(
       bucket,
       input.stagingObjectPath,
-    );
+    ));
   } catch (error) {
     if (mediaNotFound(error)) {
       return resolveMissingMediaRace(
@@ -579,6 +588,7 @@ export async function publishCheckIn(
       review_text: input.reviewText,
       tagged_user_ids: input.taggedUserIds,
       photo_storage_path: permanentPath,
+      ...(photoColor === undefined ? {} : {photo_color: photoColor}),
       created_at: timestamp,
       // When the gelato was eaten, as opposed to when the row was written.
       // `created_at` stays server-owned because it is the feed cursor; this is
