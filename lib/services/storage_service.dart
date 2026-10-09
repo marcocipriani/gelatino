@@ -10,7 +10,19 @@ abstract interface class StorageObjectGateway {
   Future<Uint8List?> read(String path, int maxBytes);
 }
 
-final class FirebaseStorageObjectGateway implements StorageObjectGateway {
+/// Optional capability: gateways that can report how much of an upload has
+/// been sent. Separate from [StorageObjectGateway] so test fakes stay small.
+abstract interface class ProgressReportingStorageGateway {
+  Future<String> putWithProgress(
+    String path,
+    Uint8List bytes,
+    SettableMetadata metadata,
+    void Function(double fraction) onProgress,
+  );
+}
+
+final class FirebaseStorageObjectGateway
+    implements StorageObjectGateway, ProgressReportingStorageGateway {
   const FirebaseStorageObjectGateway(this._storage);
 
   final FirebaseStorage _storage;
@@ -26,6 +38,27 @@ final class FirebaseStorageObjectGateway implements StorageObjectGateway {
   }
 
   @override
+  Future<String> putWithProgress(
+    String path,
+    Uint8List bytes,
+    SettableMetadata metadata,
+    void Function(double fraction) onProgress,
+  ) async {
+    final task = _storage.ref().child(path).putData(bytes, metadata);
+    final events = task.snapshotEvents.listen((snapshot) {
+      if (snapshot.totalBytes > 0) {
+        onProgress(snapshot.bytesTransferred / snapshot.totalBytes);
+      }
+    }, onError: (Object _) {});
+    try {
+      final snapshot = await task;
+      return snapshot.ref.fullPath;
+    } finally {
+      await events.cancel();
+    }
+  }
+
+  @override
   Future<Uint8List?> read(String path, int maxBytes) =>
       _storage.ref().child(path).getData(maxBytes);
 }
@@ -34,6 +67,13 @@ final class FirebaseStorageObjectGateway implements StorageObjectGateway {
 /// decodes more pixels than it keeps.
 const int checkInPhotoMaxWidth = 1024;
 const int avatarMaxWidth = 512;
+
+/// Bound for the picked photo before framing: room to zoom into a crop and
+/// still cover [checkInPhotoMaxWidth].
+const int checkInPickMaxWidth = 1600;
+
+/// Custom metadata key on staging uploads; must match the Cloud Function.
+const String stagingPhotoColorMetadataKey = 'dominant_color';
 
 final class JpegUploadJob {
   const JpegUploadJob(
@@ -47,6 +87,15 @@ final class JpegUploadJob {
   final int quality;
 }
 
+final class JpegUploadResult {
+  const JpegUploadResult(this.bytes, this.averageColorHex);
+
+  final Uint8List bytes;
+
+  /// `#RRGGBB` average of the encoded pixels, used as a loading placeholder.
+  final String averageColorHex;
+}
+
 /// Top-level so [compute] can run it in a background isolate. Returns null
 /// when the bytes are not a decodable image.
 ///
@@ -54,7 +103,7 @@ final class JpegUploadJob {
 /// phone photos carry GPS coordinates and device details that must not reach
 /// friends who can read the published photo.
 @visibleForTesting
-Uint8List? encodeJpegForUpload(JpegUploadJob job) {
+JpegUploadResult? encodeJpegForUpload(JpegUploadJob job) {
   img.Image? image;
   try {
     image = img.decodeImage(job.bytes);
@@ -74,14 +123,101 @@ Uint8List? encodeJpegForUpload(JpegUploadJob job) {
     );
   }
   image.exif = img.ExifData();
-  return Uint8List.fromList(img.encodeJpg(image, quality: job.quality));
+  return JpegUploadResult(
+    Uint8List.fromList(img.encodeJpg(image, quality: job.quality)),
+    _averageColorHex(image),
+  );
 }
 
-Future<Uint8List?> _encodeInBackground(JpegUploadJob job) =>
-    compute(encodeJpegForUpload, job);
+String _averageColorHex(img.Image image) {
+  final tiny = img.copyResize(
+    image,
+    width: 8,
+    height: 8,
+    interpolation: img.Interpolation.average,
+  );
+  var r = 0.0, g = 0.0, b = 0.0;
+  for (final pixel in tiny) {
+    r += pixel.rNormalized;
+    g += pixel.gNormalized;
+    b += pixel.bNormalized;
+  }
+  final count = tiny.width * tiny.height;
+  String channel(double sum) => (sum / count * 255)
+      .round()
+      .clamp(0, 255)
+      .toRadixString(16)
+      .padLeft(2, '0');
+  return '#${channel(r)}${channel(g)}${channel(b)}'.toUpperCase();
+}
 
-Future<Uint8List?> _encodeInline(JpegUploadJob job) async =>
-    encodeJpegForUpload(job);
+/// A photo ready to frame: orientation baked in, no EXIF, known pixel size.
+final class PreparedPhoto {
+  const PreparedPhoto(this.bytes, this.width, this.height);
+
+  final Uint8List bytes;
+  final int width;
+  final int height;
+}
+
+/// Crop in fractions of the prepared photo, so the UI never needs pixels.
+final class PhotoCropJob {
+  const PhotoCropJob(
+    this.bytes, {
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+  });
+
+  final Uint8List bytes;
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+}
+
+@visibleForTesting
+PreparedPhoto? preparePhotoForCrop(Uint8List bytes) {
+  img.Image? image;
+  try {
+    image = img.decodeImage(bytes);
+  } catch (_) {
+    return null;
+  }
+  if (image == null) return null;
+  final orientation = image.exif.imageIfd.orientation;
+  if (orientation != null && orientation != 1) {
+    image = img.bakeOrientation(image);
+  }
+  if (image.width > checkInPickMaxWidth) {
+    image = img.copyResize(
+      image,
+      width: checkInPickMaxWidth,
+      interpolation: img.Interpolation.average,
+    );
+  }
+  image.exif = img.ExifData();
+  return PreparedPhoto(
+    Uint8List.fromList(img.encodeJpg(image, quality: 92)),
+    image.width,
+    image.height,
+  );
+}
+
+@visibleForTesting
+Uint8List? cropPhoto(PhotoCropJob job) {
+  final image = img.decodeImage(job.bytes);
+  if (image == null) return null;
+  int px(double fraction, int size) =>
+      (fraction * size).round().clamp(0, size - 1);
+  final x = px(job.left, image.width);
+  final y = px(job.top, image.height);
+  final w = (job.width * image.width).round().clamp(1, image.width - x);
+  final h = (job.height * image.height).round().clamp(1, image.height - y);
+  final cropped = img.copyCrop(image, x: x, y: y, width: w, height: h);
+  return Uint8List.fromList(img.encodeJpg(cropped, quality: 92));
+}
 
 final class StorageImageFailure implements Exception {
   const StorageImageFailure();
@@ -93,14 +229,28 @@ final class StorageImageFailure implements Exception {
 class StorageService {
   StorageService(FirebaseStorage storage)
     : _gateway = FirebaseStorageObjectGateway(storage),
-      _encodeJpeg = _encodeInBackground;
+      _background = true;
 
-  /// Encodes inline: a real isolate never completes under the fake clock of
-  /// widget tests.
-  StorageService.forTesting(this._gateway) : _encodeJpeg = _encodeInline;
+  /// Processes images inline: a real isolate never completes under the fake
+  /// clock of widget tests.
+  StorageService.forTesting(this._gateway) : _background = false;
+
+  /// Image work runs in an isolate via `compute`, which itself runs inline on
+  /// web where isolates are unavailable.
+  final bool _background;
+
+  Future<R> _run<Q, R>(R Function(Q) job, Q input) =>
+      _background ? compute(job, input) : Future<R>.sync(() => job(input));
+
+  /// Decodes, orients and bounds a picked photo for the framing step. Null
+  /// when the bytes are not an image.
+  Future<PreparedPhoto?> preparePhoto(Uint8List bytes) =>
+      _run(preparePhotoForCrop, bytes);
+
+  /// Applies a framing chosen on [preparePhoto]'s output.
+  Future<Uint8List?> crop(PhotoCropJob job) => _run(cropPhoto, job);
 
   final StorageObjectGateway _gateway;
-  final Future<Uint8List?> Function(JpegUploadJob job) _encodeJpeg;
 
   /// Resizes (never upscales) and re-encodes to JPEG off the UI thread.
   /// JPEG keeps photos small (tens of KB) instead of the multi-MB PNGs the old
@@ -108,12 +258,13 @@ class StorageService {
   ///
   /// `compute` runs inline on web, where isolates are unavailable; there the
   /// picker already delivers an image at the target size, so the work is small.
-  Future<Uint8List> _compressToJpeg(
+  Future<JpegUploadResult> _compressToJpeg(
     Uint8List bytes, {
     required int maxWidth,
     required int quality,
   }) async {
-    final encoded = await _encodeJpeg(
+    final encoded = await _run(
+      encodeJpegForUpload,
       JpegUploadJob(bytes, maxWidth: maxWidth, quality: quality),
     );
     if (encoded == null) throw const StorageImageFailure();
@@ -124,25 +275,31 @@ class StorageService {
     required Uint8List bytes,
     required String uid,
     required String checkInId,
+    void Function(double fraction)? onProgress,
   }) async {
     _requireSegment(uid, 'uid');
     if (!RegExp(r'^[A-Za-z0-9_-]{20,64}$').hasMatch(checkInId)) {
       throw const FormatException('checkInId: invalid');
     }
-    final jpegBytes = await _compressToJpeg(
+    final jpeg = await _compressToJpeg(
       bytes,
       maxWidth: checkInPhotoMaxWidth,
       quality: 70,
     );
     final path = 'staging/$uid/$checkInId.jpg';
-    return _gateway.put(
-      path,
-      jpegBytes,
-      SettableMetadata(
-        contentType: 'image/jpeg',
-        cacheControl: 'private, no-store',
-      ),
+    final metadata = SettableMetadata(
+      contentType: 'image/jpeg',
+      cacheControl: 'private, no-store',
+      // Read by publishCheckIn and stored as the check-in's `photo_color`.
+      customMetadata: <String, String>{
+        stagingPhotoColorMetadataKey: jpeg.averageColorHex,
+      },
     );
+    if (_gateway case final ProgressReportingStorageGateway gateway
+        when onProgress != null) {
+      return gateway.putWithProgress(path, jpeg.bytes, metadata, onProgress);
+    }
+    return _gateway.put(path, jpeg.bytes, metadata);
   }
 
   Future<Uint8List?> readAuthenticatedObject(
@@ -170,11 +327,11 @@ class StorageService {
     if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(version)) {
       throw const FormatException('version: invalid');
     }
-    final jpegBytes = await _compressToJpeg(
+    final jpegBytes = (await _compressToJpeg(
       bytes,
       maxWidth: avatarMaxWidth,
       quality: 75,
-    );
+    )).bytes;
     final path = 'avatars/$uid/$version.jpg';
     return _gateway.put(
       path,

@@ -30,6 +30,11 @@ abstract final class AppLayout {
   static const readableText = 680.0;
   static const feed = 680.0;
   static const touchTarget = 44.0;
+
+  /// Check-in photos are framed at this ratio in the check-in cropper and
+  /// shown at it in the feed card, so what the author frames is what friends
+  /// see.
+  static const checkInPhotoAspectRatio = 16 / 9;
 }
 
 abstract final class AppElevation {

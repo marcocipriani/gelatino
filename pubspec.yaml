@@ -66,6 +66,7 @@ dependencies:
   # own resolution suggestion; the share() API is unchanged from 12.x.
   share_plus: ^13.2.1
   firebase_messaging: ^16.1.0
+  firebase_app_check: ^0.4.8
 
 dev_dependencies:
   flutter_test:

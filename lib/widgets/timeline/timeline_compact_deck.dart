@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../design/app_tokens.dart';
 import '../../models/feed_item.dart';
 import '../../repositories/timeline_repository.dart';
+import '../check_in_photo_prefetch.dart';
 import 'timeline_editorial_card.dart';
 import '../../constants/app_strings.dart';
 
@@ -364,6 +365,12 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
                     children: <Widget>[
                       for (final index in _mountedIndexes())
                         _positionedCard(index, cardHeight),
+                      // Positioned so the zero-size child cannot size the Stack.
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        child: CheckInPhotoPrefetch(paths: _prefetchPaths()),
+                      ),
                       _DeckControls(
                         canPrevious: _canMove(-1),
                         canNext: _canMove(1) || widget.hasMore,
@@ -391,6 +398,16 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
       },
     );
   }
+
+  /// The two cards past the mounted window: those are already loading.
+  List<String> _prefetchPaths() => <String>[
+    for (
+      var index = _currentIndex + 2;
+      index <= _currentIndex + 3 && index < widget.items.length;
+      index++
+    )
+      widget.items[index].photoStoragePath,
+  ];
 
   Iterable<int> _mountedIndexes() sync* {
     final first = (_currentIndex - 1).clamp(0, widget.items.length - 1);

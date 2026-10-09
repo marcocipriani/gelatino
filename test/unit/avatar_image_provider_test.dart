@@ -32,7 +32,10 @@ void main() {
     await tester.pumpAndSettle();
 
     final avatar = tester.widget<CircleAvatar>(find.byType(CircleAvatar));
-    expect(avatar.backgroundImage, isA<MemoryImage>());
+    expect(
+      (avatar.backgroundImage! as ResizeImage).imageProvider,
+      isA<MemoryImage>(),
+    );
     expect(gateway.readPaths, <String>['avatars/alice/version.jpg']);
   });
 
@@ -48,7 +51,10 @@ void main() {
     await tester.pumpAndSettle();
 
     final avatar = tester.widget<CircleAvatar>(find.byType(CircleAvatar));
-    expect(avatar.backgroundImage, isA<NetworkImage>());
+    expect(
+      (avatar.backgroundImage! as ResizeImage).imageProvider,
+      isA<NetworkImage>(),
+    );
     expect(gateway.readPaths, isEmpty);
   });
 

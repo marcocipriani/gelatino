@@ -199,6 +199,13 @@ export function validateCheckIn(
     invalidEvent('photo_storage_path: is invalid');
   }
 
+  // Optional like consumed_at: only check-ins published after it shipped
+  // carry it, and the feed item omits it rather than inventing one.
+  if ('photo_color' in data &&
+      (typeof data.photo_color !== 'string' || !HEX_COLOR.test(data.photo_color))) {
+    invalidEvent('photo_color: is invalid');
+  }
+
   return {
     authorUid,
     placeId,
@@ -217,6 +224,7 @@ export function validateCheckIn(
       created_at: data.created_at,
       consumed_at: consumedAt,
       photo_storage_path: photoStoragePath,
+      ...('photo_color' in data ? {photo_color: data.photo_color} : {}),
     },
   };
 }

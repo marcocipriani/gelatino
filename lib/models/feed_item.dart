@@ -15,6 +15,7 @@ class FeedItem {
     required this.createdAt,
     required this.photoStoragePath,
     this._consumedAt,
+    this.photoColor,
   });
 
   final String authorUid;
@@ -29,6 +30,10 @@ class FeedItem {
   final List<String> taggedUserIds;
   final DateTime createdAt;
   final String photoStoragePath;
+
+  /// Average colour of the photo as opaque ARGB, shown while the photo loads.
+  /// Null for items projected before it shipped.
+  final int? photoColor;
 
   /// Null for feed items projected before backdating shipped. [consumedAt]
   /// falls back to [createdAt] so callers never branch.
@@ -92,6 +97,7 @@ class FeedItem {
       createdAt: requireTimestamp(data, 'created_at'),
       photoStoragePath: photoStoragePath,
       consumedAt: optionalTimestamp(data, 'consumed_at'),
+      photoColor: parsePhotoColor(data),
     );
   }
 }
@@ -113,7 +119,11 @@ const Set<String> _feedItemKeys = <String>{
 
 /// Projected since backdating shipped. Feed items written before it have no
 /// `consumed_at`, so it can never join [_feedItemKeys].
-const Set<String> _feedItemOptionalKeys = <String>{'consumed_at'};
+/// `photo_color` likewise only exists on items projected after it shipped.
+const Set<String> _feedItemOptionalKeys = <String>{
+  'consumed_at',
+  'photo_color',
+};
 
 Map<String, dynamic> _userSnapshot(Map<String, dynamic> data, String key) {
   final snapshot = stringMap(data, key);

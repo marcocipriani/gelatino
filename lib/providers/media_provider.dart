@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/media_cache/media_disk_cache.dart';
+import '../services/media_telemetry.dart';
 import '../services/storage_service.dart';
 
 const int checkInMediaMaxBytes = 5 * 1024 * 1024;
@@ -48,9 +49,16 @@ final mediaBytesProvider =
         final cache = ref.watch(mediaDiskCacheProvider);
         final cached = await cache.read(key.path, maxBytes: key.maxBytes);
         if (cached != null) return cached;
-        final bytes = await ref
-            .watch(storageServiceProvider)
-            .readAuthenticatedObject(key.path, maxBytes: key.maxBytes);
+        final Uint8List? bytes;
+        try {
+          bytes = await ref
+              .watch(storageServiceProvider)
+              .readAuthenticatedObject(key.path, maxBytes: key.maxBytes);
+        } catch (error) {
+          // Each retry reports again; the telemetry collapses repeats.
+          ref.read(mediaTelemetryProvider).report(MediaFailureKind.load, error);
+          rethrow;
+        }
         if (bytes != null) unawaited(cache.write(key.path, bytes));
         return bytes;
       },

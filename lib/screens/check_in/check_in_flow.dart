@@ -27,11 +27,12 @@ import 'check_in_flow_widgets.dart';
 import 'check_in_step_rail.dart';
 import 'experience_step.dart';
 import 'gelato_step.dart';
+import 'photo_crop_page.dart';
 import 'photo_step.dart';
 import 'place_step.dart';
 import 'share_step.dart';
 import '../../constants/app_strings.dart';
-import '../../services/storage_service.dart' show checkInPhotoMaxWidth;
+import '../../services/storage_service.dart';
 
 final class CheckInFlow extends ConsumerStatefulWidget {
   const CheckInFlow({
@@ -453,15 +454,22 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
     try {
       final picked = await picker.pickImage(
         source: source,
-        // Width only, like the upload, so portrait photos keep their height.
-        // Decoding a larger image only to shrink it again is the slow part on
-        // web, where compression runs on the UI thread.
-        maxWidth: checkInPhotoMaxWidth.toDouble(),
+        // Width only, so portrait photos keep their height. Bounded because
+        // decoding a larger image only to shrink it is the slow part on web,
+        // where image work runs on the UI thread; the margin over the upload
+        // width leaves room to zoom while framing.
+        maxWidth: checkInPickMaxWidth.toDouble(),
         imageQuality: 90,
       );
       if (picked == null || !_isSnapshotCurrent(lifecycle)) return;
-      final Uint8List bytes = await picked.readAsBytes();
-      if (!_isSnapshotCurrent(lifecycle)) return;
+      final Uint8List original = await picked.readAsBytes();
+      if (!_isSnapshotCurrent(lifecycle) || !mounted) return;
+      final bytes = await framePhotoForCheckIn(
+        context,
+        ref.read(storageServiceProvider),
+        original,
+      );
+      if (bytes == null || !_isSnapshotCurrent(lifecycle)) return;
       await lifecycle.controller.selectPhoto(
         bytes,
         picked.name.trim().isEmpty ? 'photo.jpg' : picked.name,
@@ -1198,6 +1206,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
         bytes: flow.photoBytes,
         hasStagedPhoto: draft.stagingObjectPath != null,
         isUploading: flow.isUploading,
+        uploadProgress: flow.uploadProgress,
         photoMissing: flow.photoMissing,
         uploadFailed:
             !flow.isUploading &&
