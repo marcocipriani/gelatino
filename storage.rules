@@ -34,9 +34,13 @@ service firebase.storage {
     }
 
     match /check_ins/{userId}/{checkInId}/{fileName} {
-      allow read: if signedIn()
-        && canonicalCheckInBelongsTo(userId, checkInId)
-        && (isOwner(userId) || isAcceptedFriend(request.auth.uid, userId));
+      // Each Firestore lookup here is a billed read on every photo load, so the
+      // owner (path-scoped, server-written) needs none; friends still need the
+      // friendship and a live check-in, which hides photos of deleted
+      // check-ins until the scheduled cleanup removes them.
+      allow read: if isOwner(userId)
+        || (isAcceptedFriend(request.auth.uid, userId)
+          && canonicalCheckInBelongsTo(userId, checkInId));
       allow write: if false;
     }
 
