@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../design/app_tokens.dart';
 import '../../providers/places_discovery_provider.dart';
 import '../../constants/app_strings.dart';
+import 'place_marker.dart';
 
 final class PlaceFilterBar extends StatelessWidget {
   const PlaceFilterBar({
@@ -31,9 +32,15 @@ final class PlaceFilterBar extends StatelessWidget {
               button: true,
               selected: selected == filter,
               label: AppStrings.placeFilterLabel(filter.label),
-              child: SizedBox(
-                height: AppLayout.touchTarget,
+              // Height follows the label, so larger type never clips.
+              child: MediaQuery.withClampedTextScaling(
+                maxScaleFactor: 1.5,
                 child: ChoiceChip(
+                  // Same glyph as the pin: the filters double as a map legend.
+                  avatar: switch (_variantOf(filter)) {
+                    final variant? => PlaceStateBadge(variant: variant),
+                    null => null,
+                  },
                   label: Text(filter.label),
                   selected: selected == filter,
                   showCheckmark: false,
@@ -55,3 +62,11 @@ final class PlaceFilterBar extends StatelessWidget {
     );
   }
 }
+
+PlaceMarkerVariant? _variantOf(PlacesFilter filter) => switch (filter) {
+  PlacesFilter.all => null,
+  PlacesFilter.liked => PlaceMarkerVariant.liked,
+  PlacesFilter.favorites => PlaceMarkerVariant.favorite,
+  PlacesFilter.saved => PlaceMarkerVariant.saved,
+  PlacesFilter.addedByMe => PlaceMarkerVariant.userAdded,
+};

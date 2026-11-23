@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui' show Tristate;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -142,6 +143,12 @@ void main() {
       buildExternalMapUri(_place).toString(),
       'https://www.google.com/maps/search/?api=1&query=45.123456%2C9.987654',
     );
+
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    final apple = buildExternalMapUri(_place);
+    expect(apple.host, 'maps.apple.com');
+    expect(apple.queryParameters['ll'], '45.123456,9.987654');
   });
 
   testWidgets('personal note comes only from current PlaceState', (
@@ -223,6 +230,8 @@ void main() {
       tester.element(find.byType(PlaceDetailScreen)),
     );
 
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
     await tester.tap(save);
     await tester.pump();
     container

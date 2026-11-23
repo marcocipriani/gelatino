@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import 'app_page.dart';
 import 'avatar_image_provider.dart';
 import 'editorial_top_navigation.dart';
 import 'floating_bottom_navigation.dart';
+import 'melt_pin.dart';
 import '../constants/app_strings.dart';
 
 class AuthenticatedShell extends ConsumerWidget {
@@ -49,7 +51,18 @@ class AuthenticatedShell extends ConsumerWidget {
       );
       final content = AppPage(fullBleed: fullBleed, child: child);
 
-      if (responsiveClass == ResponsiveClass.wide) {
+      // A landscape phone loses half its height to two bars; give it one.
+      // The top bar's labels grow with text size (to 1.3x), and so does the
+      // width they need.
+      final landscapePhone =
+          constraints.maxHeight < 500 &&
+          availableWidth >=
+              800 *
+                  (MediaQuery.textScalerOf(context).scale(16) / 16).clamp(
+                    1.0,
+                    1.3,
+                  );
+      if (responsiveClass == ResponsiveClass.wide || landscapePhone) {
         return Scaffold(
           body: Column(
             children: [
@@ -61,7 +74,7 @@ class AuthenticatedShell extends ConsumerWidget {
                 onCheckIn: () => context.push('/check-in'),
                 avatar: accountActions,
               ),
-              Expanded(child: content),
+              Expanded(child: _BelowTopBar(child: content)),
             ],
           ),
         );
@@ -70,14 +83,18 @@ class AuthenticatedShell extends ConsumerWidget {
       final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
       return Scaffold(
         resizeToAvoidBottomInset: false,
-        body: MediaQuery.removeViewInsets(
-          context: context,
-          removeBottom: true,
-          child: Column(
-            children: [
-              _CompactHeader(accountActions: accountActions),
-              Expanded(child: content),
-            ],
+        // A Builder, so these start from the body's MediaQuery: the Scaffold
+        // has already handed the bottom inset to the tab bar.
+        body: Builder(
+          builder: (bodyContext) => MediaQuery.removeViewInsets(
+            context: bodyContext,
+            removeBottom: true,
+            child: Column(
+              children: [
+                _CompactHeader(accountActions: accountActions),
+                Expanded(child: _BelowTopBar(child: content)),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: Padding(
@@ -92,6 +109,27 @@ class AuthenticatedShell extends ConsumerWidget {
         ),
       );
     },
+  );
+}
+
+/// The bar above already cleared the status bar; don't let screens do it again.
+///
+/// The semantics container matters: the routed body is a Navigator, whose
+/// modal barrier drops everything painted before it in the same container.
+/// Without this, screen readers never see the bar.
+class _BelowTopBar extends StatelessWidget {
+  const _BelowTopBar({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    child: MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: child,
+    ),
   );
 }
 
@@ -111,13 +149,21 @@ class _CompactHeader extends StatelessWidget {
         child: AppPage(
           child: Row(
             children: [
-              Text(
-                'Gelatino',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              const MeltPinGlyph(color: AppColors.fragola, height: 26),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: MediaQuery.withClampedTextScaling(
+                  maxScaleFactor: 1.3,
+                  child: Text(
+                    'Gelatino',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
               ),
-              const Spacer(),
               accountActions,
             ],
           ),
@@ -175,7 +221,7 @@ class _SettingsGearState extends State<_SettingsGear> {
               minimumSize: const Size.square(48),
               padding: const EdgeInsets.all(4),
             ),
-            icon: const Icon(Icons.settings_outlined),
+            icon: const Icon(CupertinoIcons.settings),
           ),
         ),
       ),

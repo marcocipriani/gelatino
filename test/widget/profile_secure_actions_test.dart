@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,7 +40,7 @@ void main() {
         find.byKey(const ValueKey('profile-settings-gear')),
         findsOneWidget,
       );
-      expect(find.byIcon(Icons.logout), findsNothing);
+      expect(find.byIcon(CupertinoIcons.square_arrow_right), findsNothing);
       expect(find.byKey(const ValueKey('profile-default-view')), findsNothing);
       expect(find.byKey(const ValueKey('profile-theme-mode')), findsNothing);
     },
@@ -56,7 +57,7 @@ void main() {
       expect(find.text('Bob pubblico'), findsOneWidget);
       expect(find.text('Modifica Profilo'), findsNothing);
       expect(find.byKey(const ValueKey('profile-settings-gear')), findsNothing);
-      expect(find.byIcon(Icons.logout), findsNothing);
+      expect(find.byIcon(CupertinoIcons.square_arrow_right), findsNothing);
       expect(probe.savedPlacesReads, 0);
       expect(find.text('Da provare'), findsNothing);
       expect(find.byKey(const ValueKey('profile-default-view')), findsNothing);
@@ -293,7 +294,7 @@ void main() {
     );
 
     expect(find.text('Giolitti'), findsOneWidget);
-    expect(find.byIcon(Icons.delete_outline), findsNothing);
+    expect(find.byIcon(CupertinoIcons.trash), findsNothing);
     expect(repository.deletedIds, isEmpty);
   });
 
@@ -412,7 +413,7 @@ void main() {
 
     expect(repository.deletedIds, isEmpty);
     expect(find.text('Fatamorgana'), findsOneWidget);
-    expect(find.byIcon(Icons.delete_outline), findsNothing);
+    expect(find.byIcon(CupertinoIcons.trash), findsNothing);
   });
 }
 

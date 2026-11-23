@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gelatino/models/place.dart';
 import 'package:gelatino/providers/auth_provider.dart';
 import 'package:gelatino/providers/location_provider.dart';
@@ -83,7 +84,12 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('filter-saved')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('place-row-a')));
+    await tester.pumpAndSettle();
+    expect(find.text('DETAIL a'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mappa'));
     await tester.pumpAndSettle();
 
@@ -428,6 +434,18 @@ Future<void> _pumpPlaces(
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
+  final router = GoRouter(
+    routes: <RouteBase>[
+      GoRoute(path: '/', builder: (_, _) => const PlacesTab()),
+      GoRoute(
+        path: '/place/:id',
+        builder: (_, state) =>
+            Scaffold(body: Text('DETAIL ${state.pathParameters['id']}')),
+      ),
+    ],
+  );
+  addTearDown(router.dispose);
+
   await tester.pumpWidget(
     ProviderScope(
       key: UniqueKey(),
@@ -459,7 +477,7 @@ Future<void> _pumpPlaces(
           );
         }),
       ],
-      child: const MaterialApp(home: PlacesTab()),
+      child: MaterialApp.router(routerConfig: router),
     ),
   );
   await tester.pumpAndSettle();

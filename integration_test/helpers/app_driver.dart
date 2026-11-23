@@ -7,10 +7,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gelatino/constants/app_strings.dart';
 import 'package:gelatino/providers/auth_provider.dart';
 import 'package:gelatino/providers/timeline_providers.dart';
 import 'package:gelatino/screens/timeline_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gelatino/widgets/app_controls.dart';
 import 'package:gelatino/widgets/semantic_state_button.dart';
 
 import 'finders.dart';
@@ -160,42 +162,43 @@ final class AppDriver {
     await tester.pump(pollInterval);
   }
 
-  Future<void> waitForDropdownValue(String key, Object expectedValue) async {
-    final finder = E2EFinders.key(key);
-    await waitFor(finder, 'dropdown "$key"');
-    await waitUntil(() {
-      final widget = tester.widget(finder);
-      return switch (widget) {
-        DropdownButton<ThemeMode>(:final value, :final onChanged) =>
-          value == expectedValue && onChanged != null,
-        DropdownButton<String>(:final value, :final onChanged) =>
-          value == expectedValue && onChanged != null,
-        _ => false,
+  ({Object value, bool enabled}) _segmentState(String key) =>
+      switch (tester.widget(E2EFinders.key(key))) {
+        AppSegmented<ThemeMode>(:final value, :final onChanged) => (
+          value: value,
+          enabled: onChanged != null,
+        ),
+        AppSegmented<String>(:final value, :final onChanged) => (
+          value: value,
+          enabled: onChanged != null,
+        ),
+        _ => throw StateError('"$key" is not a segmented control'),
       };
-    }, 'dropdown "$key" value $expectedValue');
+
+  Future<void> waitForSegmentValue(String key, Object expectedValue) async {
+    await waitUntil(() {
+      final state = _segmentState(key);
+      return state.value == expectedValue && state.enabled;
+    }, 'segmented "$key" value $expectedValue');
   }
 
-  Future<void> selectDropdown({
+  Future<void> selectSegment({
     required String key,
     required String option,
     required Object expectedValue,
   }) async {
-    await tapKey(key);
-    await tapLabel(option);
-    await waitUntil(() {
-      final widget = tester.widget(E2EFinders.key(key));
-      return switch (widget) {
-        DropdownButton<ThemeMode>(:final value, :final onChanged) =>
-          value == expectedValue && onChanged != null,
-        DropdownButton<String>(:final value, :final onChanged) =>
-          value == expectedValue && onChanged != null,
-        _ => false,
-      };
-    }, 'dropdown "$key" to persist "$option"');
+    await waitUntil(() => _segmentState(key).enabled, 'enabled "$key"');
+    final segment = find.descendant(
+      of: E2EFinders.key(key),
+      matching: E2EFinders.text(option),
+    );
+    await _tap(segment, 'segment "$option" in "$key"');
+    await waitForSegmentValue(key, expectedValue);
   }
 
+  // Not tester.pageBack(): it looks for the English "Back" tooltip.
   Future<void> pageBack() async {
-    await tester.pageBack();
+    await tapTooltip(AppStrings.back);
     await tester.pump(const Duration(milliseconds: 250));
   }
 

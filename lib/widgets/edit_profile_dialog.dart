@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +12,6 @@ import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
 import '../utils/error_handler.dart';
 import 'avatar_image_provider.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../constants/app_strings.dart';
 
 class EditProfileDialog extends ConsumerStatefulWidget {
@@ -140,30 +140,35 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
               const SizedBox(height: 20),
 
               // Selettore Avatar
-              GestureDetector(
-                onTap: _pickAvatar,
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    AuthenticatedAvatar(
-                      source: widget.profile.photoUrl,
-                      bytes: _avatarBytes,
-                      radius: 50,
-                      iconSize: 50,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        shape: BoxShape.circle,
+              Semantics(
+                button: true,
+                label: AppStrings.editProfileChangePhoto,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: _isLoading ? null : _pickAvatar,
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      AuthenticatedAvatar(
+                        source: widget.profile.photoUrl,
+                        bytes: _avatarBytes,
+                        radius: 50,
+                        iconSize: 50,
                       ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 16,
-                        color: Colors.white,
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          CupertinoIcons.camera_fill,
+                          size: 16,
+                          color: AppTheme.fondenteExtra,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -173,7 +178,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: AppStrings.editProfileDisplayName,
-                  prefixIcon: Icon(Icons.person_outline),
+                  prefixIcon: Icon(CupertinoIcons.person),
                 ),
               ),
               const SizedBox(height: 16),
@@ -203,23 +208,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
                         ? SizedBox(
                             width: 20,
                             height: 20,
-                            child:
-                                Image.asset(
-                                      'assets/images/logo-white.png',
-                                      width: 20,
-                                      height: 20,
-                                      fit: BoxFit.contain,
-                                    )
-                                    .animate(
-                                      onPlay: (controller) =>
-                                          controller.repeat(reverse: true),
-                                    )
-                                    .scaleXY(
-                                      begin: 0.75,
-                                      end: 1.15,
-                                      duration: 600.ms,
-                                      curve: Curves.easeInOutCubic,
-                                    ),
+                            child: CircularProgressIndicator.adaptive(),
                           )
                         : const Text(AppStrings.save),
                   ),

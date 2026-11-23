@@ -3,13 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gelatino/design/app_tokens.dart';
 import 'package:gelatino/design/focus_ring.dart';
+import 'package:gelatino/design/motion.dart';
 import 'package:gelatino/theme/app_theme.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
-  tearDownAll(() => GoogleFonts.config.allowRuntimeFetching = true);
 
   test('ordinary cards are flat in both themes', () {
     expect(AppTheme.lightTheme.cardTheme.elevation, 0);
@@ -79,6 +77,70 @@ void main() {
         reason: theme.brightness.name,
       );
     }
+  });
+
+  test('every text role clears AA on every surface it sits on', () {
+    for (final (name, theme, minimum) in <(String, ThemeData, double)>[
+      ('light', AppTheme.lightTheme, 4.5),
+      ('dark', AppTheme.darkTheme, 4.5),
+      ('light high contrast', AppTheme.highContrastLightTheme, 7.0),
+      ('dark high contrast', AppTheme.highContrastDarkTheme, 7.0),
+    ]) {
+      final scheme = theme.colorScheme;
+      for (final surface in <Color>[
+        theme.scaffoldBackgroundColor,
+        scheme.surface,
+        scheme.surfaceContainer,
+        scheme.surfaceContainerHighest,
+        scheme.primaryContainer,
+      ]) {
+        for (final ink in <Color>[
+          scheme.onSurface,
+          scheme.onSurfaceVariant,
+          scheme.accentInk,
+        ]) {
+          expect(
+            _contrastRatio(surface, ink),
+            greaterThanOrEqualTo(minimum),
+            reason: '$name: $ink on $surface',
+          );
+        }
+      }
+      // Control outlines only need the 3:1 non-text minimum.
+      for (final surface in [theme.scaffoldBackgroundColor, scheme.surface]) {
+        expect(
+          _contrastRatio(surface, scheme.outline),
+          greaterThanOrEqualTo(3),
+          reason: '$name outline',
+        );
+      }
+    }
+  });
+
+  test('text styles use the bundled family at their real weight', () {
+    final text = AppTheme.lightTheme.textTheme;
+    expect(text.displaySmall?.fontFamily, AppTheme.fontFamily);
+    expect(text.displaySmall?.fontWeight, FontWeight.w800);
+    expect(text.titleMedium?.fontWeight, FontWeight.w700);
+  });
+
+  testWidgets('iOS Reduce Motion reaches every motion check', (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(reduceMotion: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    late bool reduced;
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => ReducedMotionScope(child: child!),
+        home: Builder(
+          builder: (context) {
+            reduced = MediaQuery.disableAnimationsOf(context);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+    expect(reduced, isTrue);
   });
 
   for (final brightness in Brightness.values) {

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../design/app_tokens.dart';
@@ -47,7 +48,7 @@ final class AsyncContentState extends StatelessWidget {
     this.actionLabel = AppStrings.retry,
   }) : status = AsyncContentStatus.error,
        loadingChild = null,
-       icon = Icons.error_outline,
+       icon = CupertinoIcons.exclamationmark_circle,
        title = null,
        description = null,
        onAction = onRetry;
@@ -95,7 +96,7 @@ final class AsyncContentState extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.error_outline,
+                  CupertinoIcons.exclamationmark_circle,
                   color: Theme.of(context).colorScheme.error,
                 ),
                 const SizedBox(height: AppSpacing.xs),
@@ -107,7 +108,7 @@ final class AsyncContentState extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xs),
                 TextButton.icon(
                   onPressed: onAction,
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(CupertinoIcons.refresh),
                   label: Text(actionLabel!),
                 ),
               ],

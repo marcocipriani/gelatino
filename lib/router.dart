@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'design/motion.dart';
 import 'providers/router_auth_provider.dart';
 import 'screens/check_in_screen.dart';
 import 'screens/collection_screen.dart';
@@ -44,38 +45,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/', redirect: (context, state) => '/collection'),
       ShellRoute(
-        builder: (context, state, child) => MainScreen(
-          location: state.uri.path,
-          fullBleed:
-              state.uri.path == '/places' || state.uri.path == '/timeline',
-          child: child,
-        ),
+        // Every tab pads itself; padding here too doubled the gutters.
+        builder: (context, state, child) =>
+            MainScreen(location: state.uri.path, fullBleed: true, child: child),
         routes: [
           GoRoute(
             path: '/collection',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const CollectionScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _tabPage(state, const CollectionScreen()),
           ),
           GoRoute(
             path: '/timeline',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const TimelineScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _tabPage(state, const TimelineScreen()),
           ),
           GoRoute(
             path: '/places',
-            pageBuilder: (context, state) =>
-                NoTransitionPage(key: state.pageKey, child: const PlacesTab()),
+            pageBuilder: (context, state) => _tabPage(state, const PlacesTab()),
           ),
           GoRoute(
             path: '/friends',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const FriendsScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _tabPage(state, const FriendsScreen()),
           ),
         ],
       ),
@@ -84,43 +75,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) {
           final placeId = state.uri.queryParameters['placeId'];
           final prefillFriendId = state.uri.queryParameters['prefillFriendId'];
-          return buildPageWithTransition(
-            state: state,
-            child: CheckInScreen(
-              placeId: placeId,
-              prefillFriendId: prefillFriendId,
-            ),
-            isSlideUp: true,
-            opaque: false,
+          return _sheetPage(
+            state,
+            CheckInScreen(placeId: placeId, prefillFriendId: prefillFriendId),
           );
         },
       ),
       GoRoute(path: '/wishlist', redirect: (context, state) => '/collection'),
       GoRoute(
         path: '/favorite-flavors',
-        pageBuilder: (context, state) => buildPageWithTransition(
-          state: state,
+        pageBuilder: (context, state) => MaterialPage<void>(
+          key: state.pageKey,
           child: const FavoriteFlavorsScreen(),
         ),
       ),
       GoRoute(
         path: '/profile',
-        pageBuilder: (context, state) => buildPageWithTransition(
-          state: state,
+        pageBuilder: (context, state) => MaterialPage<void>(
+          key: state.pageKey,
           child: ProfileScreen(userId: state.uri.queryParameters['userId']),
         ),
       ),
       GoRoute(
         path: '/settings',
-        pageBuilder: (context, state) => buildPageWithTransition(
-          state: state,
+        pageBuilder: (context, state) => MaterialPage<void>(
+          key: state.pageKey,
           child: const SettingsScreen(),
         ),
       ),
       GoRoute(
         path: '/place/:id',
-        pageBuilder: (context, state) => buildPageWithTransition(
-          state: state,
+        pageBuilder: (context, state) => MaterialPage<void>(
+          key: state.pageKey,
           child: PlaceDetailScreen(placeId: state.pathParameters['id']!),
         ),
       ),
@@ -130,40 +116,55 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-Page<dynamic> buildPageWithTransition<T>({
-  required GoRouterState state,
-  required Widget child,
-  bool isSlideUp = false,
-  bool opaque = true,
-}) {
-  return CustomTransitionPage<T>(
-    key: state.pageKey,
-    child: child,
-    opaque: opaque,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      if (isSlideUp) {
-        return SlideTransition(
-          position: animation.drive(
-            Tween<Offset>(
-              begin: const Offset(0.0, 1.0),
-              end: Offset.zero,
-            ).chain(CurveTween(curve: Curves.easeOutCubic)),
-          ),
+/// Tabs are siblings, so they fade through rather than push. The page paints
+/// its own canvas because the outgoing tab stays put until this one lands.
+CustomTransitionPage<void> _tabPage(GoRouterState state, Widget child) =>
+    CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: AppMotion.standard,
+      reverseTransitionDuration: AppMotion.fast,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final page = ColoredBox(
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: child,
         );
-      }
-      return FadeTransition(
-        opacity: animation,
-        child: SlideTransition(
-          position: animation.drive(
-            Tween<Offset>(
-              begin: const Offset(0.05, 0.0),
-              end: Offset.zero,
-            ).chain(CurveTween(curve: Curves.easeOutCubic)),
+        final eased = animation.drive(CurveTween(curve: AppMotion.enter));
+        return FadeTransition(
+          opacity: AppMotion.reduced(context)
+              ? kAlwaysCompleteAnimation
+              : eased,
+          child: SlideTransition(
+            position: AppMotion.reduced(context)
+                ? const AlwaysStoppedAnimation(Offset.zero)
+                : eased.drive(
+                    Tween(begin: const Offset(0, 0.012), end: Offset.zero),
+                  ),
+            child: page,
           ),
-          child: child,
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+
+/// A modal task: rises over the screen it was opened from, which stays painted.
+CustomTransitionPage<void> _sheetPage(GoRouterState state, Widget child) =>
+    CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+      opaque: false,
+      fullscreenDialog: true,
+      transitionDuration: AppMotion.emphasized,
+      reverseTransitionDuration: AppMotion.standard,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          AppMotion.reduced(context)
+          ? FadeTransition(opacity: animation, child: child)
+          : SlideTransition(
+              position: animation.drive(
+                Tween(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).chain(CurveTween(curve: AppMotion.glide)),
+              ),
+              child: child,
+            ),
+    );

@@ -1,4 +1,5 @@
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,109 +42,112 @@ final class ShareCheckInCard extends StatelessWidget {
       minHeight: height,
       maxHeight: height,
       alignment: Alignment.topLeft,
-      child: ColoredBox(
-        color: AppTheme.fiorDiPanna,
-        child: Padding(
-          padding: const EdgeInsets.all(56),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                flex: 7,
-                child: ClipSmoothRect(
-                  radius: SmoothBorderRadius(
-                    cornerRadius: 64,
-                    cornerSmoothing: 0.6,
+      child: MediaQuery.withNoTextScaling(
+        // An exported image: the sender's text size must not reflow it.
+        child: ColoredBox(
+          color: AppTheme.fiorDiPanna,
+          child: Padding(
+            padding: const EdgeInsets.all(56),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Expanded(
+                  flex: 7,
+                  child: ClipSmoothRect(
+                    radius: SmoothBorderRadius(
+                      cornerRadius: 64,
+                      cornerSmoothing: 0.6,
+                    ),
+                    child: SizedBox.expand(child: photo),
                   ),
-                  child: SizedBox.expand(child: photo),
                 ),
-              ),
-              const SizedBox(height: 40),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SvgPicture.asset(
-                              'assets/images/simple-pin.svg',
-                              width: 72,
-                              height: 72,
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 12),
-                                child: Text(
-                                  placeName,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 44,
-                                    color: AppTheme.fondenteExtra,
+                const SizedBox(height: 40),
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              SvgPicture.asset(
+                                'assets/images/simple-pin.svg',
+                                width: 72,
+                                height: 72,
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: Text(
+                                    placeName,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontFamily: 'PlusJakartaSans',
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 44,
+                                      color: AppTheme.fondenteExtra,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: List<Widget>.generate(
-                            5,
-                            (index) => Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: Icon(
-                                Icons.star_rounded,
-                                size: 48,
-                                color: index < rating
-                                    ? AppTheme.sorbettoYuzu
-                                    : AppTheme.fondenteExtra.withValues(
-                                        alpha: 0.2,
-                                      ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: List<Widget>.generate(
+                              5,
+                              (index) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: Icon(
+                                  CupertinoIcons.star_fill,
+                                  size: 48,
+                                  color: index < rating
+                                      ? AppColors.fragolaInk
+                                      : AppTheme.fondenteExtra.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: flavors
-                              .map(
-                                (flavor) => _FlavorChip(
-                                  name: flavor['name'] as String,
-                                  colorHex: flavor['color_hex'] as String?,
-                                ),
-                              )
-                              .toList(growable: false),
-                        ),
-                      ],
-                    ),
-                    const Align(
-                      alignment: Alignment.bottomRight,
-                      child: Text(
-                        'Gelatino',
-                        style: TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontWeight: FontWeight.w900,
-                          fontSize: 34,
-                          color: AppTheme.fondenteExtra,
+                          const SizedBox(height: 24),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: flavors
+                                .map(
+                                  (flavor) => _FlavorChip(
+                                    name: flavor['name'] as String,
+                                    colorHex: flavor['color_hex'] as String?,
+                                  ),
+                                )
+                                .toList(growable: false),
+                          ),
+                        ],
+                      ),
+                      const Align(
+                        alignment: Alignment.bottomRight,
+                        child: Text(
+                          'Gelatino',
+                          style: TextStyle(
+                            fontFamily: 'PlusJakartaSans',
+                            fontWeight: FontWeight.w900,
+                            fontSize: 34,
+                            color: AppTheme.fondenteExtra,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -177,9 +181,7 @@ final class _FlavorChip extends StatelessWidget {
     final background = parsed ?? AppTheme.fondenteExtra.withValues(alpha: 0.1);
     final foreground = parsed == null
         ? AppTheme.fondenteExtra
-        : (background.computeLuminance() > 0.55
-              ? AppTheme.fondenteExtra
-              : Colors.white);
+        : inkOn(background);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
@@ -189,7 +191,7 @@ final class _FlavorChip extends StatelessWidget {
       child: Text(
         name,
         style: TextStyle(
-          fontFamily: 'Plus Jakarta Sans',
+          fontFamily: 'PlusJakartaSans',
           fontWeight: FontWeight.w700,
           fontSize: 28,
           color: foreground,
@@ -291,35 +293,41 @@ final class _ShareCheckInPreviewDialogState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: screenSize.width * 0.8,
-                maxHeight: screenSize.height * 0.6,
-              ),
-              child: FittedBox(
-                // FittedBox measures its child under unbounded constraints,
-                // which the card's own OverflowBox can't size itself under
-                // (it would try to be infinitely big). This SizedBox pins
-                // the child to the card's exact design size first, so
-                // OverflowBox only ever sees bounded constraints.
-                child: SizedBox(
-                  width: ShareCheckInCard.width,
-                  height: ShareCheckInCard.height,
-                  child: RepaintBoundary(
-                    key: _repaintKey,
-                    child: ShareCheckInCard(
-                      placeName: widget.placeName,
-                      rating: widget.rating,
-                      flavors: widget.flavors,
-                      photo: widget.photo,
+            // Flexible: in landscape the buttons need the height first.
+            Flexible(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: screenSize.width * 0.8,
+                  maxHeight: screenSize.height * 0.6,
+                ),
+                child: FittedBox(
+                  // FittedBox measures its child under unbounded constraints,
+                  // which the card's own OverflowBox can't size itself under
+                  // (it would try to be infinitely big). This SizedBox pins
+                  // the child to the card's exact design size first, so
+                  // OverflowBox only ever sees bounded constraints.
+                  child: SizedBox(
+                    width: ShareCheckInCard.width,
+                    height: ShareCheckInCard.height,
+                    child: RepaintBoundary(
+                      key: _repaintKey,
+                      child: ShareCheckInCard(
+                        placeName: widget.placeName,
+                        rating: widget.rating,
+                        flavors: widget.flavors,
+                        photo: widget.photo,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            // Wraps at large type instead of running off the dialog.
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: 8,
+              runSpacing: 8,
               children: <Widget>[
                 TextButton(
                   onPressed: _sharing
@@ -327,7 +335,6 @@ final class _ShareCheckInPreviewDialogState
                       : () => Navigator.of(context).pop(),
                   child: const Text(AppStrings.cancel),
                 ),
-                const SizedBox(width: 8),
                 FilledButton(
                   onPressed: _sharing ? null : _share,
                   style: FilledButton.styleFrom(
@@ -338,7 +345,7 @@ final class _ShareCheckInPreviewDialogState
                           dimension: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppTheme.fondenteExtra,
                           ),
                         )
                       : const Text(AppStrings.shareCardPreviewConfirm),

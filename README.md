@@ -74,7 +74,7 @@ Mi piace → **Fragola** · Preferiti → **Sorbetto** · Salvati/da provare →
 ### 2. Dashboard (`MainScreen`)
 *   **Header centrato:** titolo sezione perfettamente centrato (Stack); a sinistra il **Melt Pin** (più grande) come scorciatoia al **check-in veloce** (haptic + badge "+"), a destra l'avatar.
 *   **Navigazione a 4 tab:** Collezione · Bacheca · Gelaterie · Amici. Default su Collezione.
-*   **Floating Pill Navigation** con `BackdropFilter`; su desktop sidebar verticale. Stato attivo in Fragola Pop.
+*   **Tab bar ancorata e opaca**, con check-in al centro; su desktop e su telefono in orizzontale barra in alto. Stato attivo in Fragola.
 
 ### 3. Collezione (`CollectionScreen`) — landing
 *   **Da provare:** gelaterie salvate (wishlist), con accento Menta.
@@ -84,11 +84,12 @@ Mi piace → **Fragola** · Preferiti → **Sorbetto** · Salvati/da provare →
 *   Feed dei check-in propri e degli amici. Card editoriali 3:4, rating, note, chip gusti **colorate dal colore del gusto**.
 
 ### 5. Gelaterie (`PlacesTab`)
-*   **Dual-View:** pills Lista/Mappa in alto; **ricerca e filtri sotto** le pills.
+*   **Dual-View:** ricerca, filtri, poi selettore Lista/Mappa. La ricerca ignora accenti e punteggiatura, accetta parole in qualsiasi ordine e trova anche i gusti già assaggiati.
 *   **Filtri per stato:** Tutte · Mi piace · Preferiti · Salvati · Aggiunte da me (validi in lista e mappa).
 *   **Marker semantici:** Melt Pin colorato per stato (`pin-*.svg`); precedenza preferiti > salvati > mi piace > aggiunte > default.
 *   **Aggiungi gelateria:** pulsante Puffo → dialog (nome, indirizzo, posizione GPS); la nuova gelateria è marcata come aggiunta dall'utente.
-*   Tile vettoriale OpenStreetMap o satellitare ArcGIS.
+*   **Cluster:** i pin vicini si raggruppano con conteggio e glifo dello stato; il tap ingrandisce.
+*   Tile raster OpenStreetMap, con attribuzione.
 
 ### 6. Creazione Check-in (`CheckInScreen`)
 *   **Upload JPEG compresso** (pacchetto `image`, ridimensionamento + `cache-control`) su Firebase Storage — leggero, evita sprechi di quota.

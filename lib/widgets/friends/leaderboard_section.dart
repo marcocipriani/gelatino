@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_tokens.dart';
 import '../../providers/leaderboard_provider.dart';
 import '../../screens/friends/friends_sections.dart';
+import '../app_controls.dart';
 import '../avatar_image_provider.dart';
 import '../../constants/app_strings.dart';
 
@@ -24,7 +24,6 @@ class _LeaderboardSectionState extends ConsumerState<LeaderboardSection> {
 
   void _setPeriod(LeaderboardPeriod period) {
     if (period == _period) return;
-    HapticFeedback.selectionClick();
     setState(() => _period = period);
   }
 
@@ -64,33 +63,14 @@ class _PeriodToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return SizedBox(
+    return AppSegmented<LeaderboardPeriod>(
       key: const ValueKey('leaderboard-period-toggle'),
-      height: AppLayout.touchTarget,
-      child: SegmentedButton<LeaderboardPeriod>(
-        segments: const <ButtonSegment<LeaderboardPeriod>>[
-          ButtonSegment<LeaderboardPeriod>(
-            value: LeaderboardPeriod.month,
-            label: Text(AppStrings.leaderboardPeriodMonth),
-          ),
-          ButtonSegment<LeaderboardPeriod>(
-            value: LeaderboardPeriod.allTime,
-            label: Text(AppStrings.leaderboardPeriodAll),
-          ),
-        ],
-        selected: <LeaderboardPeriod>{period},
-        onSelectionChanged: (selection) => onChanged(selection.single),
-        showSelectedIcon: false,
-        style: SegmentedButton.styleFrom(
-          selectedBackgroundColor: theme.colorScheme.primary,
-          selectedForegroundColor: theme.colorScheme.onPrimary,
-          minimumSize: const Size(0, AppLayout.touchTarget),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadii.control),
-          ),
-        ),
-      ),
+      value: period,
+      onChanged: onChanged,
+      segments: const {
+        LeaderboardPeriod.month: AppStrings.leaderboardPeriodMonth,
+        LeaderboardPeriod.allTime: AppStrings.leaderboardPeriodAll,
+      },
     );
   }
 }
@@ -106,7 +86,7 @@ class _LeaderboardEmpty extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.icecream_outlined, color: theme.colorScheme.primary),
+          Icon(Icons.icecream_outlined, color: theme.colorScheme.accentInk),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
@@ -156,21 +136,48 @@ class _Podium extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final entry in entries)
+        for (final (index, entry) in entries.indexed)
           Expanded(
             key: ValueKey('leaderboard-podium-${entry.uid}'),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               child: Column(
                 children: [
-                  AuthenticatedAvatar(source: entry.avatarPath, radius: 32),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      AuthenticatedAvatar(source: entry.avatarPath, radius: 32),
+                      Positioned(
+                        right: -4,
+                        bottom: -2,
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: index == 0
+                              ? AppColors.sorbetto
+                              : theme.colorScheme.inverseSurface,
+                          child: Text(
+                            '${index + 1}',
+                            semanticsLabel: '${index + 1}º posto',
+                            textScaler: TextScaler.noScaling,
+                            style: TextStyle(
+                              color: index == 0
+                                  ? AppColors.fondente
+                                  : theme.colorScheme.onInverseSurface,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     entry.displayName,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: entry.isCurrentUser
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                          ? FontWeight.w800
+                          : FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -212,7 +219,7 @@ class _LeaderboardRow extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: entry.isCurrentUser
-            ? theme.colorScheme.primary.withValues(alpha: 0.1)
+            ? theme.colorScheme.primaryContainer
             : null,
         borderRadius: BorderRadius.circular(AppRadii.control),
       ),

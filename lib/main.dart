@@ -5,10 +5,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'design/motion.dart';
 import 'firebase/emulator_config.dart';
 import 'firebase/firebase_providers.dart';
 import 'firebase_options.dart';
@@ -16,13 +19,14 @@ import 'providers/profile_lifecycle_bindings.dart';
 import 'providers/check_in_flow_provider.dart';
 import 'repositories/check_in_draft_repository.dart';
 import 'repositories/check_in_label_repository.dart';
+import 'providers/high_contrast_provider.dart';
 import 'providers/theme_provider.dart';
 import 'router.dart';
 import 'theme/app_theme.dart';
 import 'constants/app_strings.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  GelatinoBinding.ensureInitialized();
 
   final firebaseOptions = firebaseOptionsForRuntime(
     base: DefaultFirebaseOptions.currentPlatform,
@@ -83,12 +87,27 @@ class GelatinoApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final router = ref.watch(appRouterProvider);
+    final highContrast = ref.watch(highContrastProvider);
 
     return ProfileLifecycleBindings(
       child: MaterialApp.router(
         title: AppStrings.appName,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
+        theme: highContrast
+            ? AppTheme.highContrastLightTheme
+            : AppTheme.lightTheme,
+        darkTheme: highContrast
+            ? AppTheme.highContrastDarkTheme
+            : AppTheme.darkTheme,
+        highContrastTheme: AppTheme.highContrastLightTheme,
+        highContrastDarkTheme: AppTheme.highContrastDarkTheme,
+        themeAnimationDuration: AppMotion.standard,
+        locale: const Locale('it'),
+        supportedLocales: const [Locale('it')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+          value: AppTheme.systemBars(Theme.of(context)),
+          child: ReducedMotionScope(child: child!),
+        ),
         themeMode: themeMode,
         routerConfig: router,
         debugShowCheckedModeBanner: false,

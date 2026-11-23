@@ -9,10 +9,12 @@ import 'package:gelatino/firebase/firebase_providers.dart';
 import 'package:gelatino/models/user_profile.dart';
 import 'package:gelatino/models/user_settings.dart';
 import 'package:gelatino/providers/auth_provider.dart';
+import 'package:gelatino/providers/high_contrast_provider.dart';
 import 'package:gelatino/providers/profile_providers.dart';
 import 'package:gelatino/providers/theme_provider.dart';
 import 'package:gelatino/repositories/profile_repository.dart';
 import 'package:gelatino/screens/settings_screen.dart';
+import 'package:gelatino/widgets/app_controls.dart';
 import 'package:gelatino/widgets/edit_profile_dialog.dart';
 import 'package:go_router/go_router.dart';
 
@@ -355,7 +357,7 @@ void main() {
     await tester.pumpWidget(_settingsHarness(repository: repository));
     await tester.pumpAndSettle();
 
-    final defaultView = tester.widget<DropdownButton<String>>(
+    final defaultView = tester.widget<AppSegmented<String>>(
       find.byKey(const ValueKey('settings-default-view')),
     );
     defaultView.onChanged!('map');
@@ -371,7 +373,7 @@ void main() {
     expect(repository.privacyCalls, <(String, bool)>[('alice', false)]);
     expect(
       tester
-          .widget<DropdownButton<String>>(
+          .widget<AppSegmented<String>>(
             find.byKey(const ValueKey('settings-default-view')),
           )
           .onChanged,
@@ -401,7 +403,7 @@ void main() {
     await tester.pumpAndSettle();
 
     tester
-        .widget<DropdownButton<String>>(
+        .widget<AppSegmented<String>>(
           find.byKey(const ValueKey('settings-default-view')),
         )
         .onChanged!('map');
@@ -456,7 +458,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final select = tester
-          .widget<DropdownButton<ThemeMode>>(
+          .widget<AppSegmented<ThemeMode>>(
             find.byKey(const ValueKey('settings-theme')),
           )
           .onChanged!;
@@ -504,7 +506,7 @@ void main() {
     await tester.pumpAndSettle();
 
     tester
-        .widget<DropdownButton<ThemeMode>>(
+        .widget<AppSegmented<ThemeMode>>(
           find.byKey(const ValueKey('settings-theme')),
         )
         .onChanged!(ThemeMode.dark);
@@ -540,10 +542,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    DropdownButton<ThemeMode> control() =>
-        tester.widget<DropdownButton<ThemeMode>>(
-          find.byKey(const ValueKey('settings-theme')),
-        );
+    AppSegmented<ThemeMode> control() => tester.widget<AppSegmented<ThemeMode>>(
+      find.byKey(const ValueKey('settings-theme')),
+    );
     control().onChanged!(ThemeMode.dark);
     expect(await scheduler.firstScheduled.future, 1);
     await tester.pump();
@@ -572,7 +573,7 @@ void main() {
     await tester.pumpAndSettle();
 
     tester
-        .widget<DropdownButton<String>>(
+        .widget<AppSegmented<String>>(
           find.byKey(const ValueKey('settings-default-view')),
         )
         .onChanged!('map');
@@ -599,7 +600,7 @@ void main() {
     await tester.pumpWidget(_settingsHarness(repository: repository));
     await tester.pumpAndSettle();
 
-    DropdownButton<String> control() => tester.widget<DropdownButton<String>>(
+    AppSegmented<String> control() => tester.widget<AppSegmented<String>>(
       find.byKey(const ValueKey('settings-default-view')),
     );
     control().onChanged!('map');
@@ -760,6 +761,7 @@ Widget _settingsHarness({
       profileRepositoryProvider.overrideWithValue(
         repository ?? _ActionProfileRepository(),
       ),
+      highContrastProvider.overrideWith(_MemoryHighContrast.new),
       themePreferencesProvider.overrideWithValue(
         themePreferences ?? _MemoryThemePreferences(),
       ),
@@ -825,6 +827,7 @@ Future<GoRouter> _pumpSettingsRouter(
           (ref) => Stream<UserSettings?>.value(_settings),
         ),
         profileRepositoryProvider.overrideWithValue(_ActionProfileRepository()),
+        highContrastProvider.overrideWith(_MemoryHighContrast.new),
         themePreferencesProvider.overrideWithValue(_MemoryThemePreferences()),
         firebaseAuthProvider.overrideWithValue(_ActionAuth()),
       ],
@@ -958,4 +961,9 @@ final class _ActionAuth implements FirebaseAuth {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+final class _MemoryHighContrast extends HighContrastNotifier {
+  @override
+  bool build() => false;
 }

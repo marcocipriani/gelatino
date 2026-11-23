@@ -25,6 +25,7 @@ import 'package:gelatino/repositories/check_in_label_repository.dart';
 import 'package:gelatino/repositories/check_in_publication_repository.dart';
 import 'package:gelatino/repositories/check_in_repository.dart';
 import 'package:gelatino/repositories/place_repository.dart';
+import 'package:gelatino/screens/check_in/place_picker_field.dart';
 import 'package:gelatino/screens/check_in_screen.dart';
 import 'package:gelatino/services/storage_service.dart';
 // ignore: depend_on_referenced_packages
@@ -647,8 +648,8 @@ void main() {
 
       expect(
         tester
-            .widget<DropdownButtonFormField<String>>(
-              find.byType(DropdownButtonFormField<String>),
+            .widget<PlacePickerField>(
+              find.byType(PlacePickerField),
             )
             .onChanged,
         isNull,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -32,6 +32,14 @@
   <link rel="icon" type="image/png" href="favicon-dark.png" media="(prefers-color-scheme: dark)"/>
 
   <title>Gelatino</title>
+
+  <!-- Launch screen: shows until Flutter paints over it. Flutter swaps the
+       viewport tag for its own; until then phones would lay out at 980px. -->
+  <meta name="viewport" flt-viewport content="width=device-width, initial-scale=1">
+  <style>
+    html { height: 100%; background: #FAFAFA url("icons/Icon-192.png") center / 160px no-repeat; }
+    @media (prefers-color-scheme: dark) { html { background-color: #1A1A1A; } }
+  </style>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>

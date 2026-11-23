@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,11 +20,12 @@ import '../models/flavor.dart';
 import '../models/place.dart';
 import '../models/public_profile.dart';
 import '../widgets/edit_profile_dialog.dart';
-import '../widgets/bounce_button.dart';
+import '../widgets/app_controls.dart';
 import '../widgets/avatar_image_provider.dart';
 import '../utils/error_handler.dart';
 import '../design/app_tokens.dart';
 import '../design/focus_ring.dart';
+import '../design/motion.dart';
 import '../widgets/app_page.dart';
 import '../widgets/editorial_header.dart';
 import 'profile/profile_a1_layout.dart';
@@ -56,6 +58,7 @@ class ProfileScreen extends ConsumerWidget {
               .whenData<ProfileViewData?>((value) => value);
     return Scaffold(
       body: SafeArea(
+        bottom: false,
         child: AppPage(
           child: profile.when(
             data: (value) {
@@ -64,17 +67,29 @@ class ProfileScreen extends ConsumerWidget {
                   child: ProfileStatePanel(
                     title: AppStrings.profileNotFound,
                     message: AppStrings.profileNotAvailableMessage,
-                    icon: Icons.person_off_outlined,
+                    icon: CupertinoIcons.person_crop_circle_badge_xmark,
                   ),
                 );
               }
               final history = ref.watch(authorizedHistoryProvider(value.uid));
               return ListView(
-                padding: const EdgeInsets.only(
-                  top: AppSpacing.xl,
-                  bottom: AppSpacing.display,
+                padding: EdgeInsets.only(
+                  top: AppSpacing.xs,
+                  bottom:
+                      AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
                 ),
                 children: [
+                  Row(
+                    children: [
+                      AppBackButton(
+                        key: const ValueKey('profile-back'),
+                        fallback: isOwnProfile ? '/collection' : '/friends',
+                      ),
+                      const Spacer(),
+                      if (isOwnProfile) const _ProfileSettingsGear(),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
                   ProfileA1Layout(
                     identity: _ProfileIdentity(
                       profile: value,
@@ -155,34 +170,9 @@ final class _ProfileIdentity extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isOwnProfile) ...[
-                IconButton(
-                  key: const ValueKey('profile-back'),
-                  tooltip: AppStrings.back,
-                  onPressed: () {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else {
-                      context.go('/friends');
-                    }
-                  },
-                  icon: const Icon(Icons.arrow_back),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-              ],
-              AuthenticatedAvatar(source: profile.photoUrl, radius: 38),
-              if (isOwnProfile) ...[
-                const Spacer(),
-                const _ProfileSettingsGear(),
-              ],
-            ],
-          ),
+          AuthenticatedAvatar(source: profile.photoUrl, radius: 44),
           const SizedBox(height: AppSpacing.lg),
           EditorialHeader(
-            eyebrow: isOwnProfile ? AppStrings.profileHeaderLabel : 'PROFILO',
             title: profile.displayName,
             description: bio.isEmpty ? null : bio,
           ),
@@ -196,12 +186,7 @@ final class _ProfileIdentity extends StatelessWidget {
             ),
           ],
           const SizedBox(height: AppSpacing.md),
-          Text(
-            AppStrings.settingsPoints(profile.points),
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.primary,
-            ),
-          ),
+          _PointsPill(points: profile.points),
           if (!isOwnProfile) ...[
             const SizedBox(height: AppSpacing.lg),
             ProfileRelationshipAction(targetUid: profile.uid),
@@ -223,13 +208,50 @@ final class _ProfileIdentity extends StatelessWidget {
                       builder: (context) =>
                           EditProfileDialog(profile: ownProfile),
                     ),
-                    icon: const Icon(Icons.edit_outlined),
+                    icon: const Icon(CupertinoIcons.pencil),
                     label: const Text(AppStrings.profileEditButton),
                   ),
               ],
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Points count up once, and again when they change.
+final class _PointsPill extends StatelessWidget {
+  const _PointsPill({required this.points});
+
+  final int points;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Semantics(
+      label: AppStrings.settingsPoints(points),
+      excludeSemantics: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(AppRadii.pill),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: points.toDouble()),
+            duration: AppMotion.of(context, const Duration(milliseconds: 700)),
+            curve: AppMotion.glide,
+            builder: (context, value, _) => Text(
+              AppStrings.settingsPoints(value.round()),
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.accentInk,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -283,7 +305,7 @@ final class _ProfileSettingsGearState extends State<_ProfileSettingsGear> {
               minimumSize: const Size.square(48),
               padding: const EdgeInsets.all(4),
             ),
-            icon: const Icon(Icons.settings_outlined),
+            icon: const Icon(CupertinoIcons.settings),
           ),
         ),
       ),
@@ -312,7 +334,7 @@ final class _ProfilePreferences extends ConsumerWidget {
       return const ProfileStatePanel(
         title: AppStrings.profilePreferencesTitle,
         message: AppStrings.profilePrefsNonePublic,
-        icon: Icons.favorite_outline,
+        icon: CupertinoIcons.heart,
       );
     }
 
@@ -322,7 +344,7 @@ final class _ProfilePreferences extends ConsumerWidget {
       return const ProfileStatePanel(
         title: AppStrings.profilePreferencesUnavailable,
         message: AppStrings.profilePrefsNamesUnavailable,
-        icon: Icons.favorite_border,
+        icon: CupertinoIcons.heart,
       );
     }
     if (flavors.isLoading || places.isLoading) {
@@ -349,7 +371,7 @@ final class _ProfilePreferences extends ConsumerWidget {
       return const ProfileStatePanel(
         title: AppStrings.profilePreferencesUpdating,
         message: AppStrings.profilePrefsNamesPending,
-        icon: Icons.sync,
+        icon: CupertinoIcons.arrow_2_circlepath,
       );
     }
     return ProfilePanel(
@@ -369,7 +391,7 @@ final class _ProfilePreferences extends ConsumerWidget {
                 ),
               if (placeName != null)
                 Chip(
-                  avatar: const Icon(Icons.storefront_outlined, size: 18),
+                  avatar: const Icon(CupertinoIcons.map_pin_ellipse, size: 18),
                   label: Text(placeName),
                 ),
             ],
@@ -470,7 +492,7 @@ final class _OwnerSavedPlaces extends ConsumerWidget {
                       for (final place in places)
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.storefront_outlined),
+                          leading: const Icon(CupertinoIcons.map_pin_ellipse),
                           title: Text(place.name),
                           subtitle: Text(place.address),
                           trailing: ProfileSavedPlaceRemoveButton(
@@ -495,13 +517,13 @@ final class _OwnerSavedPlaces extends ConsumerWidget {
               OutlinedButton.icon(
                 key: const ValueKey('profile-open-wishlist'),
                 onPressed: () => context.push('/wishlist'),
-                icon: const Icon(Icons.bookmarks_outlined),
+                icon: const Icon(CupertinoIcons.bookmark),
                 label: const Text(AppStrings.profileSeeAll),
               ),
               OutlinedButton.icon(
                 key: const ValueKey('profile-open-favorite-flavors'),
                 onPressed: () => context.push('/favorite-flavors'),
-                icon: const Icon(Icons.favorite_border),
+                icon: const Icon(CupertinoIcons.heart),
                 label: const Text(AppStrings.profileManageFlavors),
               ),
             ],
@@ -587,7 +609,6 @@ class _ProfileRecentActivityListState
       children: [
         ListTile(
           contentPadding: EdgeInsets.zero,
-          dense: true,
           leading: const Icon(Icons.icecream_outlined),
           title: Text(item.placeSnapshot['name'] as String),
           subtitle: Text(
@@ -612,7 +633,7 @@ class _ProfileRecentActivityListState
                     key: ValueKey<String>('profile-delete-$id'),
                     tooltip: AppStrings.profileDeleteCheckInTooltip,
                     onPressed: () => _confirmDelete(item),
-                    icon: const Icon(Icons.delete_outline),
+                    icon: const Icon(CupertinoIcons.trash),
                   ),
               ],
             ],
@@ -642,24 +663,13 @@ class _ProfileRecentActivityListState
     final generation = _generation;
     final historyUid = widget.historyUid;
     final canDelete = widget.canDelete;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text(AppStrings.profileDeleteCheckInTitle),
-        content: const Text(AppStrings.profileDeleteCheckInBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text(AppStrings.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text(AppStrings.delete),
-          ),
-        ],
-      ),
+    final confirmed = await showAppConfirmation(
+      context,
+      title: AppStrings.profileDeleteCheckInTitle,
+      message: AppStrings.profileDeleteCheckInBody,
+      confirmLabel: AppStrings.delete,
     );
-    if (confirmed == true &&
+    if (confirmed &&
         _isCurrentBinding(generation, historyUid, canDelete)) {
       await _delete(item);
     }
@@ -716,16 +726,16 @@ class ProfileSavedPlaceRemoveButton extends ConsumerWidget {
     final current = stateAsync.value;
     final canRemove = current?.saved == true;
 
-    return Tooltip(
-      message: AppStrings.profileRemoveFromWishlist,
-      child: IgnorePointer(
-        ignoring: !canRemove,
-        child: Opacity(
-          opacity: canRemove ? 1 : 0.45,
-          child: BounceButton(
-            key: ValueKey<String>('profile-remove-$placeId'),
-            onTap: () async {
-              if (!canRemove) return;
+    return IconButton(
+      key: ValueKey<String>('profile-remove-$placeId'),
+      tooltip: AppStrings.profileRemoveFromWishlist,
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.menta,
+        foregroundColor: AppColors.fondente,
+      ),
+      onPressed: !canRemove
+          ? null
+          : () async {
               try {
                 await ref
                     .read(placeStateControllerProvider.notifier)
@@ -736,25 +746,7 @@ class ProfileSavedPlaceRemoveButton extends ConsumerWidget {
                 }
               }
             },
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFEA00).withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFFFFEA00).withValues(alpha: 0.4),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(
-                Icons.bookmark_rounded,
-                color: Color(0xFFFFEA00),
-                size: 16,
-              ),
-            ),
-          ),
-        ),
-      ),
+      icon: const Icon(CupertinoIcons.bookmark_fill, size: 20),
     );
   }
 }

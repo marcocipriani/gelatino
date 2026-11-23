@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,7 @@ import '../providers/navigation_provider.dart';
 import '../providers/profile_providers.dart';
 import '../repositories/friendship_repository.dart';
 import '../repositories/gelato_invite_repository.dart';
+import '../widgets/app_controls.dart';
 import '../widgets/app_page.dart';
 import '../widgets/editorial_header.dart';
 import '../widgets/friends/leaderboard_section.dart';
@@ -407,7 +409,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                       title: AppStrings.friendsLoginTitle,
                       message:
                           AppStrings.friendsLoginSubtitle,
-                      icon: Icons.lock_outline,
+                      icon: CupertinoIcons.lock,
                     );
                   }
                   return _buildA1Friends(context, uid, responsive);
@@ -486,7 +488,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             return const FriendsStatePanel(
               title: AppStrings.friendsEmptyTitle,
               message: AppStrings.friendsEmptySubtitle,
-              icon: Icons.people_outline,
+              icon: CupertinoIcons.person_2,
             );
           }
           return FriendsResponsiveCards(
@@ -524,7 +526,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                           _pendingActions.contains('remove-${profile.uid}')
                           ? null
                           : () => _confirmRemoveFriend(profile),
-                      icon: const Icon(Icons.person_remove_outlined),
+                      icon: const Icon(CupertinoIcons.person_badge_minus),
                       label: const Text(AppStrings.remove),
                     ),
                   ],
@@ -555,7 +557,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             return const FriendsStatePanel(
               title: AppStrings.friendsRequestsEmpty,
               message: AppStrings.friendsRequestsEmptySubtitle,
-              icon: Icons.person_add_alt,
+              icon: CupertinoIcons.person_add,
             );
           }
           return Column(
@@ -707,7 +709,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             onPressed: _isCopyingExternalInvite
                 ? null
                 : () => _copyExternalInvite(uid),
-            icon: const Icon(Icons.link),
+            icon: const Icon(CupertinoIcons.link),
             label: Text(
               _isCopyingExternalInvite
                   ? AppStrings.friendsCopying
@@ -740,7 +742,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         ),
         children: [
           const EditorialHeader(
-            eyebrow: 'AMICI',
             title: AppStrings.friendsGelatoWithWhom,
             description:
                 AppStrings.friendsGelatoWithWhomSubtitle,
@@ -822,14 +823,14 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
             labelText: AppStrings.friendsSearchLabel,
-            prefixIcon: const Icon(Icons.person_search),
+            prefixIcon: const Icon(CupertinoIcons.search),
             suffixIcon: _searchController.text.isEmpty
                 ? null
                 : IconButton(
                     key: const ValueKey('friends-search-clear'),
                     onPressed: _clearSearch,
                     tooltip: AppStrings.clearSearch,
-                    icon: const Icon(Icons.clear),
+                    icon: const Icon(CupertinoIcons.clear_circled_solid),
                   ),
           ),
           onSubmitted: (_) => _searchUsers(),
@@ -896,7 +897,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           const FriendsStatePanel(
             title: AppStrings.friendsNoResults,
             message: AppStrings.friendsNoResultsSubtitle,
-            icon: Icons.search_off,
+            icon: CupertinoIcons.search,
           ),
         ],
       ],
@@ -908,7 +909,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       _RelationshipLookupState.loading => const FriendsStatePanel(
         title: AppStrings.relationshipChecking,
         message: AppStrings.relationshipCheckingMessage,
-        icon: Icons.sync,
+        icon: CupertinoIcons.arrow_2_circlepath,
       ),
       _RelationshipLookupState.error => FriendsStatePanel(
         title: AppStrings.relationshipUnavailable,
@@ -933,7 +934,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       onPressed: _pendingActions.contains('request-$uid')
           ? null
           : () => _addFriend(uid),
-      icon: const Icon(Icons.person_add_alt),
+      icon: const Icon(CupertinoIcons.person_add),
       label: const Text(AppStrings.add),
     );
   }
@@ -971,7 +972,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           TextButton.icon(
             key: ValueKey(retryKey),
             onPressed: _pendingActions.contains(key) ? null : retry,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(CupertinoIcons.refresh),
             label: const Text(AppStrings.retry),
           ),
         ],
@@ -982,25 +983,14 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   Future<void> _confirmRemoveFriend(PublicProfile profile) async {
     final uid = ref.read(currentUidProvider);
     final generation = _actionGeneration;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(AppStrings.friendsRemoveConfirmTitle(profile.displayName)),
-        content: const Text(AppStrings.removeFriendshipBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text(AppStrings.cancel),
-          ),
-          FilledButton(
-            key: ValueKey('friend-remove-confirm-${profile.uid}'),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(AppStrings.remove),
-          ),
-        ],
-      ),
+    final confirmed = await showAppConfirmation(
+      context,
+      title: AppStrings.friendsRemoveConfirmTitle(profile.displayName),
+      message: AppStrings.removeFriendshipBody,
+      confirmLabel: AppStrings.remove,
+      confirmKey: ValueKey('friend-remove-confirm-${profile.uid}'),
     );
-    if (confirmed == true && _isCurrentAction(generation, uid)) {
+    if (confirmed && _isCurrentAction(generation, uid)) {
       await _removeFriend(profile.uid);
     }
   }

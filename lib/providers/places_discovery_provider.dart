@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/place.dart';
+import '../utils/search_text.dart';
 import 'auth_provider.dart';
 import 'flavor_search_provider.dart';
 import 'place_providers.dart';
@@ -237,9 +238,11 @@ List<DiscoveryPlace> filterDiscoveryPlaces(
   required String? currentUid,
   Map<String, FlavorPlaceMatch>? flavorMatches,
 }) {
-  final normalizedQuery = query.trim().toLowerCase();
+  final normalizedQuery = normalizeSearchText(query);
+  // Only punctuation typed: that is a search with no possible match.
+  final unsearchable = normalizedQuery.isEmpty && query.trim().isNotEmpty;
   final flavorHits = <DiscoveryPlace>[];
-  final nameHits = <DiscoveryPlace>[];
+  final textHits = List.generate(5, (_) => <DiscoveryPlace>[]);
   for (final entry in places) {
     final place = entry.place;
     final passesFilter = switch (filter) {
@@ -258,11 +261,15 @@ List<DiscoveryPlace> filterDiscoveryPlaces(
       continue;
     }
 
-    final matchesQuery =
-        normalizedQuery.isEmpty ||
-        place.name.toLowerCase().contains(normalizedQuery) ||
-        place.address.toLowerCase().contains(normalizedQuery);
-    if (matchesQuery) nameHits.add(entry);
+    if (unsearchable) continue;
+    final rank = normalizedQuery.isEmpty
+        ? 0
+        : searchRank(
+            normalizedQuery,
+            name: normalizeSearchText(place.name),
+            detail: normalizeSearchText(place.address),
+          );
+    if (rank != null) textHits[rank].add(entry);
   }
   // Stable sort by rating desc: List.sort isn't guaranteed stable, so break
   // ties with the original (catalog) index to keep ordering deterministic.
@@ -275,7 +282,7 @@ List<DiscoveryPlace> filterDiscoveryPlaces(
     });
   return List<DiscoveryPlace>.unmodifiable([
     for (final (_, entry) in ranked) entry,
-    ...nameHits,
+    for (final hits in textHits) ...hits,
   ]);
 }
 

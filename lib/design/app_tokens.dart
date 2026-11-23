@@ -19,7 +19,7 @@ abstract final class AppSpacing {
 }
 
 abstract final class AppRadii {
-  static const control = 10.0;
+  static const control = 14.0;
   static const card = 20.0;
   static const hero = 24.0;
   static const pill = 999.0;
@@ -52,10 +52,22 @@ abstract final class AppColors {
   static const warning = sorbetto;
 
   static const lightSurface = Color(0xFFFFFFFF);
-  static const lightBorder = Color(0xFFEEEEEE);
+  static const lightFill = Color(0xFFEDEDED);
+  static const lightFillStrong = Color(0xFFE2E2E2);
+  static const lightSecondaryText = Color(0xFF454545);
+  static const lightBorder = Color(0xFFD4D4D4);
+  static const lightOutline = Color(0xFF767676);
+  static const lightTint = Color(0xFFFFE3E8);
+
   static const darkSurface = Color(0xFF242424);
+  static const darkFill = Color(0xFF303030);
+  static const darkFillStrong = Color(0xFF3A3A3A);
   static const darkText = Color(0xFFF5F5F5);
-  static const darkBorder = Color(0xFF3B3B3B);
+  static const darkSecondaryText = Color(0xFFCCCCCC);
+  static const darkBorder = Color(0xFF484848);
+  static const darkOutline = Color(0xFF969696);
+  static const darkTint = Color(0xFF4A1F28);
+  static const darkAccentInk = Color(0xFFFFA3B3);
   static const error = Color(0xFFBA1A1A);
   static const darkError = Color(0xFFFFB4AB);
   static const onDarkError = Color(0xFF690005);
@@ -66,4 +78,26 @@ abstract final class AppFocus {
   static const ringGap = 2.0;
   static const animationDuration = Duration(milliseconds: 120);
   static const color = AppColors.fragola;
+}
+
+/// Fragola is 3.1:1 on Fior di Panna: good for fills, too weak for text.
+/// Coloured text and small icons on neutral surfaces use [accentInk] instead.
+extension AppSchemeColors on ColorScheme {
+  Color get accentInk => onPrimaryContainer;
+}
+
+const _deepestInk = Color(0xFF050505);
+
+/// Fondente or white ink, whichever reads better on an arbitrary fill
+/// such as a user-picked flavour colour.
+Color inkOn(Color fill) {
+  final luminance = fill.computeLuminance();
+  final onWhite = 1.05 / (luminance + 0.05);
+  final onFondente =
+      (luminance + 0.05) / (AppColors.fondente.computeLuminance() + 0.05);
+  if (onFondente >= 4.5 && onFondente >= onWhite) return AppColors.fondente;
+  if (onWhite >= 4.5) return Colors.white;
+  // Mid-tones defeat both. One shade deeper than Fondente clears AA and
+  // still isn't pure black.
+  return _deepestInk;
 }

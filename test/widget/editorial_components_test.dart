@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gelatino/design/app_tokens.dart';
@@ -7,12 +8,9 @@ import 'package:gelatino/widgets/editorial_header.dart';
 import 'package:gelatino/widgets/section_heading.dart';
 import 'package:gelatino/widgets/semantic_state_button.dart';
 import 'package:gelatino/widgets/skeleton_loader.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
-  tearDownAll(() => GoogleFonts.config.allowRuntimeFetching = true);
 
   for (final brightness in Brightness.values) {
     testWidgets(
@@ -177,15 +175,15 @@ void main() {
           selected: true,
           selectedLabel: 'Salvata',
           unselectedLabel: 'Salva',
-          selectedIcon: Icons.bookmark,
-          unselectedIcon: Icons.bookmark_border,
+          selectedIcon: CupertinoIcons.bookmark_fill,
+          unselectedIcon: CupertinoIcons.bookmark,
           onPressed: () {},
         ),
       ),
     );
 
     expect(find.text('Salvata'), findsOneWidget);
-    expect(find.byIcon(Icons.bookmark), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.bookmark_fill), findsOneWidget);
     expect(
       tester.getSize(find.byType(FilledButton)).height,
       greaterThanOrEqualTo(AppLayout.touchTarget),

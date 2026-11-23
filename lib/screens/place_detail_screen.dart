@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,15 +16,25 @@ import '../providers/auth_provider.dart';
 import '../providers/place_aggregate_providers.dart';
 import '../providers/place_providers.dart';
 import '../utils/error_handler.dart';
+import '../widgets/app_controls.dart';
 import '../widgets/collection/place_editorial_cover.dart';
 import '../widgets/semantic_state_button.dart';
 import '../constants/app_strings.dart';
 
-Uri buildExternalMapUri(Place place) =>
-    Uri.https('www.google.com', '/maps/search/', <String, String>{
-      'api': '1',
-      'query': '${place.location.latitude},${place.location.longitude}',
+/// Apple Maps on iPhone and iPad, Google Maps everywhere else.
+Uri buildExternalMapUri(Place place) {
+  final coordinates = '${place.location.latitude},${place.location.longitude}';
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+    return Uri.https('maps.apple.com', '/', <String, String>{
+      'll': coordinates,
+      'q': place.name,
     });
+  }
+  return Uri.https('www.google.com', '/maps/search/', <String, String>{
+    'api': '1',
+    'query': coordinates,
+  });
+}
 
 class PlaceDetailScreen extends ConsumerWidget {
   const PlaceDetailScreen({super.key, required this.placeId});
@@ -35,9 +47,8 @@ class PlaceDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const AppBackButton(fallback: '/places'),
         title: const Text(AppStrings.placeDetailTitle),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: catalog.when(
         loading: () => const _PlaceDetailLoading(),
@@ -117,14 +128,13 @@ final class _PlaceDetailContent extends ConsumerWidget {
                       children: <Widget>[
                         Text(
                           place.name,
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(fontWeight: FontWeight.w900),
+                          style: Theme.of(context).textTheme.displaySmall,
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            const Icon(Icons.location_on_outlined, size: 20),
+                            const Icon(CupertinoIcons.placemark, size: 20),
                             const SizedBox(width: AppSpacing.xs),
                             Expanded(child: Text(place.address)),
                           ],
@@ -150,11 +160,13 @@ final class _PlaceDetailContent extends ConsumerWidget {
                       key: const ValueKey<String>('place-detail-actions'),
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.md),
+                        _NavigationActions(place: place),
+                        const SizedBox(height: AppSpacing.xl),
                         Text(
                           AppStrings.placeYourActions,
                           style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w900),
+                              ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         if (personal.hasError)
@@ -180,8 +192,6 @@ final class _PlaceDetailContent extends ConsumerWidget {
                             ),
                           ),
                         ],
-                        const SizedBox(height: AppSpacing.lg),
-                        _NavigationActions(place: place),
                       ],
                     ),
                   ],
@@ -203,7 +213,7 @@ final class _PlaceDetailLoading extends StatelessWidget {
     final responsive = ResponsiveClass.fromWidth(
       MediaQuery.sizeOf(context).width,
     );
-    final skeleton = Theme.of(context).colorScheme.surfaceContainerLow;
+    final skeleton = Theme.of(context).colorScheme.surfaceContainer;
     Widget block({required double height, double? width}) => Container(
       width: width ?? double.infinity,
       height: height,
@@ -299,11 +309,13 @@ final class _AggregateRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 56,
+    return ConstrainedBox(
+      // A floor, not a fixed height: large type needs more.
+      constraints: const BoxConstraints(minHeight: 56),
       child: aggregate.when(
-        loading: () => DecoratedBox(
+        loading: () => Container(
           key: const ValueKey<String>('place-aggregate-loading'),
+          height: 56,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(AppRadii.control),
@@ -313,7 +325,7 @@ final class _AggregateRow extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: TextButton.icon(
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(CupertinoIcons.refresh),
             label: const Text(AppStrings.placeDetailRetryRatings),
           ),
         ),
@@ -322,10 +334,10 @@ final class _AggregateRow extends StatelessWidget {
           if (value == null || count == 0) {
             return const Row(
               children: <Widget>[
-                Icon(Icons.star_border_rounded),
+                Icon(CupertinoIcons.star),
                 SizedBox(width: AppSpacing.xs),
                 Expanded(child: Text(AppStrings.placeDetailNoRatings)),
-                Text('0', style: TextStyle(fontWeight: FontWeight.w900)),
+                Text('0', style: TextStyle(fontWeight: FontWeight.w800)),
                 SizedBox(width: AppSpacing.xxs),
                 Text(AppStrings.placeDetailVisits),
               ],
@@ -333,18 +345,21 @@ final class _AggregateRow extends StatelessWidget {
           }
           return Row(
             children: <Widget>[
-              const Icon(Icons.star_rounded, color: AppColors.sorbetto),
+              Icon(
+                CupertinoIcons.star_fill,
+                color: Theme.of(context).colorScheme.accentInk,
+              ),
               const SizedBox(width: AppSpacing.xs),
               Text(
                 value.ratingAverage.toStringAsFixed(1),
                 style: Theme.of(
                   context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
               ),
               const Spacer(),
               Text(
                 '$count',
-                style: const TextStyle(fontWeight: FontWeight.w900),
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
               const SizedBox(width: AppSpacing.xxs),
               const Text(AppStrings.placeDetailVisits),
@@ -367,7 +382,7 @@ final class _PersonalNote extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(AppRadii.card),
       ),
       child: Column(
@@ -377,7 +392,7 @@ final class _PersonalNote extends StatelessWidget {
             AppStrings.placeYourNote,
             style: Theme.of(
               context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900),
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(note),
@@ -442,9 +457,10 @@ final class _PersonalActions extends ConsumerWidget {
             key: const ValueKey<String>('place-save-action'),
             selected: current?.saved ?? false,
             selectedLabel: 'Salvata',
+            selectedColor: AppColors.menta,
             unselectedLabel: 'Salva',
-            selectedIcon: Icons.bookmark_rounded,
-            unselectedIcon: Icons.bookmark_border_rounded,
+            selectedIcon: CupertinoIcons.bookmark_fill,
+            unselectedIcon: CupertinoIcons.bookmark,
             onPressed: !canMutate || savedPending
                 ? null
                 : () => unawaited(toggle(PlaceStateField.saved)),
@@ -458,9 +474,10 @@ final class _PersonalActions extends ConsumerWidget {
             key: const ValueKey<String>('place-favorite-action'),
             selected: current?.favorite ?? false,
             selectedLabel: 'Preferita',
+            selectedColor: AppColors.sorbetto,
             unselectedLabel: AppStrings.placeAddToFavorites,
-            selectedIcon: Icons.star_rounded,
-            unselectedIcon: Icons.star_border_rounded,
+            selectedIcon: CupertinoIcons.star_fill,
+            unselectedIcon: CupertinoIcons.star,
             onPressed: !canMutate || favoritePending
                 ? null
                 : () => unawaited(toggle(PlaceStateField.favorite)),
@@ -518,21 +535,10 @@ final class _NavigationActions extends StatelessWidget {
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
       children: <Widget>[
-        OutlinedButton.icon(
-          key: const ValueKey<String>('place-maps-action'),
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(44, AppLayout.touchTarget),
-          ),
-          onPressed: () => unawaited(_openMap(context, place)),
-          icon: const Icon(Icons.map_outlined),
-          label: const Text(AppStrings.placeOpenInMaps),
-        ),
         FilledButton.icon(
           key: const ValueKey<String>('place-check-in-action'),
           style: FilledButton.styleFrom(
             minimumSize: const Size(44, AppLayout.touchTarget),
-            backgroundColor: AppColors.fragola,
-            foregroundColor: Colors.white,
           ),
           onPressed: () => context.push(
             Uri(
@@ -540,8 +546,17 @@ final class _NavigationActions extends StatelessWidget {
               queryParameters: <String, String>{'placeId': place.id},
             ).toString(),
           ),
-          icon: const Icon(Icons.add_circle_outline_rounded),
+          icon: const Icon(CupertinoIcons.plus_circle_fill),
           label: const Text(AppStrings.placeCheckinButton),
+        ),
+        OutlinedButton.icon(
+          key: const ValueKey<String>('place-maps-action'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(44, AppLayout.touchTarget),
+          ),
+          onPressed: () => unawaited(_openMap(context, place)),
+          icon: const Icon(CupertinoIcons.map),
+          label: const Text(AppStrings.placeOpenInMaps),
         ),
       ],
     );
@@ -605,7 +620,7 @@ final class _CatalogRecovery extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(Icons.storefront_outlined, size: 44),
+            const Icon(CupertinoIcons.map_pin_ellipse, size: 44),
             const SizedBox(height: AppSpacing.md),
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: AppSpacing.md),

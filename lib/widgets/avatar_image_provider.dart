@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,7 +49,7 @@ final class AuthenticatedAvatar extends ConsumerWidget {
     this.radius = 20,
     this.iconSize,
     this.iconColor,
-    this.icon = Icons.person,
+    this.icon = CupertinoIcons.person_fill,
     this.backgroundColor,
   });
 

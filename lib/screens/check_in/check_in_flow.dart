@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -30,6 +31,8 @@ import 'photo_step.dart';
 import 'place_step.dart';
 import 'share_step.dart';
 import '../../constants/app_strings.dart';
+import '../../design/motion.dart';
+import '../../widgets/melt_pin.dart';
 
 final class CheckInFlow extends ConsumerStatefulWidget {
   const CheckInFlow({
@@ -1016,18 +1019,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (flow.published) {
-      return const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(Icons.check_circle, size: 64, color: AppTheme.mentaGlaciale),
-              SizedBox(height: 16),
-              Text(AppStrings.checkInPublished),
-            ],
-          ),
-        ),
-      );
+      return const Scaffold(body: Center(child: _PublishedMoment()));
     }
     if (flow.publishedPendingClear && flow.draft == null) {
       return _PublishedRecovery(
@@ -1105,6 +1097,8 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
                             key: const Key('check-in-editor-lock'),
                             absorbing: flow.isEditorLocked,
                             child: SingleChildScrollView(
+                              // Each step starts at its top.
+                              key: ValueKey<int>(draft.currentStep),
                               padding: EdgeInsets.fromLTRB(
                                 wide ? 36 : 20,
                                 wide ? 28 : 14,
@@ -1121,7 +1115,9 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
                                       'check-in-form',
                                     ),
                                     width: double.infinity,
-                                    child: _buildPage(flow, draft, places),
+                                    child: _StepEntrance(
+                                      child: _buildPage(flow, draft, places),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1457,6 +1453,104 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
   }
 }
 
+/// A step settles in from just below.
+final class _StepEntrance extends StatelessWidget {
+  const _StepEntrance({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+    tween: Tween(begin: 0, end: 1),
+    duration: AppMotion.of(context, AppMotion.standard),
+    curve: AppMotion.enter,
+    builder: (context, value, child) => Opacity(
+      opacity: value,
+      alwaysIncludeSemantics: true,
+      child: Transform.translate(
+        offset: Offset(0, 8 * (1 - value)),
+        transformHitTests: false,
+        child: child,
+      ),
+    ),
+    child: child,
+  );
+}
+
+/// The one celebratory moment: pin reveal, then the check lands.
+final class _PublishedMoment extends StatefulWidget {
+  const _PublishedMoment();
+
+  @override
+  State<_PublishedMoment> createState() => _PublishedMomentState();
+}
+
+final class _PublishedMomentState extends State<_PublishedMoment> {
+  @override
+  void initState() {
+    super.initState();
+    HapticFeedback.mediumImpact();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: AppMotion.of(context, const Duration(milliseconds: 700)),
+      builder: (context, value, _) {
+        final pin = AppMotion.glide.transform((value / 0.7).clamp(0.0, 1.0));
+        final check = AppMotion.glide.transform(
+          ((value - 0.3) / 0.7).clamp(0.0, 1.0),
+        );
+        return Semantics(
+          liveRegion: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox.square(
+                dimension: 136,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Transform.scale(
+                      scale: 0.6 + 0.4 * pin,
+                      alignment: Alignment.bottomCenter,
+                      child: const MeltPinGlyph(
+                        color: AppTheme.fragolaPop,
+                        height: 128,
+                      ),
+                    ),
+                    Positioned(
+                      right: 8,
+                      bottom: 16,
+                      child: Transform.scale(
+                        scale: check,
+                        child: const CircleAvatar(
+                          radius: 22,
+                          backgroundColor: AppTheme.mentaGlaciale,
+                          foregroundColor: AppTheme.fondenteExtra,
+                          child: Icon(CupertinoIcons.check_mark),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                AppStrings.checkInPublished,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineSmall,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 final class _UnresolvedLabelsNotice extends StatelessWidget {
   const _UnresolvedLabelsNotice();
 
@@ -1515,7 +1609,7 @@ final class _Header extends StatelessWidget {
           constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
           onPressed: onClose,
           tooltip: AppStrings.checkInCloseTooltip,
-          icon: const Icon(Icons.close),
+          icon: const Icon(CupertinoIcons.xmark),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -1558,10 +1652,11 @@ final class _PublishedRecovery extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const Icon(
-                    Icons.cloud_done_outlined,
-                    size: 64,
-                    color: AppTheme.mentaGlaciale,
+                  const CircleAvatar(
+                    radius: 44,
+                    backgroundColor: AppTheme.mentaGlaciale,
+                    foregroundColor: AppTheme.fondenteExtra,
+                    child: Icon(CupertinoIcons.cloud_fill, size: 44),
                   ),
                   const SizedBox(height: 16),
                   Text(

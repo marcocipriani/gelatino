@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -89,7 +90,7 @@ final class ShareStep extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: <Widget>[
-                    const Icon(Icons.lock_outline_rounded, size: 18),
+                    const Icon(CupertinoIcons.lock, size: 18),
                     const SizedBox(width: 7),
                     Expanded(
                       child: Text(
@@ -178,7 +179,7 @@ final class ShareStep extends StatelessWidget {
             flavors: shareFlavors,
             photo: Image.memory(photoBytes!, fit: BoxFit.cover),
           ),
-          icon: const Icon(Icons.ios_share_rounded),
+          icon: const Icon(CupertinoIcons.share),
           label: const Text(AppStrings.checkInShareCardCta),
         ),
       ],

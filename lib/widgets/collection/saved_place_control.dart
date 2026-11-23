@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -61,10 +62,17 @@ class _SavedPlaceControlState extends ConsumerState<SavedPlaceControl> {
                       )
                     : Icon(
                         selected
-                            ? Icons.bookmark_rounded
-                            : Icons.bookmark_outline_rounded,
+                            ? CupertinoIcons.bookmark_fill
+                            : CupertinoIcons.bookmark,
                       ),
-                color: Theme.of(context).colorScheme.primary,
+                style: IconButton.styleFrom(
+                  backgroundColor: selected
+                      ? AppColors.menta
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  foregroundColor: selected
+                      ? AppColors.fondente
+                      : Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
           ),

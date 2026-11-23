@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -102,7 +103,7 @@ void main() {
     expect(probe.historyReads, <String>['bob']);
     expect(find.text('alice@example.com'), findsNothing);
     expect(find.text('Modifica Profilo'), findsNothing);
-    expect(find.byIcon(Icons.logout), findsNothing);
+    expect(find.byIcon(CupertinoIcons.square_arrow_right), findsNothing);
     expect(find.text('Vista Default Gelaterie'), findsNothing);
     expect(find.text('Vista Default'), findsNothing);
     expect(find.text('Tema App'), findsNothing);

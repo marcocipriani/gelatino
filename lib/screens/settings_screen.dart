@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,9 +12,11 @@ import '../firebase/firebase_providers.dart';
 import '../models/user_profile.dart';
 import '../models/user_settings.dart';
 import '../providers/auth_provider.dart';
+import '../providers/high_contrast_provider.dart';
 import '../providers/profile_providers.dart';
 import '../providers/theme_provider.dart';
 import '../services/push_service.dart';
+import '../widgets/app_controls.dart';
 import '../widgets/app_page.dart';
 import '../widgets/avatar_image_provider.dart';
 import '../widgets/edit_profile_dialog.dart';
@@ -143,7 +146,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton.icon(
             key: ValueKey('settings-retry-$field'),
             onPressed: _pendingFields.contains(field) ? null : retry,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(CupertinoIcons.refresh),
             label: const Text(AppStrings.retry),
           ),
         ],
@@ -182,7 +185,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           return const _SettingsStatePanel(
             title: AppStrings.settingsNotFound,
             message: AppStrings.settingsCompleteProfile,
-            icon: Icons.settings_outlined,
+            icon: CupertinoIcons.settings,
           );
         }
         final ThemeMode currentTheme =
@@ -249,12 +252,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       loading: () => const _SettingsStatePanel(
         title: AppStrings.settingsLoading,
         message: AppStrings.settingsLoadingPrefs,
-        icon: Icons.sync,
+        icon: CupertinoIcons.arrow_2_circlepath,
       ),
       error: (error, stackTrace) => _SettingsStatePanel(
         title: AppStrings.settingsUnavailable,
         message: AppStrings.settingsLoadError,
-        icon: Icons.error_outline,
+        icon: CupertinoIcons.exclamationmark_circle,
         actionLabel: AppStrings.retry,
         actionKey: const ValueKey('settings-retry-load'),
         onAction: () => ref.invalidate(ownSettingsProvider),
@@ -326,8 +329,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       return Scaffold(
         key: ValueKey('settings-${responsive.name}'),
         body: SafeArea(
+          bottom: false,
           child: AppPage(
             child: _SettingsSurface(
+              horizontalPadding: 0,
               onClose: () => _close(context),
               closeKey: const ValueKey('settings-back'),
               content: content,
@@ -344,11 +349,13 @@ final class _SettingsSurface extends StatelessWidget {
     required this.onClose,
     required this.closeKey,
     required this.content,
+    this.horizontalPadding = AppSpacing.lg,
   });
 
   final VoidCallback onClose;
   final Key closeKey;
   final Widget content;
+  final double horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -356,12 +363,7 @@ final class _SettingsSurface extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            AppSpacing.sm,
-            AppSpacing.md,
-            AppSpacing.sm,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
           child: Row(
             children: [
               IconButton(
@@ -369,13 +371,20 @@ final class _SettingsSurface extends StatelessWidget {
                 tooltip: AppStrings.back,
                 onPressed: onClose,
                 style: IconButton.styleFrom(minimumSize: const Size.square(48)),
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(CupertinoIcons.back),
               ),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacing.xxs),
               Expanded(
-                child: Text(
-                  AppStrings.settingsTitle,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                child: Semantics(
+                  header: true,
+                  child: FittedBox(
+                    alignment: AlignmentDirectional.centerStart,
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      AppStrings.settingsTitle,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -384,7 +393,12 @@ final class _SettingsSurface extends StatelessWidget {
         const Divider(height: 1),
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              AppSpacing.lg,
+              horizontalPadding,
+              AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
+            ),
             child: content,
           ),
         ),
@@ -462,10 +476,13 @@ final class _SettingsSections extends StatelessWidget {
           children: [
             ListTile(
               key: const ValueKey('settings-edit-profile'),
-              leading: const Icon(Icons.person_outline),
+              leading: const _SettingsIcon(
+                CupertinoIcons.person,
+                AppColors.puffo,
+              ),
               title: const Text(AppStrings.settingsEditPersonal),
               subtitle: Text(editSubtitle),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(CupertinoIcons.chevron_forward),
               enabled: owner != null,
               onTap: switch (owner) {
                 final value? => () => onEdit(value),
@@ -474,16 +491,22 @@ final class _SettingsSections extends StatelessWidget {
             ),
             ListTile(
               key: const ValueKey('settings-favorite-flavors'),
-              leading: const Icon(Icons.favorite_outline),
+              leading: const _SettingsIcon(
+                CupertinoIcons.heart,
+                AppColors.fragola,
+              ),
               title: const Text(AppStrings.settingsFavoriteFlavors),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(CupertinoIcons.chevron_forward),
               onTap: onFavoriteFlavors,
             ),
             ListTile(
               key: const ValueKey('settings-saved-collection'),
-              leading: const Icon(Icons.bookmark_outline),
+              leading: const _SettingsIcon(
+                CupertinoIcons.bookmark,
+                AppColors.menta,
+              ),
               title: const Text(AppStrings.settingsSavedPlaces),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(CupertinoIcons.chevron_forward),
               onTap: onSavedCollection,
             ),
           ],
@@ -492,37 +515,34 @@ final class _SettingsSections extends StatelessWidget {
         _SettingsSection(
           label: AppStrings.settingsSectionApp,
           children: [
-            ListTile(
-              title: const Text(AppStrings.settingsTheme),
-              subtitle: const Text(AppStrings.settingsThemeSubtitle),
-              trailing: SizedBox(
-                width: 148,
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<ThemeMode>(
-                    key: const ValueKey('settings-theme'),
-                    value: themeMode,
-                    isExpanded: true,
-                    onChanged: themePending
-                        ? null
-                        : (value) {
-                            if (value != null) onThemeChanged(value);
-                          },
-                    items: const [
-                      DropdownMenuItem(
-                        value: ThemeMode.system,
-                        child: Text(AppStrings.settingsThemeAuto),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.light,
-                        child: Text(AppStrings.settingsThemeLight),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.dark,
-                        child: Text(AppStrings.settingsThemeDark),
-                      ),
-                    ],
-                  ),
+            _SettingsChoice(
+              title: AppStrings.settingsTheme,
+              subtitle: AppStrings.settingsThemeSubtitle,
+              control: AppSegmented<ThemeMode>(
+                key: const ValueKey('settings-theme'),
+                value: themeMode,
+                onChanged: themePending ? null : onThemeChanged,
+                segments: const {
+                  ThemeMode.system: AppStrings.settingsThemeAuto,
+                  ThemeMode.light: AppStrings.settingsThemeLight,
+                  ThemeMode.dark: AppStrings.settingsThemeDark,
+                },
+              ),
+            ),
+            Consumer(
+              builder: (context, ref, _) => SwitchListTile.adaptive(
+                key: const ValueKey('settings-high-contrast'),
+                value: ref.watch(highContrastProvider),
+                onChanged: ref.read(highContrastProvider.notifier).set,
+                title: const Text(AppStrings.settingsHighContrast),
+                subtitle: const Text(AppStrings.settingsHighContrastSubtitle),
+                secondary: const _SettingsIcon(
+                  CupertinoIcons.circle_lefthalf_fill,
+                  AppColors.puffo,
                 ),
+                activeTrackColor: AppColors.fragola,
+                inactiveTrackColor: Theme.of(context).colorScheme.outline,
+                inactiveThumbColor: Theme.of(context).colorScheme.surface,
               ),
             ),
             if (themeFailure != null)
@@ -530,27 +550,17 @@ final class _SettingsSections extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: themeFailure,
               ),
-            ListTile(
-              title: const Text(AppStrings.settingsDefaultPlacesView),
-              subtitle: const Text(AppStrings.settingsDefaultPlacesViewSubtitle),
-              trailing: SizedBox(
-                width: 116,
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    key: const ValueKey('settings-default-view'),
-                    value: normalizedDefaultView,
-                    isExpanded: true,
-                    onChanged: defaultViewPending
-                        ? null
-                        : (value) {
-                            if (value != null) onDefaultViewChanged(value);
-                          },
-                    items: const [
-                      DropdownMenuItem(value: 'list', child: Text(AppStrings.settingsPlacesViewList)),
-                      DropdownMenuItem(value: 'map', child: Text(AppStrings.settingsPlacesViewMap)),
-                    ],
-                  ),
-                ),
+            _SettingsChoice(
+              title: AppStrings.settingsDefaultPlacesView,
+              subtitle: AppStrings.settingsDefaultPlacesViewSubtitle,
+              control: AppSegmented<String>(
+                key: const ValueKey('settings-default-view'),
+                value: normalizedDefaultView,
+                onChanged: defaultViewPending ? null : onDefaultViewChanged,
+                segments: const {
+                  'list': AppStrings.settingsPlacesViewList,
+                  'map': AppStrings.settingsPlacesViewMap,
+                },
               ),
             ),
             if (defaultViewFailure != null)
@@ -564,15 +574,20 @@ final class _SettingsSections extends StatelessWidget {
         _SettingsSection(
           label: AppStrings.settingsSectionPrivacy,
           children: [
-            SwitchListTile(
+            SwitchListTile.adaptive(
               key: const ValueKey('settings-private-profile'),
               value: isPrivate,
               onChanged: privacyPending ? null : onPrivacyChanged,
               title: const Text(AppStrings.settingsPrivateProfile),
-              subtitle: const Text(
-                AppStrings.settingsPrivateProfileSubtitle,
+              subtitle: const Text(AppStrings.settingsPrivateProfileSubtitle),
+              secondary: const _SettingsIcon(
+                CupertinoIcons.lock,
+                AppColors.sorbetto,
               ),
-              secondary: const Icon(Icons.lock_outline),
+              activeTrackColor: AppColors.fragola,
+              // The iOS switch ignores switchTheme; its grey is near invisible.
+              inactiveTrackColor: Theme.of(context).colorScheme.outline,
+              inactiveThumbColor: Theme.of(context).colorScheme.surface,
             ),
             if (privacyFailure != null)
               Padding(
@@ -589,8 +604,13 @@ final class _SettingsSections extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.md),
               child: FilledButton.icon(
                 key: const ValueKey('settings-logout'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  disabledBackgroundColor: Colors.transparent,
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
                 onPressed: logoutPending ? null : onLogout,
-                icon: const Icon(Icons.logout),
+                icon: const Icon(CupertinoIcons.square_arrow_right),
                 label: const Text(AppStrings.logout),
               ),
             ),
@@ -623,7 +643,15 @@ final class _SettingsSection extends StatelessWidget {
     children: [
       Padding(
         padding: const EdgeInsets.only(left: AppSpacing.sm),
-        child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+        child: Semantics(
+          header: true,
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
       ),
       const SizedBox(height: AppSpacing.xs),
       Material(
@@ -633,9 +661,64 @@ final class _SettingsSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadii.card),
           side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
-        child: Column(children: children),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final (index, child) in children.indexed) ...[
+              // Dividers separate rows, not a row from its own error.
+              if (index > 0 && child is! Padding) const Divider(height: 1),
+              child,
+            ],
+          ],
+        ),
       ),
     ],
+  );
+}
+
+/// iOS Settings glyph tile: bright fill, Fondente ink.
+final class _SettingsIcon extends StatelessWidget {
+  const _SettingsIcon(this.icon, this.fill);
+
+  final IconData icon;
+  final Color fill;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 32,
+    height: 32,
+    decoration: BoxDecoration(
+      color: fill,
+      borderRadius: BorderRadius.circular(9),
+    ),
+    child: Icon(icon, size: 19, color: AppColors.fondente),
+  );
+}
+
+/// Title, explanation, then a full-width control: never squeezed beside it.
+final class _SettingsChoice extends StatelessWidget {
+  const _SettingsChoice({
+    required this.title,
+    required this.subtitle,
+    required this.control,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget control;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(AppSpacing.md),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.titleSmall),
+        Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: AppSpacing.sm),
+        control,
+      ],
+    ),
   );
 }
 
@@ -680,7 +763,7 @@ final class _SettingsStatePanel extends StatelessWidget {
               OutlinedButton.icon(
                 key: actionKey,
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(CupertinoIcons.refresh),
                 label: Text(actionLabel!),
               ),
             ],

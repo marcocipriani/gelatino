@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -21,7 +22,7 @@ class SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: borderRadius ?? BorderRadius.circular(AppRadii.control),
       ),
     );
@@ -131,7 +132,7 @@ class GroupsSkeleton extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+                const Icon(CupertinoIcons.chevron_down, color: Colors.grey),
               ],
             ),
           ),
@@ -276,7 +277,7 @@ class MapSkeleton extends StatelessWidget {
             ),
             child:
                 Icon(
-                      Icons.map_outlined,
+                      CupertinoIcons.map,
                       size: AppSpacing.display,
                       color: Theme.of(
                         context,

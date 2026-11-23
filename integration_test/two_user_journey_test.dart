@@ -23,7 +23,7 @@ void main() {
 
     await driver.tapKey('nav-/places');
     await driver.waitForRoute('/places');
-    await driver.tapTooltip('Apri Gelateria E2E');
+    await driver.tapKey('place-row-e2e-place-1');
     await driver.waitFor(
       E2EFinders.key('place-save-action'),
       'Gelateria E2E detail',
@@ -67,12 +67,12 @@ void main() {
           data['profile_visibility'] == 'public' && data['searchable'] == true,
       description: 'Alice public searchable projection',
     );
-    await driver.selectDropdown(
+    await driver.selectSegment(
       key: 'settings-theme',
       option: 'Scuro',
       expectedValue: ThemeMode.dark,
     );
-    await driver.selectDropdown(
+    await driver.selectSegment(
       key: 'settings-default-view',
       option: 'Mappa',
       expectedValue: 'map',
@@ -172,7 +172,7 @@ void main() {
 
     await driver.waitFor(E2EFinders.key('check-in-page-1'), 'place step');
     await driver.tapKey('place-null');
-    await driver.tapTextContaining('Gelateria E2E');
+    await driver.tapKey('check-in-place-option-e2e-place-1');
     await driver.waitFor(
       E2EFinders.key('place-e2e-place-1'),
       'selected Gelateria E2E',
@@ -316,8 +316,8 @@ void main() {
     await driver.waitFor(E2EFinders.key('settings-compact'), 'Alice settings');
     await driver.waitForLabel('Scuro');
     await driver.waitForLabel('Mappa');
-    await driver.waitForDropdownValue('settings-theme', ThemeMode.dark);
-    await driver.waitForDropdownValue('settings-default-view', 'map');
+    await driver.waitForSegmentValue('settings-theme', ThemeMode.dark);
+    await driver.waitForSegmentValue('settings-default-view', 'map');
     await driver.waitForDocument(
       'users/e2e-alice',
       matches: (data) =>

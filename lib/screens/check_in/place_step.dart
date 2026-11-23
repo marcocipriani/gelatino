@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/place.dart';
 import '../../widgets/places/place_location_picker.dart';
 import '../../constants/app_strings.dart';
+import 'place_picker_field.dart';
 
 const checkInNewPlaceValue = '__new_place__';
 
@@ -61,49 +63,21 @@ final class PlaceStep extends StatelessWidget {
       key: const ValueKey<String>('check-in-page-1'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DropdownButtonFormField<String>(
+        PlacePickerField(
           key: ValueKey<String>('place-$selectedValue'),
+          places: places,
           initialValue: selectedValue,
-          isExpanded: true,
-          decoration: const InputDecoration(
-            labelText: AppStrings.checkInPlaceFieldLabel,
-            border: OutlineInputBorder(),
-          ),
-          items: <DropdownMenuItem<String>>[
-            for (final place in places)
-              DropdownMenuItem<String>(
-                value: place.id,
-                child: Text(
-                  '${place.name} — ${place.address}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            if (!hasRemoteSelection &&
-                selectedPlaceId != null &&
-                cachedSelectedPlaceName != null)
-              DropdownMenuItem<String>(
-                value: selectedPlaceId,
-                child: Text(
-                  cachedSelectedPlaceName!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            const DropdownMenuItem<String>(
-              value: checkInNewPlaceValue,
-              child: Text(
-                AppStrings.checkInAddNewPlace,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-          onChanged: enabled
-              ? (value) {
-                  if (value != null) onSelectionChanged(value);
-                }
-              : null,
+          newPlaceValue: checkInNewPlaceValue,
+          selectedLabel: isNewPlace
+              ? AppStrings.checkInAddNewPlace
+              : switch (places
+                    .where((place) => place.id == selectedPlaceId)
+                    .firstOrNull) {
+                  final place? => '${place.name} — ${place.address}',
+                  null when selectedValue != null => cachedSelectedPlaceName,
+                  null => null,
+                },
+          onChanged: enabled ? onSelectionChanged : null,
         ),
         if (isNewPlace) ...<Widget>[
           const SizedBox(height: 16),
@@ -114,7 +88,6 @@ final class PlaceStep extends StatelessWidget {
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(
               labelText: AppStrings.checkInNewPlaceLabel,
-              border: OutlineInputBorder(),
             ),
             onChanged: (_) => onInputChanged(),
           ),
@@ -126,7 +99,6 @@ final class PlaceStep extends StatelessWidget {
             textCapitalization: TextCapitalization.sentences,
             decoration: const InputDecoration(
               labelText: AppStrings.checkInAddressFieldLabel,
-              border: OutlineInputBorder(),
             ),
             onChanged: (_) => onInputChanged(),
           ),
@@ -146,7 +118,7 @@ final class PlaceStep extends StatelessWidget {
                 height: 48,
                 child: FilledButton.tonalIcon(
                   onPressed: enabled ? onUseGps : null,
-                  icon: const Icon(Icons.my_location_rounded),
+                  icon: const Icon(CupertinoIcons.location_fill),
                   label: const Text(AppStrings.useLocation),
                 ),
               ),
@@ -154,7 +126,7 @@ final class PlaceStep extends StatelessWidget {
                 height: 48,
                 child: OutlinedButton.icon(
                   onPressed: enabled ? onShowMap : null,
-                  icon: const Icon(Icons.map_outlined),
+                  icon: const Icon(CupertinoIcons.map),
                   label: const Text(AppStrings.chooseOnMap),
                 ),
               ),

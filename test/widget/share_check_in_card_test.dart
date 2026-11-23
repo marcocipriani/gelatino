@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gelatino/constants/app_strings.dart';
@@ -21,7 +22,7 @@ void main() {
     expect(find.text('Gelateria La Romana'), findsOneWidget);
     expect(find.text('Pistacchio'), findsOneWidget);
     expect(find.text('Limone'), findsOneWidget);
-    expect(find.byIcon(Icons.star_rounded), findsNWidgets(5));
+    expect(find.byIcon(CupertinoIcons.star_fill), findsNWidgets(5));
   });
 
   testWidgets('a failed share shows an error and re-enables the button', (

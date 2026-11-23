@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../design/app_tokens.dart';
+import '../../design/motion.dart';
 import '../../constants/app_strings.dart';
+import '../melt_pin.dart';
 
-/// A deterministic local illustration used where Collection needs a cover.
+/// A deterministic local illustration used where Collection needs a cover:
+/// the Melt Pin, cropped large, on one deep flavour.
 class PlaceEditorialCover extends StatelessWidget {
   const PlaceEditorialCover({
     required this.placeId,
@@ -23,83 +26,64 @@ class PlaceEditorialCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
+    final palette = _palettes[paletteIndexFor(placeId)];
+    final cover = Semantics(
       image: true,
       label: AppStrings.placeCoverSemantic(placeName),
       child: ClipRRect(
         key: ValueKey<String>('place-editorial-cover-$placeId'),
         borderRadius: BorderRadius.circular(borderRadius),
-        child: CustomPaint(
-          painter: _EditorialCoverPainter(
-            palette: _palettes[paletteIndexFor(placeId)],
+        child: ColoredBox(
+          color: palette.ground,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final height = constraints.maxHeight;
+              return Stack(
+                children: [
+                  // Tone on tone, bleeding off the edge.
+                  Positioned(
+                    right: -width * 0.1,
+                    top: -height * 0.22,
+                    child: MeltPinGlyph(color: palette.tone, height: height * 1.7),
+                  ),
+                  Positioned(
+                    left: width * 0.1,
+                    top: height * 0.2,
+                    child: MeltPinGlyph(
+                      color: palette.mark,
+                      swirl: palette.ground,
+                      height: height * 0.62,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          child: const SizedBox.expand(),
         ),
       ),
     );
+    if (AppMotion.reduced(context)) return cover;
+    // The cover carries you from the Collection card into the place.
+    return Hero(tag: 'place-cover-$placeId', child: cover);
   }
 }
 
 const List<_CoverPalette> _palettes = <_CoverPalette>[
-  _CoverPalette(Color(0xFFFFD8E1), Color(0xFFFF4D6D), Color(0xFFFFEA00)),
-  _CoverPalette(Color(0xFFC9FFF3), Color(0xFF00A887), Color(0xFFFFF4C2)),
-  _CoverPalette(Color(0xFFD5F3FF), Color(0xFF00BFFF), Color(0xFFFFD2A8)),
-  _CoverPalette(Color(0xFFE9DCFF), Color(0xFF7950C7), Color(0xFFFFC9D4)),
+  // Fragola
+  _CoverPalette(Color(0xFF7A0F2E), Color(0xFF981A3E), AppColors.fragola),
+  // Menta
+  _CoverPalette(Color(0xFF0B4A3F), Color(0xFF125C4F), AppColors.menta),
+  // Puffo
+  _CoverPalette(Color(0xFF0B3A52), Color(0xFF124A66), AppColors.puffo),
+  // Cacao e panna
+  _CoverPalette(Color(0xFF3A2520), Color(0xFF4B322B), AppColors.fiorDiPanna),
 ];
 
 final class _CoverPalette {
-  const _CoverPalette(this.background, this.accent, this.highlight);
+  const _CoverPalette(this.ground, this.tone, this.mark);
 
-  final Color background;
-  final Color accent;
-  final Color highlight;
-}
-
-final class _EditorialCoverPainter extends CustomPainter {
-  const _EditorialCoverPainter({required this.palette});
-
-  final _CoverPalette palette;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = palette.background);
-
-    final accent = Paint()..color = palette.accent;
-    canvas.drawCircle(
-      Offset(size.width * 0.78, size.height * 0.25),
-      size.shortestSide * 0.26,
-      accent,
-    );
-
-    final highlight = Paint()..color = palette.highlight;
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(size.width * 0.28, size.height * 0.64),
-        width: size.width * 0.48,
-        height: size.height * 0.58,
-      ),
-      highlight,
-    );
-
-    final line = Paint()
-      ..color = palette.accent.withValues(alpha: 0.72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.shortestSide * 0.035;
-    canvas.drawArc(
-      Rect.fromLTWH(
-        size.width * 0.08,
-        size.height * 0.12,
-        size.width * 0.5,
-        size.height * 0.62,
-      ),
-      -0.55,
-      2.3,
-      false,
-      line,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _EditorialCoverPainter oldDelegate) =>
-      oldDelegate.palette != palette;
+  final Color ground;
+  final Color tone;
+  final Color mark;
 }

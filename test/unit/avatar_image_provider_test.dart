@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -60,7 +61,7 @@ void main() {
 
     final avatar = tester.widget<CircleAvatar>(find.byType(CircleAvatar));
     expect(avatar.backgroundImage, isNull);
-    expect(find.byIcon(Icons.person), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.person_fill), findsOneWidget);
   });
 
   testWidgets('authenticated avatar read error renders fallback', (
@@ -74,7 +75,7 @@ void main() {
     expect(tester.takeException(), isNull);
     final avatar = tester.widget<CircleAvatar>(find.byType(CircleAvatar));
     expect(avatar.backgroundImage, isNull);
-    expect(find.byIcon(Icons.person), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.person_fill), findsOneWidget);
   });
 }
 

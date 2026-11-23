@@ -1,7 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:flutter/cupertino.dart'
+    show CupertinoPageTransitionsBuilder, CupertinoThemeData;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gelatino/design/app_tokens.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:gelatino/design/motion.dart';
 
 class AppTheme {
   // Official Gelatino palette
@@ -12,166 +16,263 @@ class AppTheme {
   static const Color puffoElettrico = AppColors.puffo;
   static const Color sorbettoYuzu = AppColors.sorbetto;
 
-  // Legacy aliases kept for existing widgets.
-  static const Color strawberryVibrant = fragolaPop;
-  static const Color strawberryPastel = fragolaPop;
-  static const Color mintGreen = mentaGlaciale;
-  static const Color mangoYellow = sorbettoYuzu;
+  /// Declared in pubspec.yaml with its five real weights.
+  static const String fontFamily = 'PlusJakartaSans';
 
-  // Light Mode Color Palette
-  static const Color lightScaffoldBg = fiorDiPanna;
-  static const Color lightSurface = AppColors.lightSurface;
-  static const Color lightText = fondenteExtra;
-  static const Color lightBorder = AppColors.lightBorder;
+  static ThemeData get lightTheme => _build(_light);
+  static ThemeData get darkTheme => _build(_dark);
+  static ThemeData get highContrastLightTheme => _build(_lightHighContrast);
+  static ThemeData get highContrastDarkTheme => _build(_darkHighContrast);
 
-  // Dark Mode Color Palette
-  static const Color darkScaffoldBg = fondenteExtra;
-  static const Color darkSurface = AppColors.darkSurface;
-  static const Color darkText = AppColors.darkText;
-  static const Color darkBorder = AppColors.darkBorder;
+  // Every role is set on purpose: an omitted role silently falls back to
+  // surface, onSurface or a neon accent.
+  static const _light = ColorScheme.light(
+    primary: fragolaPop,
+    onPrimary: fondenteExtra,
+    primaryContainer: AppColors.lightTint,
+    onPrimaryContainer: AppColors.fragolaInk,
+    secondary: mentaGlaciale,
+    onSecondary: fondenteExtra,
+    secondaryContainer: AppColors.lightFill,
+    onSecondaryContainer: fondenteExtra,
+    tertiary: sorbettoYuzu,
+    onTertiary: fondenteExtra,
+    tertiaryContainer: sorbettoYuzu,
+    onTertiaryContainer: fondenteExtra,
+    error: AppColors.error,
+    onError: Colors.white,
+    errorContainer: Color(0xFFFFDAD6),
+    onErrorContainer: Color(0xFF410002),
+    surface: AppColors.lightSurface,
+    onSurface: fondenteExtra,
+    onSurfaceVariant: AppColors.lightSecondaryText,
+    surfaceContainerLowest: AppColors.lightSurface,
+    surfaceContainerLow: AppColors.lightSurface,
+    surfaceContainer: AppColors.lightFill,
+    surfaceContainerHigh: AppColors.lightFill,
+    surfaceContainerHighest: AppColors.lightFillStrong,
+    surfaceTint: Colors.transparent,
+    outline: AppColors.lightOutline,
+    outlineVariant: AppColors.lightBorder,
+    inverseSurface: fondenteExtra,
+    onInverseSurface: fiorDiPanna,
+    inversePrimary: AppColors.darkAccentInk,
+    shadow: fondenteExtra,
+    scrim: fondenteExtra,
+  );
 
-  static ThemeData get lightTheme {
-    final base = ThemeData(
-      useMaterial3: true,
-      colorScheme: const ColorScheme.light(
-        primary: fragolaPop,
-        secondary: mentaGlaciale,
-        tertiary: sorbettoYuzu,
-        surface: lightSurface,
-        onPrimary: fondenteExtra,
-        onSecondary: lightText,
-        onTertiary: lightText,
-        onSurface: lightText,
-        error: AppColors.error,
-        onError: Colors.white,
-        shadow: Color(0x1AFF4D6D),
-      ),
-      scaffoldBackgroundColor: lightScaffoldBg,
-      cardColor: lightSurface,
-      dividerColor: lightBorder,
-      shadowColor: const Color(0x1AFF4D6D),
-      focusColor: const Color(0x29FF4D6D),
-      hoverColor: const Color(0x14FF4D6D),
-      materialTapTargetSize: MaterialTapTargetSize.padded,
-      visualDensity: VisualDensity.standard,
+  static const _dark = ColorScheme.dark(
+    primary: fragolaPop,
+    onPrimary: fondenteExtra,
+    primaryContainer: AppColors.darkTint,
+    onPrimaryContainer: AppColors.darkAccentInk,
+    secondary: mentaGlaciale,
+    onSecondary: fondenteExtra,
+    secondaryContainer: AppColors.darkFillStrong,
+    onSecondaryContainer: AppColors.darkText,
+    tertiary: sorbettoYuzu,
+    onTertiary: fondenteExtra,
+    tertiaryContainer: sorbettoYuzu,
+    onTertiaryContainer: fondenteExtra,
+    error: AppColors.darkError,
+    onError: AppColors.onDarkError,
+    errorContainer: Color(0xFF93000A),
+    onErrorContainer: Color(0xFFFFDAD6),
+    surface: AppColors.darkSurface,
+    onSurface: AppColors.darkText,
+    onSurfaceVariant: AppColors.darkSecondaryText,
+    surfaceContainerLowest: AppColors.darkSurface,
+    surfaceContainerLow: AppColors.darkSurface,
+    surfaceContainer: AppColors.darkFill,
+    surfaceContainerHigh: AppColors.darkFill,
+    surfaceContainerHighest: AppColors.darkFillStrong,
+    surfaceTint: Colors.transparent,
+    outline: AppColors.darkOutline,
+    outlineVariant: AppColors.darkBorder,
+    inverseSurface: fiorDiPanna,
+    onInverseSurface: fondenteExtra,
+    inversePrimary: AppColors.fragolaInk,
+    shadow: fondenteExtra,
+    scrim: fondenteExtra,
+  );
+
+  // iOS "Increase Contrast": borders become ink and secondary text goes 7:1+.
+  static final _lightHighContrast = _light.copyWith(
+    onPrimaryContainer: const Color(0xFF780026),
+    onSurfaceVariant: fondenteExtra,
+    outline: fondenteExtra,
+    outlineVariant: AppColors.lightSecondaryText,
+    error: const Color(0xFF8C0009),
+  );
+
+  static final _darkHighContrast = _dark.copyWith(
+    onPrimaryContainer: const Color(0xFFFFD0D8),
+    onSurfaceVariant: fiorDiPanna,
+    outline: fiorDiPanna,
+    outlineVariant: AppColors.darkSecondaryText,
+  );
+
+  static SmoothRectangleBorder _squircle(
+    double radius, {
+    BorderSide side = BorderSide.none,
+  }) => SmoothRectangleBorder(
+    borderRadius: SmoothBorderRadius(
+      cornerRadius: radius,
+      cornerSmoothing: 0.6,
+    ),
+    side: side,
+  );
+
+  static TextTheme _textTheme(ColorScheme colors) {
+    TextStyle style(
+      double size,
+      FontWeight weight, {
+      double height = 1.3,
+      double tracking = 0,
+      Color? color,
+    }) => TextStyle(
+      fontFamily: fontFamily,
+      fontSize: size,
+      fontWeight: weight,
+      height: height,
+      letterSpacing: size * tracking,
+      color: color ?? colors.onSurface,
     );
 
-    final textThemeBase = GoogleFonts.plusJakartaSansTextTheme();
-
-    return base.copyWith(
-      textTheme: base.textTheme.copyWith(
-        displayLarge: textThemeBase.displayLarge?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 36,
-          letterSpacing: 36 * -0.02,
-        ),
-        displayMedium: textThemeBase.displayMedium?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 32,
-          letterSpacing: 32 * -0.02,
-        ),
-        displaySmall: textThemeBase.displaySmall?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 28,
-          letterSpacing: 28 * -0.02,
-        ),
-        headlineLarge: textThemeBase.headlineLarge?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 24,
-          letterSpacing: 24 * -0.02,
-        ),
-        headlineMedium: textThemeBase.headlineMedium?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 22,
-          letterSpacing: 22 * -0.02,
-        ),
-        headlineSmall: textThemeBase.headlineSmall?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 20,
-          letterSpacing: 20 * -0.02,
-        ),
-        titleLarge: textThemeBase.titleLarge?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 20,
-          letterSpacing: 20 * -0.02,
-        ),
-        titleMedium: textThemeBase.titleMedium?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 18,
-          letterSpacing: 18 * -0.02,
-        ),
-        titleSmall: textThemeBase.titleSmall?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w800,
-          fontSize: 16,
-          letterSpacing: 16 * -0.02,
-        ),
-        bodyLarge: textThemeBase.bodyLarge?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
-        bodyMedium: textThemeBase.bodyMedium?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
-        bodySmall: textThemeBase.bodySmall?.copyWith(
-          color: lightText.withValues(alpha: 0.7),
-          fontWeight: FontWeight.normal,
-          fontSize: 14,
-        ),
-        labelLarge: textThemeBase.labelLarge?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-        labelMedium: textThemeBase.labelMedium?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-        ),
-        labelSmall: textThemeBase.labelSmall?.copyWith(
-          color: lightText,
-          fontWeight: FontWeight.normal,
-          fontSize: 12,
-        ),
+    const heavy = FontWeight.w800;
+    const bold = FontWeight.w700;
+    const semibold = FontWeight.w600;
+    const medium = FontWeight.w500;
+    // iOS Dynamic Type ramp, one weight up because Jakarta runs lighter than SF.
+    return TextTheme(
+      displayLarge: style(40, heavy, height: 1.1, tracking: -0.02),
+      displayMedium: style(36, heavy, height: 1.12, tracking: -0.02),
+      displaySmall: style(32, heavy, height: 1.15, tracking: -0.02),
+      headlineLarge: style(28, heavy, height: 1.18, tracking: -0.015),
+      headlineMedium: style(26, heavy, height: 1.2, tracking: -0.015),
+      headlineSmall: style(22, heavy, height: 1.22, tracking: -0.01),
+      titleLarge: style(20, bold, height: 1.25, tracking: -0.005),
+      titleMedium: style(17, bold),
+      titleSmall: style(16, bold),
+      bodyLarge: style(17, medium, height: 1.4),
+      bodyMedium: style(16, medium, height: 1.4),
+      bodySmall: style(
+        14,
+        medium,
+        height: 1.35,
+        color: colors.onSurfaceVariant,
       ),
+      labelLarge: style(16, bold, height: 1.25),
+      labelMedium: style(14, semibold, height: 1.25),
+      labelSmall: style(13, semibold, height: 1.2),
+    );
+  }
 
-      // AppBar Theme (SliverAppBar customizes on top of this)
+  /// System bar icons follow the app theme, which can differ from the OS one.
+  static SystemUiOverlayStyle systemBars(ThemeData theme) {
+    final dark = theme.brightness == Brightness.dark;
+    final ink = dark ? Brightness.light : Brightness.dark;
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: ink,
+      statusBarBrightness: theme.brightness, // iOS names the background.
+      systemNavigationBarColor: theme.colorScheme.surface,
+      systemNavigationBarIconBrightness: ink,
+    );
+  }
+
+  static ThemeData _build(ColorScheme colors) {
+    final dark = colors.brightness == Brightness.dark;
+    final canvas = dark ? fondenteExtra : fiorDiPanna;
+    final text = _textTheme(colors);
+    final apple =
+        defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS;
+    final controlShape = _squircle(AppRadii.control);
+    const buttonText = TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      height: 1.25,
+    );
+    const buttonPadding = EdgeInsets.symmetric(
+      horizontal: AppSpacing.md,
+      vertical: AppSpacing.sm,
+    );
+    const buttonSize = Size(88, 48);
+
+    OutlineInputBorder inputBorder(Color color, [double width = 1]) =>
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadii.control),
+          borderSide: BorderSide(color: color, width: width),
+        );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: colors.brightness,
+      colorScheme: colors,
+      fontFamily: fontFamily,
+      textTheme: text,
+      scaffoldBackgroundColor: canvas,
+      canvasColor: colors.surface,
+      cardColor: colors.surface,
+      dividerColor: colors.outlineVariant,
+      shadowColor: fondenteExtra.withValues(alpha: 0.2),
+      hintColor: colors.onSurfaceVariant,
+      focusColor: fragolaPop.withValues(alpha: dark ? 0.32 : 0.16),
+      hoverColor: fragolaPop.withValues(alpha: dark ? 0.16 : 0.08),
+      // iOS highlights on press; it never ripples.
+      splashFactory: apple ? NoSplash.splashFactory : null,
+      highlightColor: colors.onSurface.withValues(alpha: 0.08),
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      visualDensity: VisualDensity.standard,
+      cupertinoOverrideTheme: CupertinoThemeData(
+        brightness: colors.brightness,
+        primaryColor: colors.accentInk,
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: colors.accentInk,
+        selectionColor: fragolaPop.withValues(alpha: 0.32),
+        selectionHandleColor: fragolaPop,
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.iOS: MotionAwareTransitionsBuilder(
+            CupertinoPageTransitionsBuilder(),
+          ),
+          TargetPlatform.macOS: MotionAwareTransitionsBuilder(
+            CupertinoPageTransitionsBuilder(),
+          ),
+          TargetPlatform.android: MotionAwareTransitionsBuilder(
+            PredictiveBackPageTransitionsBuilder(),
+          ),
+          TargetPlatform.linux: MotionAwareTransitionsBuilder(
+            FadeForwardsPageTransitionsBuilder(),
+          ),
+          TargetPlatform.windows: MotionAwareTransitionsBuilder(
+            FadeForwardsPageTransitionsBuilder(),
+          ),
+        },
+      ),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: canvas,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        centerTitle: false,
-        iconTheme: const IconThemeData(color: lightText, size: 24),
-        actionsIconTheme: const IconThemeData(color: lightText, size: 24),
-        titleTextStyle: GoogleFonts.plusJakartaSans(
-          color: lightText,
-          fontSize: 32,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 32 * -0.02,
-        ),
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: colors.onSurface, size: 24),
+        actionsIconTheme: IconThemeData(color: colors.onSurface, size: 24),
+        titleTextStyle: text.titleMedium,
+        shape: Border(bottom: BorderSide(color: colors.outlineVariant)),
       ),
-
       // Ordinary content surfaces are flat. Overlays opt into elevation locally.
       cardTheme: CardThemeData(
         elevation: AppElevation.flat,
         shadowColor: Colors.transparent,
-        color: lightSurface,
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius: AppRadii.card,
-            cornerSmoothing: 0.6,
-          ),
-          side: const BorderSide(color: lightBorder, width: 1),
+        color: colors.surface,
+        shape: _squircle(
+          AppRadii.card,
+          side: BorderSide(color: colors.outlineVariant),
         ),
         clipBehavior: Clip.antiAlias,
         margin: const EdgeInsets.symmetric(
@@ -179,382 +280,170 @@ class AppTheme {
           horizontal: AppSpacing.lg,
         ),
       ),
-
-      // All interactive controls reserve the A1 minimum target.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: fragolaPop,
           foregroundColor: fondenteExtra,
           elevation: AppElevation.flat,
-          minimumSize: const Size(88, AppLayout.touchTarget),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.sm,
-          ),
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: AppRadii.control,
-              cornerSmoothing: 0.6,
-            ),
-          ),
-          textStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          minimumSize: buttonSize,
+          padding: buttonPadding,
+          shape: controlShape,
+          textStyle: buttonText,
         ),
       ),
-
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.fragolaInk,
-          minimumSize: const Size(AppLayout.touchTarget, AppLayout.touchTarget),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.xs,
-          ),
-          textStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-
+      // No colours here: they would also override FilledButton.tonal.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: fragolaPop,
-          foregroundColor: fondenteExtra,
-          minimumSize: const Size(88, AppLayout.touchTarget),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadii.control),
-          ),
+          minimumSize: buttonSize,
+          padding: buttonPadding,
+          shape: controlShape,
+          textStyle: buttonText,
         ),
       ),
-
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: lightText,
-          minimumSize: const Size(88, AppLayout.touchTarget),
-          side: const BorderSide(color: lightBorder),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadii.control),
-          ),
+          foregroundColor: colors.onSurface,
+          backgroundColor: colors.surface,
+          minimumSize: buttonSize,
+          padding: buttonPadding,
+          side: BorderSide(color: colors.outline),
+          shape: controlShape,
+          textStyle: buttonText,
         ),
       ),
-
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colors.accentInk,
+          minimumSize: const Size(AppLayout.touchTarget, AppLayout.touchTarget),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
+          shape: controlShape,
+          textStyle: buttonText,
+        ),
+      ),
+      // No foreground here: it would also override IconButton.filled.
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
-          foregroundColor: lightText,
           minimumSize: const Size.square(AppLayout.touchTarget),
-          padding: const EdgeInsets.all(AppSpacing.sm),
+          padding: const EdgeInsets.all(AppSpacing.xs),
         ),
       ),
-
-      // FAB Theme (Stencil border, minimum touch target size 56x56)
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: fragolaPop,
-        foregroundColor: Colors.white,
-        elevation: 6,
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius: AppRadii.hero,
-            cornerSmoothing: 0.6,
-          ),
-          side: const BorderSide(color: lightScaffoldBg, width: 4),
-        ),
-      ),
-
-      // Input Decoration Theme
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: lightSurface,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.md,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(color: lightBorder, width: 1.5),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(color: lightBorder, width: 1.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(
-            color: fragolaPop,
-            width: AppFocus.ringWidth,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
-        ),
-      ),
-    );
-  }
-
-  static ThemeData get darkTheme {
-    final base = ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(
-        brightness: Brightness.dark,
-        primary: fragolaPop,
-        secondary: mentaGlaciale,
-        tertiary: sorbettoYuzu,
-        surface: darkSurface,
-        onPrimary: fondenteExtra,
-        onSecondary: fondenteExtra,
-        onTertiary: fondenteExtra,
-        onSurface: darkText,
-        error: AppColors.darkError,
-        onError: AppColors.onDarkError,
-        shadow: Colors.transparent,
-      ),
-      scaffoldBackgroundColor: darkScaffoldBg,
-      cardColor: darkSurface,
-      dividerColor: darkBorder,
-      shadowColor: Colors.transparent,
-      focusColor: const Color(0x52FF4D6D),
-      hoverColor: const Color(0x29FF4D6D),
-      materialTapTargetSize: MaterialTapTargetSize.padded,
-      visualDensity: VisualDensity.standard,
-    );
-
-    final textThemeBase = GoogleFonts.plusJakartaSansTextTheme(
-      ThemeData.dark().textTheme,
-    );
-
-    return base.copyWith(
-      textTheme: base.textTheme.copyWith(
-        displayLarge: textThemeBase.displayLarge?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 36,
-          letterSpacing: 36 * -0.02,
-        ),
-        displayMedium: textThemeBase.displayMedium?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 32,
-          letterSpacing: 32 * -0.02,
-        ),
-        displaySmall: textThemeBase.displaySmall?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 28,
-          letterSpacing: 28 * -0.02,
-        ),
-        headlineLarge: textThemeBase.headlineLarge?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 24,
-          letterSpacing: 24 * -0.02,
-        ),
-        headlineMedium: textThemeBase.headlineMedium?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 22,
-          letterSpacing: 22 * -0.02,
-        ),
-        headlineSmall: textThemeBase.headlineSmall?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 20,
-          letterSpacing: 20 * -0.02,
-        ),
-        titleLarge: textThemeBase.titleLarge?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 20,
-          letterSpacing: 20 * -0.02,
-        ),
-        titleMedium: textThemeBase.titleMedium?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 18,
-          letterSpacing: 18 * -0.02,
-        ),
-        titleSmall: textThemeBase.titleSmall?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w800,
-          fontSize: 16,
-          letterSpacing: 16 * -0.02,
-        ),
-        bodyLarge: textThemeBase.bodyLarge?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
-        bodyMedium: textThemeBase.bodyMedium?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
-        bodySmall: textThemeBase.bodySmall?.copyWith(
-          color: darkText.withValues(alpha: 0.7),
-          fontWeight: FontWeight.normal,
-          fontSize: 14,
-        ),
-        labelLarge: textThemeBase.labelLarge?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-        labelMedium: textThemeBase.labelMedium?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-        ),
-        labelSmall: textThemeBase.labelSmall?.copyWith(
-          color: darkText,
-          fontWeight: FontWeight.normal,
-          fontSize: 12,
-        ),
-      ),
-
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: false,
-        iconTheme: const IconThemeData(color: darkText, size: 24),
-        actionsIconTheme: const IconThemeData(color: darkText, size: 24),
-        titleTextStyle: GoogleFonts.plusJakartaSans(
-          color: darkText,
-          fontSize: 32,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 32 * -0.02,
-        ),
-      ),
-
-      // Card Theme (In Dark Mode, replace shadows with thin borders 0.5px and dark surface)
-      cardTheme: CardThemeData(
+        foregroundColor: fondenteExtra,
         elevation: AppElevation.flat,
-        shadowColor: Colors.transparent,
-        color: darkSurface,
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius: AppRadii.card,
-            cornerSmoothing: 0.6,
-          ),
-          side: const BorderSide(color: darkBorder, width: 0.5),
-        ),
-        clipBehavior: Clip.antiAlias,
-        margin: const EdgeInsets.symmetric(
-          vertical: AppSpacing.sm,
-          horizontal: AppSpacing.lg,
-        ),
+        shape: _squircle(AppRadii.card),
       ),
-
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: fragolaPop,
-          foregroundColor: fondenteExtra,
-          elevation: AppElevation.flat,
-          minimumSize: const Size(88, AppLayout.touchTarget),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.sm,
-          ),
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: AppRadii.control,
-              cornerSmoothing: 0.6,
-            ),
-            side: const BorderSide(color: darkBorder, width: 0.5),
-          ),
-          textStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: fragolaPop,
-          minimumSize: const Size(AppLayout.touchTarget, AppLayout.touchTarget),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.xs,
-          ),
-          textStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: fragolaPop,
-          foregroundColor: fondenteExtra,
-          minimumSize: const Size(88, AppLayout.touchTarget),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadii.control),
-          ),
-        ),
-      ),
-
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: darkText,
-          minimumSize: const Size(88, AppLayout.touchTarget),
-          side: const BorderSide(color: darkBorder),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadii.control),
-          ),
-        ),
-      ),
-
-      iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(
-          foregroundColor: darkText,
-          minimumSize: const Size.square(AppLayout.touchTarget),
-          padding: const EdgeInsets.all(AppSpacing.sm),
-        ),
-      ),
-
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: fragolaPop,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius: AppRadii.hero,
-            cornerSmoothing: 0.6,
-          ),
-          side: const BorderSide(color: darkScaffoldBg, width: 4),
-        ),
-      ),
-
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: InputDecorationThemeData(
         filled: true,
-        fillColor: darkSurface,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.md,
+        fillColor: colors.surface,
+        contentPadding: const EdgeInsets.all(AppSpacing.md),
+        hintStyle: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+        labelStyle: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+        floatingLabelStyle: text.labelLarge?.copyWith(color: colors.accentInk),
+        prefixIconColor: colors.onSurfaceVariant,
+        suffixIconColor: colors.onSurfaceVariant,
+        border: inputBorder(colors.outline),
+        enabledBorder: inputBorder(colors.outline),
+        focusedBorder: inputBorder(fragolaPop, AppFocus.ringWidth),
+        errorBorder: inputBorder(colors.error, 1.5),
+        focusedErrorBorder: inputBorder(colors.error, AppFocus.ringWidth),
+        errorMaxLines: 3,
+      ),
+      chipTheme: ChipThemeData(
+        color: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? fragolaPop
+              : colors.surface,
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(color: darkBorder, width: 0.5),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(color: darkBorder, width: 0.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(
-            color: fragolaPop,
-            width: AppFocus.ringWidth,
+        checkmarkColor: fondenteExtra,
+        iconTheme: IconThemeData(color: colors.accentInk, size: 18),
+        labelStyle: text.labelMedium?.copyWith(
+          color: WidgetStateColor.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? fondenteExtra
+                : colors.onSurface,
           ),
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-          borderSide: const BorderSide(color: AppColors.error, width: 0.5),
+        side: WidgetStateBorderSide.resolveWith(
+          (states) => BorderSide(
+            color: states.contains(WidgetState.selected)
+                ? fragolaPop
+                : colors.outline,
+          ),
         ),
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xxs,
+          vertical: AppSpacing.xs,
+        ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        side: BorderSide(color: colors.outline, width: 2),
+      ),
+      switchTheme: SwitchThemeData(
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? fragolaPop
+              : colors.outline,
+        ),
+        // Off, the track is ink: white would vanish on it in dark mode.
+        thumbColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? Colors.white
+              : colors.surface,
+        ),
+        trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
+      ),
+      // The stock month label is onSurface at 60%, under AA on the dialog.
+      datePickerTheme: DatePickerThemeData(
+        subHeaderForegroundColor: colors.onSurfaceVariant,
+      ),
+      listTileTheme: ListTileThemeData(
+        iconColor: colors.onSurface,
+        titleTextStyle: text.titleSmall,
+        subtitleTextStyle: text.bodySmall,
+        minTileHeight: 56,
+      ),
+      dividerTheme: DividerThemeData(color: colors.outlineVariant, space: 1),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: colors.accentInk,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: colors.surface,
+        barrierColor: fondenteExtra.withValues(alpha: 0.56),
+        shape: _squircle(AppRadii.hero),
+        titleTextStyle: text.titleLarge,
+        contentTextStyle: text.bodyMedium,
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: canvas,
+        modalBackgroundColor: canvas,
+        modalBarrierColor: fondenteExtra.withValues(alpha: 0.56),
+        showDragHandle: true,
+        dragHandleColor: colors.outline,
+        dragHandleSize: const Size(36, 5),
+        clipBehavior: Clip.antiAlias,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: colors.inverseSurface,
+        contentTextStyle: text.labelMedium?.copyWith(
+          color: colors.onInverseSurface,
+        ),
+        shape: controlShape,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: colors.inverseSurface,
+          borderRadius: BorderRadius.circular(AppSpacing.xs),
+        ),
+        textStyle: text.labelSmall?.copyWith(color: colors.onInverseSurface),
       ),
     );
   }

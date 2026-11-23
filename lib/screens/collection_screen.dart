@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -68,7 +69,7 @@ class CollectionScreen extends ConsumerWidget {
                     if (uid != null) ...[
                       const SizedBox(height: AppSpacing.xl),
                       _FavoriteFlavorsSection(
-                        onOpen: () => context.go('/favorite-flavors'),
+                        onOpen: () => context.push('/favorite-flavors'),
                       ),
                     ],
                     const SizedBox(height: AppSpacing.display),
@@ -208,16 +209,19 @@ class _FavoriteFlavorsSection extends StatelessWidget {
       key: const ValueKey('favorite-flavors-section'),
       margin: EdgeInsets.zero,
       elevation: AppElevation.flat,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.sm,
         ),
-        leading: const Icon(Icons.icecream_outlined),
+        leading: CircleAvatar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          child: const Icon(Icons.icecream_outlined),
+        ),
         title: const Text(AppStrings.collectionFavoriteFlavorsTitle),
         subtitle: const Text(AppStrings.collectionFavoriteFlavorsSubtitle),
-        trailing: const Icon(Icons.arrow_forward),
+        trailing: const Icon(CupertinoIcons.chevron_forward),
         onTap: onOpen,
       ),
     );
@@ -232,12 +236,12 @@ class _EmptyCollection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _CollectionMessage(
-      icon: Icons.bookmark_border,
+      icon: CupertinoIcons.bookmark,
       title: AppStrings.collectionEmptyTitle,
       description: AppStrings.collectionEmptyDesc,
       action: FilledButton.icon(
         onPressed: onExplore,
-        icon: const Icon(Icons.explore_outlined),
+        icon: const Icon(CupertinoIcons.compass),
         label: const Text(AppStrings.collectionExploreButton),
       ),
     );
@@ -253,12 +257,12 @@ class _CollectionError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _CollectionMessage(
-      icon: Icons.error_outline,
+      icon: CupertinoIcons.exclamationmark_circle,
       title: AppStrings.collectionErrorTitle,
       description: ErrorHandler.getReadableError(error),
       action: TextButton.icon(
         onPressed: onRetry,
-        icon: const Icon(Icons.refresh),
+        icon: const Icon(CupertinoIcons.refresh),
         label: const Text(AppStrings.retry),
       ),
     );
@@ -273,7 +277,7 @@ class _UnauthenticatedCollection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _CollectionMessage(
-      icon: Icons.lock_outline,
+      icon: CupertinoIcons.lock,
       title: AppStrings.collectionUnauthTitle,
       description: AppStrings.collectionUnauthDesc,
       action: FilledButton(onPressed: onLogin, child: const Text(AppStrings.login)),
@@ -303,7 +307,11 @@ class _CollectionMessage extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: AppLayout.readableText),
           child: Column(
             children: [
-              Icon(icon, size: 40),
+              Icon(
+                icon,
+                size: 40,
+                color: Theme.of(context).colorScheme.accentInk,
+              ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 title,

@@ -33,14 +33,13 @@ class CreamyCard extends StatelessWidget {
     final cardColor =
         backgroundColor ?? theme.cardTheme.color ?? theme.cardColor;
     final dividerColor = borderColor ?? theme.dividerColor;
-    final isDark = theme.brightness == Brightness.dark;
 
     final shapeBorder = SmoothRectangleBorder(
       borderRadius: SmoothBorderRadius(
         cornerRadius: borderRadius,
         cornerSmoothing: 0.6,
       ),
-      side: BorderSide(color: dividerColor, width: isDark ? 0.5 : borderWidth),
+      side: BorderSide(color: dividerColor, width: borderWidth),
     );
 
     return Container(
@@ -50,16 +49,6 @@ class CreamyCard extends StatelessWidget {
       decoration: ShapeDecoration(
         color: cardColor,
         shape: shapeBorder,
-        shadows: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                  spreadRadius: -4,
-                ),
-              ],
       ),
       child: ClipSmoothRect(
         radius: SmoothBorderRadius(

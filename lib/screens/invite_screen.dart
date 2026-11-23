@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import '../providers/auth_provider.dart';
 import '../providers/friendship_providers.dart';
 import '../providers/profile_providers.dart';
 import '../repositories/friendship_repository.dart';
+import '../widgets/app_controls.dart';
 import '../widgets/avatar_image_provider.dart';
 import '../constants/app_strings.dart';
 
@@ -151,7 +153,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                           dimension: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.person_add_alt_1),
+                      : const Icon(CupertinoIcons.person_add_solid),
                   label: const Text(AppStrings.inviteAcceptRequest),
                 ),
               ] else
@@ -165,7 +167,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                           dimension: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.person_add_alt_1),
+                      : const Icon(CupertinoIcons.person_add_solid),
                   label: const Text(AppStrings.inviteSendRequest),
                 ),
             ],
@@ -253,7 +255,10 @@ class _InviteScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text(AppStrings.inviteTitle)),
+    appBar: AppBar(
+      leading: const AppBackButton(fallback: '/collection'),
+      title: const Text(AppStrings.inviteTitle),
+    ),
     body: Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),

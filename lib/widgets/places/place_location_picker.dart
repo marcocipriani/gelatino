@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../design/app_tokens.dart';
+import '../melt_pin.dart';
 import 'place_map_surface.dart';
 import 'place_marker.dart';
 
@@ -45,12 +45,11 @@ final class PlaceLocationPicker extends ConsumerWidget {
                         coordinate: marker,
                         width: PlaceMarker.pinWidth,
                         height: PlaceMarker.pinHeight,
-                        child: SvgPicture.asset(
-                          'assets/images/pin-fondente.svg',
-                          height: PlaceMarker.pinHeight,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.fragola,
-                            BlendMode.srcIn,
+                        child: const Center(
+                          child: MeltPinGlyph(
+                            color: AppColors.fragola,
+                            swirl: AppColors.fondente,
+                            height: PlaceMarker.pinHeight,
                           ),
                         ),
                       ),

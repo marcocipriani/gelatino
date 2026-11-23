@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gelatino/design/app_tokens.dart';
@@ -33,7 +34,7 @@ void main() {
           body: AsyncContentState.empty(
             width: 320,
             height: 240,
-            icon: Icons.bookmark_border,
+            icon: CupertinoIcons.bookmark,
             title: 'Nessun posto salvato',
             description: 'Esplora le gelaterie.',
             actionLabel: 'Esplora',

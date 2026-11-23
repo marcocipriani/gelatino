@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../design/app_tokens.dart';
@@ -59,27 +60,29 @@ final class TimelineEditorialCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: Text(
-                    username,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Flexible(
-                  child: Text(
-                    // The eaten date, not the publish date. A backdated
-                    // check-in still sorts by publication, so it says so
-                    // explicitly instead of looking like a stale post.
-                    item.isBackdated
-                        ? AppStrings.timelineBackdated(_date(item.consumedAt))
-                        : _date(item.consumedAt),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        username,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      Text(
+                        // The eaten date, not the publish date. A backdated
+                        // check-in still sorts by publication, so it says so
+                        // explicitly instead of looking like a stale post.
+                        item.isBackdated
+                            ? AppStrings.timelineBackdated(
+                                _date(item.consumedAt),
+                              )
+                            : _date(item.consumedAt),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xxs),
@@ -224,7 +227,11 @@ final class _TimelineMetadata extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Icon(Icons.star_rounded, size: 20, color: colors.primary),
+                      Icon(
+                        CupertinoIcons.star_fill,
+                        size: 20,
+                        color: colors.accentInk,
+                      ),
                       const SizedBox(width: AppSpacing.xxs),
                       Text(
                         AppStrings.timelineRatingSemantic(item.rating),
@@ -241,10 +248,13 @@ final class _TimelineMetadata extends StatelessWidget {
             spacing: AppSpacing.xs,
             runSpacing: AppSpacing.xs,
             children: item.flavors
-                .map(
-                  (flavor) => DecoratedBox(
+                .map((flavor) {
+                  final fill =
+                      _flavorFill(flavor['color_hex'] as String?) ??
+                      colors.surfaceContainerHighest;
+                  return DecoratedBox(
                     decoration: BoxDecoration(
-                      color: colors.surfaceContainerHighest,
+                      color: fill,
                       borderRadius: BorderRadius.circular(AppRadii.pill),
                     ),
                     child: Padding(
@@ -252,10 +262,15 @@ final class _TimelineMetadata extends StatelessWidget {
                         horizontal: AppSpacing.sm,
                         vertical: AppSpacing.xs,
                       ),
-                      child: Text(flavor['name'] as String),
+                      child: Text(
+                        flavor['name'] as String,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(color: inkOn(fill)),
+                      ),
                     ),
-                  ),
-                )
+                  );
+                })
                 .toList(growable: false),
           ),
           if (item.reviewText.isNotEmpty) ...<Widget>[
@@ -271,6 +286,14 @@ final class _TimelineMetadata extends StatelessWidget {
       ),
     );
   }
+}
+
+// Snapshots validate #RRGGBB; older ones have no colour at all.
+Color? _flavorFill(String? hex) {
+  final value = hex == null
+      ? null
+      : int.tryParse('FF${hex.substring(1)}', radix: 16);
+  return value == null ? null : Color(value);
 }
 
 /// Opens the branded share-card preview. Uses the theme's `onSurface` ink
@@ -302,12 +325,9 @@ final class _ShareIconButton extends StatelessWidget {
     return IconButton(
       key: const ValueKey<String>('timeline-card-share'),
       tooltip: AppStrings.shareCardTooltip,
-      iconSize: 20,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
+      iconSize: 22,
       color: Theme.of(context).colorScheme.onSurface,
-      icon: const Icon(Icons.ios_share_rounded),
+      icon: const Icon(CupertinoIcons.share),
       onPressed: () => showShareCheckInPreview(
         context,
         placeName: placeName,

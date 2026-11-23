@@ -1,6 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ErrorHandler {
   /// Converte un'eccezione tecnica in un messaggio amichevole per l'utente in italiano.
@@ -60,70 +60,20 @@ class ErrorHandler {
     // Rimuove eventuali SnackBar attive per mostrare subito quella nuova
     ScaffoldMessenger.of(context).clearSnackBars();
     
+    final colors = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFAFAFA), // Fior di Panna (Sfondo Light)
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: const Color(0xFFFF4D6D), // Fragola Pop (Primary Border)
-              width: 1.5,
+        content: Row(
+          children: [
+            Icon(
+              CupertinoIcons.exclamationmark_circle_fill,
+              color: colors.inversePrimary,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFFF4D6D).withValues(alpha: 0.15),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/images/logo.svg', // Melt Pin logo as warning icon
-                width: 24,
-                height: 24,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'ATTENZIONE',
-                      style: TextStyle(
-                        color: Color(0xFFFF4D6D), // Fragola Pop
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Plus Jakarta Sans',
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      readableMessage,
-                      style: const TextStyle(
-                        color: Color(0xFF1A1A1A), // Fondente Extra (Testo primario)
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Plus Jakarta Sans',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(readableMessage)),
+          ],
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 100), // Float it above the bottom navigation pill
-        duration: const Duration(seconds: 4),
+        duration: const Duration(seconds: 5),
       ),
     );
   }

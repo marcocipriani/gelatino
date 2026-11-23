@@ -28,14 +28,22 @@ final class EditorialHeader extends StatelessWidget {
           Text(
             eyebrowText,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.primary,
+              color: theme.colorScheme.accentInk,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
         ],
-        Text(title, style: theme.textTheme.displaySmall),
+        Semantics(
+          header: true,
+          // Like iOS Large Title: display type grows less than body, so words
+          // don't break mid-way. At 1.5x it's already 48pt.
+          child: MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.5,
+            child: Text(title, style: theme.textTheme.displaySmall),
+          ),
+        ),
         if (descriptionText != null && descriptionText.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.sm),
           ConstrainedBox(
@@ -43,7 +51,7 @@ final class EditorialHeader extends StatelessWidget {
             child: Text(
               descriptionText,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ),

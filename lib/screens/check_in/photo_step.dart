@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../e2e/e2e_config.dart';
@@ -49,15 +50,21 @@ final class PhotoStep extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: Theme.of(context).colorScheme.primaryContainer,
           ),
           child: bytes == null
-              ? const Center(child: Icon(Icons.add_a_photo_outlined, size: 64))
+              ? Center(
+                  child: Icon(
+                    CupertinoIcons.camera_fill,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                )
               : Image.memory(
                   bytes!,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) =>
-                      const Center(child: Icon(Icons.image_outlined, size: 64)),
+                      const Center(child: Icon(CupertinoIcons.photo, size: 64)),
                 ),
         ),
       ),
@@ -78,7 +85,7 @@ final class PhotoStep extends StatelessWidget {
             height: 48,
             child: OutlinedButton.icon(
               onPressed: onCamera,
-              icon: const Icon(Icons.camera_alt_outlined),
+              icon: const Icon(CupertinoIcons.camera),
               label: const Text(AppStrings.checkInCamera),
             ),
           ),
@@ -86,7 +93,7 @@ final class PhotoStep extends StatelessWidget {
             height: 48,
             child: OutlinedButton.icon(
               onPressed: onGallery,
-              icon: const Icon(Icons.photo_library_outlined),
+              icon: const Icon(CupertinoIcons.photo_on_rectangle),
               label: const Text(AppStrings.checkInGallery),
             ),
           ),
@@ -97,7 +104,7 @@ final class PhotoStep extends StatelessWidget {
               height: 48,
               child: TextButton.icon(
                 onPressed: onRemove,
-                icon: const Icon(Icons.delete_outline),
+                icon: const Icon(CupertinoIcons.trash),
                 label: const Text(AppStrings.remove),
               ),
             ),
@@ -129,7 +136,7 @@ final class PhotoStep extends StatelessWidget {
       else if (hasStagedPhoto)
         const Row(
           children: <Widget>[
-            Icon(Icons.lock_outline, size: 18),
+            Icon(CupertinoIcons.lock, size: 18),
             SizedBox(width: 8),
             Expanded(child: Text(AppStrings.checkInPrivatePhotoUploaded)),
           ],

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,7 +19,7 @@ final class AuthenticatedStorageImage extends ConsumerWidget {
     this.height,
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
-    this.missingIcon = Icons.image_not_supported_outlined,
+    this.missingIcon = CupertinoIcons.photo,
   });
 
   final String path;

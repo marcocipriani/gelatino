@@ -4,6 +4,7 @@ import 'dart:ui' show Tristate;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -129,7 +130,7 @@ void main() {
       tester.getSemantics(find.byType(AuthenticatedCheckInPhoto)).label,
       contains('Foto del check-in da Gelateria Uno'),
     );
-    expect(find.byIcon(Icons.ios_share_rounded), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.share), findsOneWidget);
   });
 
   testWidgets('share icon opens a branded preview with a Condividi action', (
@@ -137,7 +138,7 @@ void main() {
   ) async {
     await _pumpTimeline(tester, size: const Size(768, 1024), items: _items(1));
 
-    await tester.tap(find.byIcon(Icons.ios_share_rounded));
+    await tester.tap(find.byIcon(CupertinoIcons.share));
     await tester.pumpAndSettle();
 
     expect(find.byType(ShareCheckInCard), findsOneWidget);

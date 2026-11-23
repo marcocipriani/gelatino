@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../constants/app_strings.dart';
 
@@ -27,32 +27,32 @@ const primaryNavigationActions = <NavigationAction>[
   NavigationAction(
     route: '/collection',
     label: AppStrings.navCollection,
-    selectedIcon: Icons.bookmark_rounded,
-    unselectedIcon: Icons.bookmark_outline_rounded,
+    selectedIcon: CupertinoIcons.bookmark_fill,
+    unselectedIcon: CupertinoIcons.bookmark,
     semanticLabel: AppStrings.navCollection,
     semanticOrder: 1,
   ),
   NavigationAction(
     route: '/timeline',
     label: AppStrings.navTimeline,
-    selectedIcon: Icons.auto_stories_rounded,
-    unselectedIcon: Icons.auto_stories_outlined,
+    selectedIcon: CupertinoIcons.square_stack_fill,
+    unselectedIcon: CupertinoIcons.square_stack,
     semanticLabel: AppStrings.navTimeline,
     semanticOrder: 2,
   ),
   NavigationAction(
     route: '/places',
     label: AppStrings.navPlaces,
-    selectedIcon: Icons.storefront_rounded,
-    unselectedIcon: Icons.storefront_outlined,
+    selectedIcon: CupertinoIcons.map_fill,
+    unselectedIcon: CupertinoIcons.map,
     semanticLabel: AppStrings.navPlaces,
     semanticOrder: 3,
   ),
   NavigationAction(
     route: '/friends',
     label: AppStrings.navFriends,
-    selectedIcon: Icons.people_alt_rounded,
-    unselectedIcon: Icons.people_alt_outlined,
+    selectedIcon: CupertinoIcons.person_2_fill,
+    unselectedIcon: CupertinoIcons.person_2,
     semanticLabel: AppStrings.navFriends,
     semanticOrder: 4,
   ),

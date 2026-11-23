@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_strings.dart';
@@ -50,7 +51,7 @@ class _GelatoTypeSelectorState extends State<GelatoTypeSelector> {
           TextButton.icon(
             key: Key(_expanded ? 'gelato-type-collapse' : 'gelato-type-expand'),
             onPressed: () => setState(() => _expanded = !_expanded),
-            icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+            icon: Icon(_expanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down),
             label: Text(
               _expanded
                   ? AppStrings.checkInShowLessTypes

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,24 +43,49 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final actions = _actions();
     return PopScope(
       canPop: !_submitting,
-      child: AlertDialog(
-        scrollable: true,
-        title: Text(_choosingOnMap ? AppStrings.addPlaceChooseLocationTitle : AppStrings.placeAddButton),
-        content: SizedBox(
-          width: 480,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.xs,
+            AppSpacing.md,
+            AppSpacing.lg,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: actions.first,
+                ),
+                Semantics(
+                  header: true,
+                  child: Text(
+                    _choosingOnMap
+                        ? AppStrings.addPlaceChooseLocationTitle
+                        : AppStrings.placeAddButton,
+                    style: theme.textTheme.headlineMedium,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
                 TextFormField(
                   controller: _nameController,
                   enabled: !_submitting,
                   textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(labelText: AppStrings.addPlaceNameLabel),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.addPlaceNameLabel,
+                  ),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? AppStrings.addPlaceEnterName
                       : null,
@@ -69,7 +95,9 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
                   controller: _addressController,
                   enabled: !_submitting,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(labelText: AppStrings.addPlaceAddressLabel),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.addPlaceAddressLabel,
+                  ),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? AppStrings.addPlaceEnterAddress
                       : null,
@@ -108,11 +136,16 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
                   const SizedBox(height: AppSpacing.md),
                   const LinearProgressIndicator(),
                 ],
+                const SizedBox(height: AppSpacing.lg),
+                for (final action in actions.skip(1))
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.xs),
+                    child: action,
+                  ),
               ],
             ),
           ),
         ),
-        actions: _actions(),
       ),
     );
   }
@@ -140,11 +173,11 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
         child: const Text(AppStrings.cancel),
       ),
       if (_failure != null) ...<Widget>[
-        TextButton(
+        FilledButton(
           onPressed: _submitting ? null : _useGps,
           child: const Text(AppStrings.addPlaceRetryLocation),
         ),
-        TextButton(
+        OutlinedButton(
           onPressed: _submitting
               ? null
               : () => setState(() {
@@ -156,7 +189,7 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
       ] else
         FilledButton.icon(
           onPressed: _submitting ? null : _useGps,
-          icon: const Icon(Icons.my_location_rounded),
+          icon: const Icon(CupertinoIcons.location_fill),
           label: const Text(AppStrings.useLocation),
         ),
     ];

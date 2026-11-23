@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../design/app_tokens.dart';
@@ -21,7 +22,10 @@ final class FriendsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.headlineSmall),
+        Semantics(
+          header: true,
+          child: Text(title, style: Theme.of(context).textTheme.headlineSmall),
+        ),
         if (description != null) ...[
           const SizedBox(height: AppSpacing.xs),
           Text(
@@ -32,7 +36,8 @@ final class FriendsSection extends StatelessWidget {
           ),
         ],
         const SizedBox(height: AppSpacing.md),
-        child,
+        // Every section is column-wide, however short its copy.
+        SizedBox(width: double.infinity, child: child),
       ],
     );
   }
@@ -42,7 +47,7 @@ final class FriendsStatePanel extends StatelessWidget {
   const FriendsStatePanel({
     required this.title,
     required this.message,
-    this.icon = Icons.info_outline,
+    this.icon = CupertinoIcons.info,
     this.actionLabel,
     this.actionKey,
     this.onAction,
@@ -70,7 +75,7 @@ final class FriendsStatePanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: theme.colorScheme.primary),
+            Icon(icon, color: theme.colorScheme.accentInk),
             const SizedBox(height: AppSpacing.sm),
             Text(title, style: theme.textTheme.titleMedium),
             const SizedBox(height: AppSpacing.xs),
@@ -85,7 +90,7 @@ final class FriendsStatePanel extends StatelessWidget {
               OutlinedButton.icon(
                 key: actionKey,
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(CupertinoIcons.refresh),
                 label: Text(actionLabel!),
               ),
             ],
@@ -186,7 +191,7 @@ final class FriendsPersonCard extends StatelessWidget {
                           Text(
                             secondary,
                             style: theme.textTheme.labelMedium?.copyWith(
-                              color: theme.colorScheme.primary,
+                              color: theme.colorScheme.accentInk,
                             ),
                           ),
                         ],

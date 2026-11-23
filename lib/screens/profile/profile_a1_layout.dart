@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../design/app_tokens.dart';
@@ -74,7 +75,7 @@ final class ProfileStatePanel extends StatelessWidget {
   const ProfileStatePanel({
     required this.title,
     required this.message,
-    this.icon = Icons.info_outline,
+    this.icon = CupertinoIcons.info,
     this.actionLabel,
     this.actionKey,
     this.onAction,
@@ -96,7 +97,7 @@ final class ProfileStatePanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: theme.colorScheme.primary),
+          Icon(icon, color: theme.colorScheme.accentInk),
           const SizedBox(height: AppSpacing.sm),
           Text(title, style: theme.textTheme.titleLarge),
           const SizedBox(height: AppSpacing.xs),
@@ -111,7 +112,7 @@ final class ProfileStatePanel extends StatelessWidget {
             OutlinedButton.icon(
               key: actionKey,
               onPressed: onAction,
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(CupertinoIcons.refresh),
               label: Text(actionLabel!),
             ),
           ],

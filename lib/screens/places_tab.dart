@@ -1,9 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../design/app_tokens.dart';
+import '../design/motion.dart';
 import '../design/responsive.dart';
+import '../models/place.dart';
 import '../providers/auth_provider.dart';
 import '../providers/place_providers.dart';
 import '../providers/places_discovery_provider.dart';
@@ -27,11 +31,16 @@ class PlacesTab extends ConsumerStatefulWidget {
 class _PlacesTabState extends ConsumerState<PlacesTab> {
   final TextEditingController _searchController = TextEditingController();
   ProviderSubscription<String?>? _defaultViewSubscription;
+  final FocusNode _searchFocus = FocusNode();
   String? _inlineMessage;
+  bool _inlineIsError = true;
 
   @override
   void initState() {
     super.initState();
+    // The query outlives this tab; an empty field over filtered results lies.
+    _searchController.text = ref.read(placesDiscoveryControllerProvider).query;
+    _searchFocus.addListener(_onSearchFocus);
     _defaultViewSubscription = ref.listenManual<String?>(
       defaultCollectionViewProvider,
       (_, next) => _applyDefaultAfterBuild(next),
@@ -49,8 +58,13 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
     });
   }
 
+  void _onSearchFocus() => setState(() {});
+
   @override
   void dispose() {
+    _searchFocus
+      ..removeListener(_onSearchFocus)
+      ..dispose();
     _defaultViewSubscription?.close();
     _searchController.dispose();
     super.dispose();
@@ -61,6 +75,14 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
     final discovery = ref.watch(placesDiscoveryDataProvider);
     final interaction = ref.watch(placesDiscoveryControllerProvider);
     final uid = ref.watch(currentUidProvider);
+    final controller = ref.read(placesDiscoveryControllerProvider.notifier);
+    // "Azzera filtri" and account changes edit the query behind the field.
+    ref.listen(
+      placesDiscoveryControllerProvider.select((state) => state.query),
+      (_, query) {
+        if (query != _searchController.text) _searchController.text = query;
+      },
+    );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -68,67 +90,117 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final responsive = ResponsiveClass.fromWidth(constraints.maxWidth);
+            final textScale = MediaQuery.textScalerOf(context).scale(16) / 16;
+            final searching = _searchFocus.hasFocus;
+            // The title yields to content: while searching, in landscape, and
+            // at type sizes where it would push the results off screen.
+            final showTitle =
+                !(searching && !responsive.isWide) &&
+                constraints.maxHeight >= 440 * textScale.clamp(1.0, 2.0);
+            // Small phone, keyboard up: the tab bar rides on the keyboard and
+            // leaves ~180pt. Only the field and its results fit in that.
+            final onlySearchFits = constraints.maxHeight < 260;
+            final toggleBesideFilters =
+                responsive == ResponsiveClass.medium &&
+                constraints.maxHeight < 440;
+            final entries = discovery.value ?? const <DiscoveryPlace>[];
+            final toggle = PlaceActionBar(
+              mode: interaction.viewMode,
+              onChanged: controller.chooseView,
+            );
+
             return Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
                   maxWidth: AppLayout.maxContent,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: responsive.horizontalPadding,
-                    vertical: AppSpacing.md,
+                  padding: EdgeInsets.fromLTRB(
+                    responsive.horizontalPadding,
+                    showTitle ? AppSpacing.md : AppSpacing.xs,
+                    responsive.horizontalPadding,
+                    AppSpacing.xs,
                   ),
                   child: Column(
                     key: ValueKey<String>('places-${responsive.name}-layout'),
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      _buildHeader(
-                        context,
-                        uid,
-                        discovery.value ?? const <DiscoveryPlace>[],
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      PlaceSearchBar(
-                        controller: _searchController,
-                        onChanged: (query) => ref
-                            .read(placesDiscoveryControllerProvider.notifier)
-                            .setQuery(query),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      PlaceFilterBar(
-                        selected: interaction.filter,
-                        authenticated: uid != null,
-                        onSelected: (filter) {
-                          setState(() => _inlineMessage = null);
-                          ref
-                              .read(placesDiscoveryControllerProvider.notifier)
-                              .setFilter(filter);
-                        },
-                        onPrivateFilterRequiresLogin: () => setState(
-                          () => _inlineMessage =
-                              AppStrings.placesLoginForFilters,
+                      if (showTitle) ...<Widget>[
+                        _buildHeader(context, uid, entries, discovery.hasValue),
+                        const SizedBox(height: AppSpacing.sm),
+                      ],
+                      KeyedSubtree(
+                        // Keeps focus while the rows around it come and go.
+                        key: const ValueKey<String>('places-search-row'),
+                        child: MediaQuery.withClampedTextScaling(
+                          maxScaleFactor: 1.5,
+                          child: PlaceSearchBar(
+                            controller: _searchController,
+                            focusNode: _searchFocus,
+                            searching: searching,
+                            trailing: showTitle
+                                ? null
+                                : _addButton(uid, entries, compact: true),
+                            onChanged: controller.setQuery,
+                          ),
                         ),
                       ),
+                      if (discovery.hasValue)
+                        // Spoken as results change, with or without a title.
+                        Semantics(
+                          container: true,
+                          liveRegion: true,
+                          label: AppStrings.placeResultsCount(entries.length),
+                          child: const SizedBox(height: 1, width: 1),
+                        ),
+                      const SizedBox(height: AppSpacing.xs),
+                      if (!onlySearchFits)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: PlaceFilterBar(
+                                selected: interaction.filter,
+                                authenticated: uid != null,
+                                onSelected: (filter) {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => _inlineMessage = null);
+                                  controller.setFilter(filter);
+                                },
+                                onPrivateFilterRequiresLogin: () => _showInline(
+                                  AppStrings.placesLoginForFilters,
+                                ),
+                              ),
+                            ),
+                            if (toggleBesideFilters) ...[
+                              const SizedBox(width: AppSpacing.sm),
+                              SizedBox(width: 220, child: toggle),
+                            ],
+                          ],
+                        ),
                       if (_inlineMessage != null) ...<Widget>[
                         const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          _inlineMessage!,
-                          key: const ValueKey<String>('places-inline-message'),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                            fontWeight: FontWeight.w700,
+                        Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            _inlineMessage!,
+                            key: const ValueKey<String>(
+                              'places-inline-message',
+                            ),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: _inlineIsError
+                                      ? Theme.of(context).colorScheme.error
+                                      : Theme.of(context).colorScheme.onSurface,
+                                ),
                           ),
                         ),
                       ],
-                      const SizedBox(height: AppSpacing.sm),
-                      if (responsive != ResponsiveClass.wide) ...<Widget>[
-                        PlaceActionBar(
-                          mode: interaction.viewMode,
-                          onChanged: (mode) => ref
-                              .read(placesDiscoveryControllerProvider.notifier)
-                              .chooseView(mode),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
+                      const SizedBox(height: AppSpacing.xs),
+                      if (!onlySearchFits &&
+                          !responsive.isWide &&
+                          !toggleBesideFilters) ...<Widget>[
+                        toggle,
+                        const SizedBox(height: AppSpacing.xs),
                       ],
                       Expanded(
                         child: _buildDiscoveryBody(
@@ -150,57 +222,90 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
     );
   }
 
+  void _showInline(String message, {bool isError = true}) => setState(() {
+    _inlineMessage = message;
+    _inlineIsError = isError;
+  });
+
   Widget _buildHeader(
     BuildContext context,
     String? uid,
     List<DiscoveryPlace> entries,
+    bool hasCount,
   ) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Gelaterie',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
+    final text = Theme.of(context).textTheme;
+    return LayoutBuilder(
+      builder: (context, constraints) => Row(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Semantics(
+                  header: true,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text('Gelaterie', style: text.displaySmall),
+                  ),
                 ),
-              ),
-              Text(
-                AppStrings.placesSubtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        FilledButton.icon(
-          key: const ValueKey<String>('add-place-action'),
-          style: FilledButton.styleFrom(
-            minimumSize: const Size(44, AppLayout.touchTarget),
-            backgroundColor: AppColors.fragola,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadii.control),
+                ExcludeSemantics(
+                  child: Text(
+                    hasCount
+                        ? AppStrings.placeResultsCount(entries.length)
+                        : '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.bodySmall,
+                  ),
+                ),
+              ],
             ),
           ),
-          onPressed: () {
-            if (uid == null) {
-              setState(
-                () => _inlineMessage = AppStrings.placesLoginToAdd,
-              );
-              return;
-            }
-            _showAddPlaceDialog(entries);
-          },
-          icon: const Icon(Icons.add_location_alt_rounded),
-          label: const Text(AppStrings.add),
-        ),
-      ],
+          const SizedBox(width: AppSpacing.sm),
+          _addButton(
+            uid,
+            entries,
+            compact:
+                constraints.maxWidth /
+                    MediaQuery.textScalerOf(context).scale(1) <
+                300,
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _addButton(
+    String? uid,
+    List<DiscoveryPlace> entries, {
+    required bool compact,
+  }) {
+    const key = ValueKey<String>('add-place-action');
+    const icon = Icon(CupertinoIcons.plus, size: 20);
+    void add() {
+      if (uid == null) {
+        _showInline(AppStrings.placesLoginToAdd);
+        return;
+      }
+      _showAddPlaceDialog(entries);
+    }
+
+    return compact
+        ? IconButton.filled(
+            key: key,
+            tooltip: AppStrings.add,
+            onPressed: add,
+            icon: icon,
+          )
+        : FilledButton.icon(
+            key: key,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(44, AppLayout.touchTarget),
+            ),
+            onPressed: add,
+            icon: icon,
+            label: const Text(AppStrings.add),
+          );
   }
 
   Widget _buildDiscoveryBody(
@@ -213,7 +318,7 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
     return discovery.when(
       loading: () => _PlacesLoadingGeometry(wide: responsive.isWide),
       error: (error, _) => _PlacesRecoveryState(
-        icon: Icons.cloud_off_rounded,
+        icon: CupertinoIcons.wifi_slash,
         message: ErrorHandler.getReadableError(error),
         actionLabel: AppStrings.retry,
         onPressed: _retryDiscovery,
@@ -225,19 +330,23 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
               interaction.filter == PlacesFilter.all;
           if (catalogIsEmpty) {
             return _PlacesRecoveryState(
-              icon: Icons.storefront_outlined,
+              icon: CupertinoIcons.map_pin_ellipse,
               message: currentUid == null
                   ? AppStrings.placesLoginToAddFirst
                   : AppStrings.placesCatalogEmpty,
-              actionLabel: currentUid == null ? AppStrings.login : AppStrings.placeAddButton,
+              actionLabel: currentUid == null
+                  ? AppStrings.login
+                  : AppStrings.placeAddButton,
               onPressed: currentUid == null
                   ? () => context.go('/login')
                   : () => _showAddPlaceDialog(const <DiscoveryPlace>[]),
             );
           }
           return _PlacesRecoveryState(
-            icon: Icons.search_off_rounded,
-            message: AppStrings.placesNoSearchMatch,
+            icon: CupertinoIcons.search,
+            message: interaction.query.trim().isEmpty
+                ? AppStrings.placesNoSearchMatch
+                : AppStrings.placesNoMatchFor(interaction.query.trim()),
             actionLabel: AppStrings.placesClearFilters,
             onPressed: () {
               _searchController.clear();
@@ -248,13 +357,20 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
           );
         }
 
-        void select(String placeId) => ref
+        void select(String? placeId) => ref
             .read(placesDiscoveryControllerProvider.notifier)
             .selectPlace(placeId);
-        void open(String placeId) =>
-            context.push('/place/${Uri.encodeComponent(placeId)}');
+        void open(String placeId) {
+          _searchFocus.unfocus();
+          context.push('/place/${Uri.encodeComponent(placeId)}');
+        }
+
         Widget list() => PlaceList(
+          // A new search starts from its best match, not the old offset.
+          key: ValueKey((interaction.query, interaction.filter)),
           entries: entries,
+          currentUid: currentUid,
+          opensOnTap: !responsive.isWide,
           selectedPlaceId: interaction.selectedPlaceId,
           onSelect: select,
           onOpenDetail: open,
@@ -262,6 +378,8 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
         Widget map() => PlaceMap(
           entries: entries,
           currentUid: currentUid,
+          query: interaction.query,
+          filter: interaction.filter,
           selectedPlaceId: interaction.selectedPlaceId,
           onSelect: select,
           onOpenDetail: open,
@@ -291,16 +409,25 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
           );
         }
 
-        return switch (interaction.viewMode) {
-          PlacesViewMode.list => SizedBox(
-            key: const ValueKey<String>('places-list-pane'),
-            child: list(),
-          ),
-          PlacesViewMode.map => SizedBox(
-            key: const ValueKey<String>('places-map-pane'),
-            child: map(),
-          ),
-        };
+        // Fade the new pane in; cross-fading would keep two maps alive.
+        return TweenAnimationBuilder<double>(
+          key: ValueKey<PlacesViewMode>(interaction.viewMode),
+          tween: Tween(begin: 0, end: 1),
+          duration: AppMotion.of(context, AppMotion.standard),
+          curve: AppMotion.enter,
+          builder: (context, opacity, child) =>
+              Opacity(opacity: opacity, child: child),
+          child: switch (interaction.viewMode) {
+            PlacesViewMode.list => SizedBox(
+              key: const ValueKey<String>('places-list-pane'),
+              child: list(),
+            ),
+            PlacesViewMode.map => SizedBox(
+              key: const ValueKey<String>('places-map-pane'),
+              child: map(),
+            ),
+          },
+        );
       },
     );
   }
@@ -314,9 +441,20 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
   }
 
   Future<void> _showAddPlaceDialog(List<DiscoveryPlace> entries) async {
-    final created = await showDialog(
+    _searchFocus.unfocus();
+    final created = await showModalBottomSheet<Place>(
       context: context,
-      barrierDismissible: false,
+      useRootNavigator: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      // A form mid-GPS or mid-save mustn't be swiped away.
+      isDismissible: false,
+      enableDrag: false,
+      showDragHandle: false,
+      constraints: const BoxConstraints(maxWidth: 560),
+      sheetAnimationStyle: AppMotion.reduced(context)
+          ? AnimationStyle.noAnimation
+          : null,
       builder: (_) => AddPlaceDialog(
         catalogCoordinates: entries
             .map((entry) => entry.place.location)
@@ -324,7 +462,7 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
       ),
     );
     if (created != null && mounted) {
-      setState(() => _inlineMessage = AppStrings.placeAdded);
+      _showInline(AppStrings.placeAdded, isError: false);
     }
   }
 }
@@ -340,7 +478,7 @@ final class _PlacesLoadingGeometry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.surfaceContainerLow;
+    final color = Theme.of(context).colorScheme.surfaceContainer;
     Widget block() => DecoratedBox(
       decoration: BoxDecoration(
         color: color,
@@ -397,15 +535,22 @@ final class _PlacesRecoveryState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(icon, size: 40),
-          const SizedBox(height: AppSpacing.sm),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: AppSpacing.md),
-          FilledButton(onPressed: onPressed, child: Text(actionLabel)),
-        ],
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              icon,
+              size: 40,
+              color: Theme.of(context).colorScheme.accentInk,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: AppSpacing.md),
+            FilledButton(onPressed: onPressed, child: Text(actionLabel)),
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'check_in_progress.dart';
@@ -14,7 +15,7 @@ final class CheckInStepRail extends StatelessWidget {
     width: 220,
     child: DecoratedBox(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.82),
+        color: Theme.of(context).colorScheme.surface,
         border: Border(
           right: BorderSide(
             color: Theme.of(context).colorScheme.outlineVariant,
@@ -57,7 +58,7 @@ final class CheckInStepRail extends StatelessWidget {
                         ? Theme.of(context).colorScheme.onPrimary
                         : Theme.of(context).colorScheme.onSurfaceVariant,
                     child: isComplete
-                        ? const Icon(Icons.check_rounded, size: 17)
+                        ? const Icon(CupertinoIcons.check_mark, size: 17)
                         : Text('${index + 1}'),
                   ),
                   const SizedBox(width: 10),

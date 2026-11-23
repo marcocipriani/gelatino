@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/flavor.dart';
@@ -6,8 +8,13 @@ import '../models/user_profile.dart';
 import '../providers/flavors_provider.dart';
 import '../providers/profile_providers.dart';
 import '../repositories/profile_repository.dart';
-import '../theme/app_theme.dart';
+import '../design/app_tokens.dart';
+import '../design/focus_ring.dart';
+import '../design/motion.dart';
+import '../utils/search_text.dart';
 import '../utils/error_handler.dart';
+import 'app_controls.dart';
+import 'app_search_field.dart';
 import 'creamy_card.dart';
 import 'gelato_loader.dart';
 import '../constants/app_strings.dart';
@@ -70,9 +77,6 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
     return v == null ? Theme.of(context).colorScheme.primary : Color(v);
   }
 
-  Color _textOn(Color c) =>
-      c.computeLuminance() > 0.55 ? AppTheme.fondenteExtra : Colors.white;
-
   Future<void> _addFlavor() async {
     final name = _newCtrl.text.trim();
     if (name.isEmpty) return;
@@ -122,14 +126,34 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
       ),
       error: (err, _) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: Text(ErrorHandler.getReadableError(err))),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(
+                CupertinoIcons.exclamationmark_circle,
+                size: 40,
+                color: Theme.of(context).colorScheme.accentInk,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                ErrorHandler.getReadableError(err),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              FilledButton(
+                onPressed: () => ref.invalidate(flavorsProvider),
+                child: const Text(AppStrings.retry),
+              ),
+            ],
+          ),
+        ),
       ),
       data: (flavors) {
         final favIds = profile?.favoriteFlavorIds.toSet() ?? <String>{};
 
+        final query = normalizeSearchText(_search);
         var list = flavors.where((f) {
-          if (_search.isNotEmpty &&
-              !f.name.toLowerCase().contains(_search.toLowerCase())) {
+          if (!normalizeSearchText(f.name).contains(query)) {
             return false;
           }
           if (_onlyFavorites && !favIds.contains(f.id)) return false;
@@ -165,7 +189,7 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
                         : AppStrings.flavorNoneFound,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'Plus Jakarta Sans',
+                      fontFamily: 'PlusJakartaSans',
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
                   ),
@@ -198,107 +222,96 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
     UserProfile? profile,
   ) {
     final bg = _hex(flavor.colorHex);
-    final fg = _textOn(bg);
-    return GestureDetector(
-      onTap: profile == null ? null : () => _toggleFavorite(profile, flavor.id),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isFav
-                ? fg.withValues(alpha: 0.9)
-                : Colors.black.withValues(alpha: 0.06),
-            width: isFav ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isFav ? Icons.star_rounded : Icons.star_outline_rounded,
-              size: 16,
-              color: fg,
+    final fg = inkOn(bg);
+    final colors = Theme.of(context).colorScheme;
+    final onTap = profile == null
+        ? null
+        : () {
+            HapticFeedback.selectionClick();
+            _toggleFavorite(profile, flavor.id);
+          };
+    return Semantics(
+      button: true,
+      selected: isFav,
+      enabled: onTap != null,
+      child: AppFocusRing(
+        borderRadius: AppRadii.pill,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppRadii.pill),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: AppMotion.of(context, AppMotion.standard),
+            curve: AppMotion.glide,
+            constraints: const BoxConstraints(
+              minHeight: AppLayout.touchTarget,
             ),
-            const SizedBox(width: 6),
-            Text(
-              flavor.name,
-              style: TextStyle(
-                color: fg,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(AppRadii.pill),
+              border: Border.all(
+                color: isFav ? colors.onSurface : colors.outlineVariant,
+                width: isFav ? 2.5 : 1,
               ),
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isFav ? CupertinoIcons.star_fill : CupertinoIcons.star,
+                  size: 17,
+                  color: fg,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    flavor.name,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelMedium?.copyWith(color: fg),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildSearch(BuildContext context) {
-    return CreamyCard(
-      borderRadius: 16,
-      margin: EdgeInsets.zero,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: TextField(
-        controller: _searchCtrl,
-        decoration: InputDecoration(
-          hintText: AppStrings.flavorSearchHint,
-          prefixIcon: const Icon(Icons.search),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          suffixIcon: _search.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchCtrl.clear();
-                    setState(() => _search = '');
-                  },
-                )
-              : null,
-        ),
-        onChanged: (v) => setState(() => _search = v),
-      ),
-    );
-  }
+  Widget _buildSearch(BuildContext context) => AppSearchField(
+    controller: _searchCtrl,
+    hint: AppStrings.flavorSearchHint,
+    onChanged: (value) => setState(() => _search = value),
+  );
 
-  Widget _buildControls(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'az', label: Text(AppStrings.flavorSortAZ)),
-              ButtonSegment(value: 'favorites', label: Text(AppStrings.flavorSortFavorites)),
-            ],
-            selected: {_sort},
-            showSelectedIcon: false,
-            onSelectionChanged: (s) => setState(() => _sort = s.first),
-            style: ButtonStyle(
-              textStyle: WidgetStatePropertyAll(
-                Theme.of(context).textTheme.labelMedium,
-              ),
-              visualDensity: VisualDensity.compact,
-            ),
-          ),
+  Widget _buildControls(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      AppSegmented<String>(
+        value: _sort,
+        onChanged: (value) => setState(() => _sort = value),
+        segments: const {
+          'az': AppStrings.flavorSortAZ,
+          'favorites': AppStrings.flavorSortFavorites,
+        },
+      ),
+      const SizedBox(height: AppSpacing.xs),
+      FilterChip(
+        label: const Text(AppStrings.flavorFavorites),
+        showCheckmark: false,
+        avatar: Icon(
+          _onlyFavorites ? CupertinoIcons.star_fill : CupertinoIcons.star,
+          size: 18,
+          color: _onlyFavorites
+              ? AppColors.fondente
+              : Theme.of(context).colorScheme.onSurface,
         ),
-        const SizedBox(width: 10),
-        FilterChip(
-          label: const Text(AppStrings.flavorFavorites),
-          avatar: Icon(
-            _onlyFavorites ? Icons.star_rounded : Icons.star_outline_rounded,
-            size: 18,
-          ),
-          selected: _onlyFavorites,
-          onSelected: (v) => setState(() => _onlyFavorites = v),
-        ),
-      ],
-    );
-  }
+        selected: _onlyFavorites,
+        onSelected: (value) => setState(() => _onlyFavorites = value),
+      ),
+    ],
+  );
 
   Widget _buildAddRow(BuildContext context) {
     return CreamyCard(
@@ -315,64 +328,65 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
                   controller: _newCtrl,
                   decoration: const InputDecoration(
                     hintText: AppStrings.flavorCreateHint,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                    hintMaxLines: 1,
                   ),
                   onSubmitted: (_) => _addFlavor(),
                 ),
               ),
               const SizedBox(width: 8),
-              ElevatedButton(
+              IconButton.filled(
+                tooltip: AppStrings.flavorCreateTooltip,
                 onPressed: _adding ? null : _addFlavor,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: _adding
+                icon: _adding
                     ? const SizedBox(
                         width: 18,
                         height: 18,
                         child: GelatoLoader(size: 16),
                       )
-                    : const Icon(Icons.add),
+                    : const Icon(CupertinoIcons.plus),
               ),
             ],
           ),
           const SizedBox(height: 10),
           SizedBox(
-            height: 32,
-            child: ListView.separated(
+            height: AppLayout.touchTarget,
+            child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: _palette.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, i) {
                 final color = _hex(_palette[i]);
                 final selected = _palette[i] == _newColor;
-                return GestureDetector(
-                  onTap: () => setState(() => _newColor = _palette[i]),
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: selected
-                            ? Theme.of(context).colorScheme.onSurface
-                            : Colors.black.withValues(alpha: 0.1),
-                        width: selected ? 2.5 : 1,
+                final colors = Theme.of(context).colorScheme;
+                return Semantics(
+                  button: true,
+                  selected: selected,
+                  label: AppStrings.flavorColorSemantic(i + 1, _palette.length),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () => setState(() => _newColor = _palette[i]),
+                    child: SizedBox.square(
+                      dimension: AppLayout.touchTarget,
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: AppMotion.of(context, AppMotion.fast),
+                          width: selected ? 38 : 30,
+                          height: selected ? 38 : 30,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selected
+                                  ? colors.onSurface
+                                  : colors.outline,
+                              width: selected ? 2.5 : 1,
+                            ),
+                          ),
+                          child: selected
+                              ? Icon(CupertinoIcons.check_mark, size: 16, color: inkOn(color))
+                              : null,
+                        ),
                       ),
                     ),
-                    child: selected
-                        ? Icon(Icons.check, size: 16, color: _textOn(color))
-                        : null,
                   ),
                 );
               },
@@ -470,8 +484,9 @@ final class _FlavorSelectionFieldState extends State<FlavorSelectionField> {
     final visible =
         widget.flavors
             .where(
-              (flavor) =>
-                  flavor.name.toLowerCase().contains(_query.toLowerCase()),
+              (flavor) => normalizeSearchText(
+                flavor.name,
+              ).contains(normalizeSearchText(_query)),
             )
             .toList()
           ..sort((left, right) => left.name.compareTo(right.name));
@@ -512,7 +527,7 @@ final class _FlavorSelectionFieldState extends State<FlavorSelectionField> {
           enabled: widget.enabled,
           decoration: const InputDecoration(
             labelText: AppStrings.flavorSearchLabel,
-            prefixIcon: Icon(Icons.search_rounded),
+            prefixIcon: Icon(CupertinoIcons.search),
             border: OutlineInputBorder(),
           ),
           onChanged: (value) => setState(() => _query = value),
@@ -529,6 +544,12 @@ final class _FlavorSelectionFieldState extends State<FlavorSelectionField> {
                 ChoiceChip(
                   key: ValueKey<String>('check-in-flavor-${flavor.id}'),
                   label: Text(flavor.name),
+                  showCheckmark: true,
+                  avatar: switch (flavor.color) {
+                    final color? when !widget.selectedIds.contains(flavor.id) =>
+                      CircleAvatar(backgroundColor: color),
+                    _ => null,
+                  },
                   selected: widget.selectedIds.contains(flavor.id),
                   onSelected: widget.enabled ? (_) => _toggle(flavor) : null,
                 ),
@@ -560,7 +581,7 @@ final class _FlavorSelectionFieldState extends State<FlavorSelectionField> {
                         dimension: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.add_rounded),
+                    : const Icon(CupertinoIcons.plus),
               ),
             ),
           ],

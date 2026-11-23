@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +9,7 @@ import '../../providers/friendship_providers.dart';
 import '../../providers/profile_providers.dart';
 import '../../repositories/friendship_repository.dart';
 import '../../constants/app_strings.dart';
+import '../../widgets/app_controls.dart';
 
 enum _RelationshipKind { accepted, incoming, outgoing, available }
 
@@ -68,7 +70,7 @@ final class _ProfileRelationshipActionState
             onPressed: _pending
                 ? null
                 : () => ref.read(retryFriendshipSourcesProvider)(),
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(CupertinoIcons.refresh),
             label: const Text(AppStrings.retry),
           ),
         ],
@@ -83,7 +85,7 @@ final class _ProfileRelationshipActionState
         OutlinedButton.icon(
           key: ValueKey('profile-relationship-remove-${widget.targetUid}'),
           onPressed: _pending ? null : _confirmRemove,
-          icon: const Icon(Icons.person_remove_outlined),
+          icon: const Icon(CupertinoIcons.person_badge_minus),
           label: const Text(AppStrings.remove),
         ),
       ],
@@ -107,7 +109,7 @@ final class _ProfileRelationshipActionState
         FilledButton.icon(
           key: ValueKey('profile-relationship-send-${widget.targetUid}'),
           onPressed: _pending ? null : _send,
-          icon: const Icon(Icons.person_add_alt),
+          icon: const Icon(CupertinoIcons.person_add),
           label: const Text(AppStrings.add),
         ),
       ],
@@ -132,7 +134,7 @@ final class _ProfileRelationshipActionState
           TextButton.icon(
             key: ValueKey('profile-relationship-retry-${widget.targetUid}'),
             onPressed: _pending ? null : _retry,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(CupertinoIcons.refresh),
             label: const Text(AppStrings.retry),
           ),
         ],
@@ -168,24 +170,13 @@ final class _ProfileRelationshipActionState
     final uid = ref.read(currentUidProvider);
     final targetUid = widget.targetUid;
     final generation = _generation;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text(AppStrings.removeFriendshipTitle),
-        content: const Text(AppStrings.removeFriendshipBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text(AppStrings.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text(AppStrings.remove),
-          ),
-        ],
-      ),
+    final confirmed = await showAppConfirmation(
+      context,
+      title: AppStrings.removeFriendshipTitle,
+      message: AppStrings.removeFriendshipBody,
+      confirmLabel: AppStrings.remove,
     );
-    if (confirmed == true && _isCurrent(generation, uid, targetUid)) {
+    if (confirmed && _isCurrent(generation, uid, targetUid)) {
       await _remove();
     }
   }

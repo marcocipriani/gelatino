@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -105,8 +106,7 @@ class _BrandContent extends StatelessWidget {
             AppStrings.accessTagline,
             style: theme.textTheme.displayLarge?.copyWith(
               fontSize: titleFontSize,
-              height: 0.98,
-              letterSpacing: -1.8,
+              height: 1.05,
             ),
           ),
         ),
@@ -117,7 +117,7 @@ class _BrandContent extends StatelessWidget {
             AppStrings.accessDescription,
             style: theme.textTheme.bodyLarge?.copyWith(
               height: 1.55,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -138,7 +138,7 @@ class _BrandContent extends StatelessWidget {
                           color: AppColors.fondente,
                         ),
                       )
-                    : const Icon(Icons.login_rounded, size: 20),
+                    : const Icon(CupertinoIcons.square_arrow_right, size: 20),
               ),
               label: const Text(AppStrings.loginButton),
             ),
@@ -203,11 +203,13 @@ class _Wordmark extends StatelessWidget {
               height: 40,
             ),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              AppStrings.appName,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontSize: 22,
-                letterSpacing: -0.5,
+            Flexible(
+              child: Text(
+                AppStrings.appName,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ],

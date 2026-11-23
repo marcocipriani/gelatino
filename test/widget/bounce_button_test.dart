@@ -70,9 +70,12 @@ void main() {
       await tester.pump(); // Start animation frame
       await tester.pump(const Duration(milliseconds: 100)); // Finish animation duration
 
-      // Scale should be scaled down (1 - 0.15 = 0.85)
+      // Subtle iOS-style press, not a 15% squash.
       transform = tester.widget<Transform>(transformFinder);
-      expect(transform.transform.entry(0, 0), closeTo(0.85, 0.01));
+      expect(
+        transform.transform.entry(0, 0),
+        closeTo(BounceButton.pressedScale, 0.001),
+      );
 
       // Release touch (reverse animation)
       await gesture.up();

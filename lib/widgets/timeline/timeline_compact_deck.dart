@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -456,13 +457,17 @@ final class _DeckControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Positioned(
-    left: AppSpacing.md,
-    right: AppSpacing.md,
-    bottom: AppSpacing.xs,
+    right: AppSpacing.md + AppSpacing.xs,
+    bottom: AppSpacing.xxs,
+    // Both live in the peek strip's trailing corner, off the next card's
+    // avatar and name.
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         IconButton.filledTonal(
+          style: IconButton.styleFrom(
+            disabledBackgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+          ),
           key: const ValueKey<String>('timeline-previous'),
           constraints: const BoxConstraints(
             minWidth: AppLayout.touchTarget,
@@ -470,8 +475,9 @@ final class _DeckControls extends StatelessWidget {
           ),
           tooltip: AppStrings.timelinePrevTooltip,
           onPressed: canPrevious ? onPrevious : null,
-          icon: const Icon(Icons.keyboard_arrow_up),
+          icon: const Icon(CupertinoIcons.chevron_up),
         ),
+        const SizedBox(width: AppSpacing.xs),
         IconButton.filled(
           key: const ValueKey<String>('timeline-next'),
           constraints: const BoxConstraints(
@@ -487,7 +493,7 @@ final class _DeckControls extends StatelessWidget {
                   dimension: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Icon(Icons.keyboard_arrow_down),
+              : const Icon(CupertinoIcons.chevron_down),
         ),
       ],
     ),
@@ -509,7 +515,14 @@ final class _DeckPaginationError extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(left: AppSpacing.sm),
-            child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis),
+            child: Text(
+              message,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
+            ),
           ),
         ),
         TextButton(

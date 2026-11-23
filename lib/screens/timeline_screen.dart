@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:animations/animations.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,14 +9,12 @@ import '../design/app_tokens.dart';
 import '../design/responsive.dart';
 import '../providers/friendship_providers.dart';
 import '../providers/timeline_providers.dart';
-import '../widgets/bounce_button.dart';
 import '../widgets/editorial_card.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton_loader.dart';
 import '../widgets/timeline/friends_activity_sidebar.dart';
 import '../widgets/timeline/timeline_compact_deck.dart';
 import '../widgets/timeline/timeline_editorial_card.dart';
-import 'check_in_screen.dart';
 import '../constants/app_strings.dart';
 
 class TimelineScreen extends ConsumerWidget {
@@ -271,7 +269,7 @@ final class _TimelineEmpty extends StatelessWidget {
           SizedBox(
             height: MediaQuery.sizeOf(context).height - AppSpacing.display,
             child: EmptyState(
-              icon: Icons.history_edu,
+              icon: CupertinoIcons.book,
               title: title,
               description: description,
               action: FilledButton.tonal(
@@ -302,6 +300,12 @@ final class _TimelineFailure extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          Icon(
+            CupertinoIcons.exclamationmark_circle,
+            size: 40,
+            color: Theme.of(context).colorScheme.accentInk,
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Text(message, textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.md),
           FilledButton.tonal(
@@ -393,8 +397,8 @@ final class _TimelineLoading extends StatelessWidget {
             child: const SizedBox(
               key: ValueKey<String>('timeline-medium-feed'),
               width: double.infinity,
-              child: Align(
-                alignment: Alignment.topCenter,
+              child: SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
                 child: _TimelineLoadingCard(),
               ),
             ),
@@ -405,7 +409,8 @@ final class _TimelineLoading extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final sidebarWidth = _timelineSidebarWidth(constraints.maxWidth);
-        return Padding(
+        return SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Center(
             child: SizedBox(
@@ -487,51 +492,21 @@ final class _CheckInAction extends StatelessWidget {
   const _CheckInAction();
 
   @override
-  Widget build(BuildContext context) => OpenContainer(
-    transitionType: ContainerTransitionType.fade,
-    openBuilder: (_, _) => const CheckInScreen(),
-    closedElevation: 0,
-    closedColor: Colors.transparent,
-    openColor: Theme.of(context).scaffoldBackgroundColor,
-    middleColor: Theme.of(context).scaffoldBackgroundColor,
-    closedShape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(24),
-    ),
-    closedBuilder: (_, open) => BounceButton(
-      onTap: open,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: AppLayout.touchTarget),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(AppRadii.pill),
-        ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(Icons.add_a_photo_outlined, color: Colors.white),
-            SizedBox(width: AppSpacing.xs),
-            Text(
-              'Check-in',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
+  Widget build(BuildContext context) => FloatingActionButton.extended(
+    heroTag: null,
+    onPressed: () => _openCheckIn(context),
+    icon: const Icon(CupertinoIcons.camera_fill),
+    label: Text(
+      'Check-in',
+      style: Theme.of(
+        context,
+      ).textTheme.labelLarge?.copyWith(color: AppColors.fondente),
     ),
   );
 }
 
-void _openCheckIn(BuildContext context) {
-  Navigator.of(
-    context,
-  ).push<void>(MaterialPageRoute<void>(builder: (_) => const CheckInScreen()));
-}
+// Through the router: a local push landed inside the tab shell, under its bar,
+// and outlived publication.
+void _openCheckIn(BuildContext context) => context.push('/check-in');
 
 double _timelineSidebarWidth(double width) => width >= 1280 ? 304 : 280;

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../design/motion.dart';
+
 class GelatoLoader extends StatelessWidget {
   final double size;
 
@@ -12,6 +14,15 @@ class GelatoLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (AppMotion.reduced(context)) {
+      return Center(
+        child: SvgPicture.asset(
+          'assets/images/logo.svg',
+          width: size,
+          height: size,
+        ),
+      );
+    }
     return Center(
       child: SizedBox(
         width: size,

@@ -31,6 +31,7 @@ import 'package:gelatino/repositories/check_in_publication_repository.dart';
 import 'package:gelatino/repositories/check_in_repository.dart';
 import 'package:gelatino/repositories/place_repository.dart';
 import 'package:gelatino/screens/check_in/check_in_flow.dart';
+import 'package:gelatino/screens/check_in/place_picker_field.dart';
 import 'package:gelatino/screens/check_in_screen.dart';
 import 'package:gelatino/router.dart';
 import 'package:gelatino/services/storage_service.dart';
@@ -602,8 +603,8 @@ void main() {
     await pumpFlow(tester, draft: restored, preferences: preferences);
 
     expect(find.textContaining('Gelateria del Passo'), findsOneWidget);
-    final dropdown = tester.widget<DropdownButtonFormField<String>>(
-      find.byType(DropdownButtonFormField<String>),
+    final dropdown = tester.widget<PlacePickerField>(
+      find.byType(PlacePickerField),
     );
     expect(dropdown.initialValue, 'place-1');
   });

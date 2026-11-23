@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,7 +38,7 @@ final class FriendsActivitySidebar extends StatelessWidget {
             child: activities.when(
               data: (items) => items.isEmpty
                   ? const _SidebarMessage(
-                      icon: Icons.people_outline,
+                      icon: CupertinoIcons.person_2,
                       text: AppStrings.activityEmptyDesc,
                     )
                   : ListView.separated(
@@ -149,7 +150,7 @@ final class _SidebarError extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     children: <Widget>[
       const _SidebarMessage(
-        icon: Icons.error_outline,
+        icon: CupertinoIcons.exclamationmark_circle,
         text: AppStrings.activityUnavailable,
       ),
       TextButton(

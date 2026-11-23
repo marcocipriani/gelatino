@@ -101,7 +101,7 @@ class AppStrings {
   static const String placeCheckinButton = 'Fai check-in';
   static const String placeMapsError = 'Impossibile aprire Maps.';
   static const String placeOpenDetail = 'Apri dettaglio';
-  static const String placeSearchHint = 'Cerca per nome o indirizzo';
+  static const String placeSearchHint = 'Nome, via o gusto';
   static const String placeActionList = 'Lista';
   static const String placeActionMap = 'Mappa';
   static String placeFilterLabel(String filter) => 'Filtro $filter';
@@ -183,7 +183,8 @@ class AppStrings {
   static const String profilePreferencesTitle = 'Preferenze';
   static const String profilePreferencesUnavailable =
       'Preferenze non disponibili';
-  static const String profilePreferencesUpdating = 'Preferenze in aggiornamento';
+  static const String profilePreferencesUpdating =
+      'Preferenze in aggiornamento';
   static const String profileActivityUnavailable = 'Attività non disponibile';
   static const String profileWishlistTitle = 'Da provare';
   static const String profileWishlistEmpty = 'Niente da provare, per ora.';
@@ -221,6 +222,9 @@ class AppStrings {
   static const String settingsDefaultPlacesViewSubtitle = 'Elenco oppure mappa';
   static const String settingsPlacesViewList = 'Elenco';
   static const String settingsPlacesViewMap = 'Mappa';
+  static const String settingsHighContrast = 'Alto contrasto';
+  static const String settingsHighContrastSubtitle =
+      'Testi e bordi più marcati, su questo dispositivo';
   static const String settingsSectionPrivacy = 'PRIVACY';
   static const String settingsPrivateProfile = 'Profilo privato';
   static const String settingsSectionAccount = 'ACCOUNT';
@@ -263,7 +267,8 @@ class AppStrings {
   static const String checkInWhenTooOld =
       'Puoi risalire al massimo a cinque anni fa.';
   static const String checkInRetryUpload = 'Riprova caricamento';
-  static const String checkInCompressing = 'Compressione e caricamento privato…';
+  static const String checkInCompressing =
+      'Compressione e caricamento privato…';
   static const String checkInUploadInterrupted =
       'Caricamento privato interrotto.';
   static const String checkInPrivatePhotoNotFound = 'Foto privata non trovata.';
@@ -319,8 +324,7 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   static const String editProfileEmptyName = 'Il nome non può essere vuoto';
   static const String editProfileDisplayName = 'Nome visualizzato';
-  static const String editProfileFavoritesTitle =
-      'Gelateria e gusto preferiti';
+  static const String editProfileFavoritesTitle = 'Gelateria e gusto preferiti';
   static const String editProfileFavoritesSubtitle =
       'Seleziona dalla raccolta personale.';
 
@@ -340,7 +344,8 @@ class AppStrings {
   static const String profileLoadError =
       'Non riusciamo a caricare il profilo. Riprova.';
   static const String profileGelatinoFallback = 'Profilo Gelatino';
-  static const String contentLoadError = 'Non riusciamo a caricare i contenuti.';
+  static const String contentLoadError =
+      'Non riusciamo a caricare i contenuti.';
   static const String wishlistLabel = 'Da provare';
   static const String mapTapToChoose = 'Tocca la mappa per scegliere un punto.';
   static const String mapPointSelected = 'Punto selezionato sulla mappa.';
@@ -356,7 +361,6 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   static const String profileNotAvailableMessage =
       'Questo profilo non è disponibile.';
-  static const String profileHeaderLabel = 'IL TUO PROFILO';
   static const String profilePrefsNonePublic =
       'Nessuna preferenza pubblica indicata.';
   static const String profilePrefsNamesUnavailable =
@@ -415,7 +419,8 @@ class AppStrings {
   static const String friendsLoginSubtitle =
       'Il profilo e le richieste sono disponibili dopo l’accesso.';
   static const String friendsFindPeopleSubtitle = 'Cerca per nome o username.';
-  static const String friendsYourFriendsSubtitle = 'Le persone, prima dei numeri.';
+  static const String friendsYourFriendsSubtitle =
+      'Le persone, prima dei numeri.';
   static const String friendsEmptySubtitle =
       'Cerca una persona e inviale una richiesta.';
   static const String friendsInviteSent = 'Invito inviato';
@@ -448,7 +453,6 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   static const String placesLoginForFilters =
       'Accedi per usare i filtri personali.';
-  static const String placesSubtitle = 'Scopri, salva e ritrova i tuoi posti.';
   static const String placesLoginToAdd = 'Accedi per aggiungere una gelateria.';
   static const String placesLoginToAddFirst =
       'Accedi per aggiungere la prima gelateria.';
@@ -507,7 +511,8 @@ class AppStrings {
   static const String timelineFriendshipsUpdating = 'Aggiornamento amicizie';
   static const String timelineFriendshipsUpdatingDesc =
       'La Timeline sarà disponibile tra poco.';
-  static const String timelineFriendshipsUnavailable = 'Amicizie non disponibili';
+  static const String timelineFriendshipsUnavailable =
+      'Amicizie non disponibili';
   static const String timelineFriendshipsUnavailableDesc =
       'Aggiorna per riprovare senza mostrare attività non autorizzate.';
   static const String timelineLoginTitle = 'Accedi alla Timeline';
@@ -587,7 +592,8 @@ class AppStrings {
   static const String checkInAddNewPlace = 'Aggiungi una nuova gelateria';
   static const String checkInAddLocationHint =
       'Aggiungi una posizione con il GPS o scegli un punto sulla mappa.';
-  static const String checkInLocationReady = 'Posizione pronta per il salvataggio.';
+  static const String checkInLocationReady =
+      'Posizione pronta per il salvataggio.';
   static const String checkInFriendsNone = 'Amici: nessuno';
   static const String checkInPhotoReady =
       'Foto privata pronta per la pubblicazione';
@@ -640,7 +646,8 @@ class AppStrings {
       'Le attività dei tuoi amici appariranno qui.';
   static const String activityEmptyTitle = 'Nessuna attività recente';
   static const String activityUnavailable = 'Attività amici non disponibile.';
-  static String activityCheckInFrom(String placeName) => 'Check-in da $placeName';
+  static String activityCheckInFrom(String placeName) =>
+      'Check-in da $placeName';
 
   // ---------------------------------------------------------------------------
   // Check-in step labels & progress/selection state (accessibility)
@@ -688,4 +695,28 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   static const String errUserNotLogged = 'Utente non connesso';
   static const String errGeneric = 'Si è verificato un errore.';
+
+  // ---------------------------------------------------------------------------
+  // Ricerca, mappa e controlli
+  // ---------------------------------------------------------------------------
+  static String checkInStepOf(int step, int total) => 'Passo $step di $total';
+  static const String mapSemantic = 'Mappa delle gelaterie';
+  static const String mapAttribution = '© OpenStreetMap';
+  static const String placeMapZoomIn = 'Ingrandisci la mappa';
+  static const String placeMapZoomOut = 'Riduci la mappa';
+  static const String placeMapClosePreview = 'Chiudi anteprima';
+  static const String checkInPlaceSearchHint = 'Nome o via';
+  static const String checkInPickPlace = 'Scegli la gelateria';
+  static const String checkInPlaceNoMatch = 'Nessuna gelateria trovata.';
+  static const String editProfileChangePhoto = 'Cambia foto del profilo';
+  static const String done = 'Fine';
+  static String placeResultsCount(int count) =>
+      count == 1 ? '1 gelateria' : '$count gelaterie';
+  static String placeClusterSemantic(int count, {required bool includesOwn}) =>
+      '$count gelaterie vicine${includesOwn ? ', incluse le tue' : ''}, '
+      'tocca per ingrandire';
+  static String placesNoMatchFor(String query) =>
+      'Niente per «$query». Prova con una parola sola, la via o un gusto.';
+  static String flavorColorSemantic(int index, int total) =>
+      'Colore $index di $total';
 }
