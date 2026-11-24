@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../design/app_tokens.dart';
 import '../providers/media_provider.dart';
+import '../services/media_telemetry.dart';
 import 'skeleton_loader.dart';
 import '../constants/app_strings.dart';
 
@@ -20,6 +21,7 @@ final class AuthenticatedStorageImage extends ConsumerWidget {
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
     this.missingIcon = CupertinoIcons.photo,
+    this.placeholderColor,
   });
 
   final String path;
@@ -30,6 +32,10 @@ final class AuthenticatedStorageImage extends ConsumerWidget {
   final BoxFit fit;
   final AlignmentGeometry alignment;
   final IconData missingIcon;
+
+  /// Shown flat while loading instead of the shimmering skeleton, so the card
+  /// already has the photo's tone before its bytes arrive.
+  final Color? placeholderColor;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -57,6 +63,9 @@ final class AuthenticatedStorageImage extends ConsumerWidget {
                 data: (value) => value == null
                     ? _MediaFallback(icon: missingIcon, onRetry: retry)
                     : _MemoryStorageImage(
+                        onDecodeError: (error) => ref
+                            .read(mediaTelemetryProvider)
+                            .report(MediaFailureKind.decode, error),
                         bytes: value,
                         width: geometry.width,
                         height: geometry.height,
@@ -65,11 +74,20 @@ final class AuthenticatedStorageImage extends ConsumerWidget {
                         missingIcon: missingIcon,
                         onRetry: retry,
                       ),
-                loading: () => SkeletonBox(
-                  width: geometry.width,
-                  height: geometry.height,
-                  borderRadius: BorderRadius.zero,
-                ),
+                loading: () => placeholderColor == null
+                    ? SkeletonBox(
+                        width: geometry.width,
+                        height: geometry.height,
+                        borderRadius: BorderRadius.zero,
+                      )
+                    : ColoredBox(
+                        key: const ValueKey<String>('media-color-placeholder'),
+                        color: placeholderColor!,
+                        child: SizedBox(
+                          width: geometry.width,
+                          height: geometry.height,
+                        ),
+                      ),
                 error: (error, stackTrace) {
                   debugPrint('Authenticated Storage image failed: $error');
                   return _MediaFallback(icon: missingIcon, onRetry: retry);
@@ -120,8 +138,10 @@ final class _MemoryStorageImage extends StatelessWidget {
     required this.alignment,
     required this.missingIcon,
     required this.onRetry,
+    required this.onDecodeError,
   });
 
+  final void Function(Object error) onDecodeError;
   final Uint8List bytes;
   final double width;
   final double height;
@@ -141,6 +161,7 @@ final class _MemoryStorageImage extends StatelessWidget {
     excludeFromSemantics: true,
     errorBuilder: (context, error, stackTrace) {
       debugPrint('Authenticated Storage image decode failed: $error');
+      onDecodeError(error);
       return _MediaFallback(icon: missingIcon, onRetry: onRetry);
     },
   );

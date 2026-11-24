@@ -1,13 +1,14 @@
 import {getApps, initializeApp} from 'firebase-admin/app';
 import {getFirestore} from 'firebase-admin/firestore';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
+import {callableOptions} from './options';
 import {
   removeAcceptedFriendship,
   respondToRequest,
   sendRequest,
 } from '../services/friendships';
 
-const options = {region: 'europe-west1', enforceAppCheck: false} as const;
+const options = callableOptions;
 
 function callerUid(auth: {uid: string} | undefined): string {
   if (!auth) {

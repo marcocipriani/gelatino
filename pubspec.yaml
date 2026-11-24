@@ -59,12 +59,14 @@ dependencies:
   flutter_svg: ^2.3.0
   url_launcher: ^6.3.2
   shared_preferences: ^2.5.5
+  path_provider: ^2.1.6
   web: ^1.1.1
   # ponytail: brief specified ^12.0.1, but that pins win32 ^5.5.3 which
   # conflicts with our geolocator ^14.0.3 (win32 ^6.0.0). ^13.2.1 is pub's
   # own resolution suggestion; the share() API is unchanged from 12.x.
   share_plus: ^13.2.1
   firebase_messaging: ^16.1.0
+  firebase_app_check: ^0.4.8
 
 dev_dependencies:
   flutter_test:

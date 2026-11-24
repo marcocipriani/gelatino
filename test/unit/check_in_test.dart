@@ -112,10 +112,11 @@ void main() {
       FakeDocumentSnapshot(checkInId, legacyCheckIn()),
     );
 
-    expect(checkIn.userSummary['username'], 'Alice');
-    expect(checkIn.placeName, 'Giolitti');
-    expect(checkIn.photoUrl, 'https://example.test/check-in.jpg');
-    expect(checkIn.taggedUserUids, <String>['bob']);
+    expect(checkIn.userSnapshot['username'], 'Alice');
+    expect(checkIn.placeSnapshot['name'], 'Giolitti');
+    expect(checkIn.photoStoragePath, 'https://example.test/check-in.jpg');
+    expect(checkIn.taggedUserIds, <String>['bob']);
+    expect(checkIn.schemaVersion, 1);
   });
 
   test('canonical parser validates rating IDs path and nested shapes', () {
@@ -170,27 +171,15 @@ void main() {
     }
   });
 
-  test('legacy compatibility constructor defensively copies collections', () {
-    final liked = <String>['bob'];
+  test('test constructor defensively copies collections', () {
     final flavors = <Flavor>[Flavor(id: 'cup', name: 'Coppetta')];
-    final checkIn = CheckIn.legacy(
+    final checkIn = CheckIn.forTesting(
       id: checkInId,
-      userId: 'alice',
-      userSummary: const <String, dynamic>{'username': 'Alice'},
-      placeId: 'place-1',
-      placeName: 'Giolitti',
-      photoUrl: 'https://example.test/photo.jpg',
-      isLivePhoto: false,
-      rating: 5,
       flavors: flavors,
-      likedByUids: liked,
-      wishlistedByUids: const <String>[],
       createdAt: createdAt,
     );
 
-    liked.add('carol');
     flavors.add(Flavor(id: 'cone', name: 'Cono'));
-    expect(checkIn.likedByUids, <String>['bob']);
     expect(checkIn.flavors, hasLength(1));
     expect(() => checkIn.flavors.clear(), throwsUnsupportedError);
   });

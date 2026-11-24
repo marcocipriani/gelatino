@@ -492,11 +492,16 @@ test('permanent check-in photos are server-written and owner/friend-readable', a
   );
 });
 
-test('permanent photo path must agree with the canonical check-in owner', async () => {
+test('friends read a photo only while its path matches a live check-in', async () => {
   const path = `check_ins/bob/${CHECK_IN_ID}/1.jpg`;
   await harness.seed('check_ins/ABCDEFGHIJKLMNOPQRST', {user_id: 'alice'});
+  await harness.seed('friend_access/alice/members/bob', {
+    friendship_id: 'alice_bob',
+  });
   await harness.seedStorage(path, JPEG);
-  await assert.rejects(getBytes(ref(harness.storageUsers.bob.storage, path)));
+  await assert.rejects(getBytes(ref(harness.storageUsers.alice.storage, path)));
+  // The owner's own path is server-written, so it needs no Firestore lookup.
+  await getBytes(ref(harness.storageUsers.bob.storage, path));
 });
 
 test('avatars are public to authenticated users but owner-written JPEGs only', async () => {

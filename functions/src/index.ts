@@ -25,3 +25,4 @@ export {
   respondToFriendRequest,
   sendFriendRequest,
 } from './callable/friendships';
+export {reportClientFailure} from './callable/telemetry';

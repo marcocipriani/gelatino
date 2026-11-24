@@ -12,6 +12,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'design/motion.dart';
+import 'firebase/app_check.dart';
 import 'firebase/emulator_config.dart';
 import 'firebase/firebase_providers.dart';
 import 'firebase_options.dart';
@@ -24,6 +25,9 @@ import 'providers/theme_provider.dart';
 import 'router.dart';
 import 'theme/app_theme.dart';
 import 'constants/app_strings.dart';
+import 'services/media_cache/media_disk_cache.dart';
+import 'services/media_cache/platform_media_disk_cache.dart';
+import 'services/media_telemetry.dart';
 
 void main() async {
   GelatinoBinding.ensureInitialized();
@@ -34,6 +38,9 @@ void main() async {
     useFirebaseEmulators: const bool.fromEnvironment('USE_FIREBASE_EMULATORS'),
   );
   await Firebase.initializeApp(options: firebaseOptions);
+  await activateAppCheck(
+    usesEmulators: const bool.fromEnvironment('USE_FIREBASE_EMULATORS'),
+  );
 
   final firebaseAuth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
@@ -69,6 +76,12 @@ void main() async {
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        mediaDiskCacheProvider.overrideWithValue(
+          createPlatformMediaDiskCache(),
+        ),
+        mediaTelemetryProvider.overrideWithValue(
+          CallableMediaTelemetry.forFunctions(functions),
+        ),
         checkInLabelRepositoryProvider.overrideWithValue(
           PersistentCheckInLabelRepository(
             SharedPreferencesDraftPreferences(sharedPreferences),

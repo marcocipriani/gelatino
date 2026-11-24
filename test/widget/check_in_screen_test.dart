@@ -145,7 +145,7 @@ void main() {
     await tester.pumpWidget(app(storage: storage));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Galleria'));
+    await _pickFromGallery(tester);
     await tester.pumpAndSettle();
 
     expect(storage.putPaths, ['staging/alice/$id.jpg']);
@@ -165,7 +165,7 @@ void main() {
     await tester.pumpWidget(app(storage: storage));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Galleria'));
+    await _pickFromGallery(tester);
     while (storage.putPaths.isEmpty) {
       await tester.pump();
     }
@@ -208,7 +208,7 @@ void main() {
     await tester.pumpWidget(app(storage: storage));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Galleria'));
+    await _pickFromGallery(tester);
     await tester.pumpAndSettle();
     expect(find.text('Riprova caricamento'), findsOneWidget);
     expect(storage.putPaths, hasLength(1));
@@ -239,7 +239,7 @@ void main() {
     await tester.pumpAndSettle();
     drafts.saveError = StateError('disk');
 
-    await tester.tap(find.text('Galleria'));
+    await _pickFromGallery(tester);
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
@@ -868,6 +868,14 @@ final class _StorageGateway implements StorageObjectGateway {
     if (pending != null) return pending.future;
     return readResult;
   }
+}
+
+/// Picks through the fake picker and accepts the default framing.
+Future<void> _pickFromGallery(WidgetTester tester) async {
+  await tester.tap(find.text('Galleria'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Usa questa inquadratura'));
+  await tester.pump();
 }
 
 final class _MemoryImagePicker extends ImagePickerPlatform {

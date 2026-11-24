@@ -56,6 +56,19 @@ void main() {
     }
   });
 
+  test('photo_color is optional and parsed as opaque ARGB', () {
+    expect(FeedItem.fromMap(feedItem(), checkInId).photoColor, isNull);
+    expect(
+      FeedItem.fromMap(feedItem()..['photo_color'] = '#C81428', checkInId)
+          .photoColor,
+      0xFFC81428,
+    );
+    expect(
+      () => FeedItem.fromMap(feedItem()..['photo_color'] = 'red', checkInId),
+      throwsA(isA<FormatException>()),
+    );
+  });
+
   test('rejects fields outside the server projection allowlist', () {
     final privateData = feedItem()..['email'] = 'private@example.test';
     expect(

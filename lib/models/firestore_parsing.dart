@@ -150,3 +150,15 @@ T? parseOrReport<T>({required String path, required T Function() parse}) {
     return null;
   }
 }
+
+final RegExp _photoColor = RegExp(r'^#[0-9A-Fa-f]{6}$');
+
+/// Optional `photo_color` (`#RRGGBB`, server-validated) as opaque ARGB.
+int? parsePhotoColor(Map<String, dynamic> data) {
+  final value = optionalString(data, 'photo_color');
+  if (value == null) return null;
+  if (!_photoColor.hasMatch(value)) {
+    throw const FormatException('photo_color: expected #RRGGBB');
+  }
+  return 0xFF000000 | int.parse(value.substring(1), radix: 16);
+}

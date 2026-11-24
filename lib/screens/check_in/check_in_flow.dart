@@ -24,15 +24,18 @@ import '../../theme/app_theme.dart';
 import '../../widgets/gelato_background.dart';
 import 'check_in_navigation.dart';
 import 'check_in_progress.dart';
+import 'check_in_flow_widgets.dart';
 import 'check_in_step_rail.dart';
 import 'experience_step.dart';
 import 'gelato_step.dart';
+import 'photo_crop_page.dart';
 import 'photo_step.dart';
 import 'place_step.dart';
 import 'share_step.dart';
 import '../../constants/app_strings.dart';
 import '../../design/motion.dart';
 import '../../widgets/melt_pin.dart';
+import '../../services/storage_service.dart';
 
 final class CheckInFlow extends ConsumerStatefulWidget {
   const CheckInFlow({
@@ -62,20 +65,15 @@ typedef _CheckInLifecycleSnapshot = ({
 });
 
 final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
-  static const _missingPlaceFields =
-      AppStrings.checkInMissingPlace;
+  static const _missingPlaceFields = AppStrings.checkInMissingPlace;
   static const _missingType = AppStrings.checkInMissingType;
   static const _invalidFlavors = AppStrings.checkInInvalidFlavors;
   static const _missingRating = AppStrings.checkInInvalidRating;
-  static const _invalidPlaceLocation =
-      AppStrings.checkInPlaceNoLocation;
-  static const _photoUploadFailure =
-      AppStrings.checkInPhotoInterrupted;
+  static const _invalidPlaceLocation = AppStrings.checkInPlaceNoLocation;
+  static const _photoUploadFailure = AppStrings.checkInPhotoInterrupted;
   static const _flavorCreationFailure = AppStrings.checkInFlavorCreateFailed;
-  static const _labelLoadFailureMessage =
-      AppStrings.checkInLabelsRestoreFailed;
-  static const _unresolvedLabelsMessage =
-      AppStrings.checkInLabelsUnavailable;
+  static const _labelLoadFailureMessage = AppStrings.checkInLabelsRestoreFailed;
+  static const _unresolvedLabelsMessage = AppStrings.checkInLabelsUnavailable;
   static const _friendsVerificationMessage =
       AppStrings.checkInAwaitFriendsVerify;
 
@@ -418,8 +416,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
       _isSavingLabels = false;
       _labelSaveFailed = !succeeded;
       if (succeeded) {
-        if (_stepError ==
-            AppStrings.checkInLabelsSaveFailed) {
+        if (_stepError == AppStrings.checkInLabelsSaveFailed) {
           _stepError = null;
         }
       } else {
@@ -454,13 +451,22 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
     try {
       final picked = await picker.pickImage(
         source: source,
-        maxWidth: 1600,
-        maxHeight: 1600,
+        // Width only, so portrait photos keep their height. Bounded because
+        // decoding a larger image only to shrink it is the slow part on web,
+        // where image work runs on the UI thread; the margin over the upload
+        // width leaves room to zoom while framing.
+        maxWidth: checkInPickMaxWidth.toDouble(),
         imageQuality: 90,
       );
       if (picked == null || !_isSnapshotCurrent(lifecycle)) return;
-      final Uint8List bytes = await picked.readAsBytes();
-      if (!_isSnapshotCurrent(lifecycle)) return;
+      final Uint8List original = await picked.readAsBytes();
+      if (!_isSnapshotCurrent(lifecycle) || !mounted) return;
+      final bytes = await framePhotoForCheckIn(
+        context,
+        ref.read(storageServiceProvider),
+        original,
+      );
+      if (bytes == null || !_isSnapshotCurrent(lifecycle)) return;
       await lifecycle.controller.selectPhoto(
         bytes,
         picked.name.trim().isEmpty ? 'photo.jpg' : picked.name,
@@ -604,10 +610,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
       switch (draft.currentStep) {
         case 0:
           if (draft.stagingObjectPath == null || flow.photoMissing) {
-            setState(
-              () => _stepError =
-                  AppStrings.checkInAddPhotoFirst,
-            );
+            setState(() => _stepError = AppStrings.checkInAddPhotoFirst);
             return;
           }
         case 1:
@@ -674,9 +677,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
       }
     } on FormatException {
       if (_isSnapshotCurrent(lifecycle)) {
-        setState(
-          () => _stepError = AppStrings.checkInCheckStepData,
-        );
+        setState(() => _stepError = AppStrings.checkInCheckStepData);
       }
     }
   }
@@ -1022,7 +1023,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
       return const Scaffold(body: Center(child: _PublishedMoment()));
     }
     if (flow.publishedPendingClear && flow.draft == null) {
-      return _PublishedRecovery(
+      return CheckInPublishedRecovery(
         busy: flow.isPublishing,
         message: _stepError ?? flow.failure?.message,
         onRetry: _publish,
@@ -1032,7 +1033,9 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
     if (draft == null) {
       return Scaffold(
         body: Center(
-          child: Text(flow.failure?.message ?? AppStrings.checkInDraftUnavailable),
+          child: Text(
+            flow.failure?.message ?? AppStrings.checkInDraftUnavailable,
+          ),
         ),
       );
     }
@@ -1084,7 +1087,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
               final wide = constraints.maxWidth >= 1024;
               return Column(
                 children: <Widget>[
-                  _Header(onClose: canExit ? _close : null),
+                  CheckInFlowHeader(onClose: canExit ? _close : null),
                   if (!wide) CheckInProgress(currentStep: draft.currentStep),
                   Expanded(
                     child: Row(
@@ -1190,6 +1193,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
         bytes: flow.photoBytes,
         hasStagedPhoto: draft.stagingObjectPath != null,
         isUploading: flow.isUploading,
+        uploadProgress: flow.uploadProgress,
         photoMissing: flow.photoMissing,
         uploadFailed:
             !flow.isUploading &&
@@ -1259,7 +1263,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
       4 =>
         _reviewLabelsResolved(draft)
             ? _sharePage(flow, draft)
-            : const _UnresolvedLabelsNotice(),
+            : const CheckInUnresolvedLabelsNotice(),
       _ => const SizedBox.shrink(),
     };
     final failureMessage = _stepError ?? flow.failure?.message;
@@ -1277,7 +1281,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
         content,
         if (_labelLoadFailed) ...<Widget>[
           const SizedBox(height: 16),
-          _LabelRecoveryActions(
+          CheckInLabelRecoveryActions(
             busy: _isLoadingLabels,
             onRetry: _retryLabelLoad,
             onRebuild: _rebuildLabelCache,
@@ -1354,7 +1358,8 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
         _persistCurrentMutation((controller) => controller.setFlavorIds(ids));
       },
       onCreateFlavor: _createFlavor,
-      onFlavorLimit: () => setState(() => _stepError = AppStrings.checkInMaxFlavors),
+      onFlavorLimit: () =>
+          setState(() => _stepError = AppStrings.checkInMaxFlavors),
     );
   }
 
@@ -1418,10 +1423,14 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
         ((_labelSavePending && !_labelSaveFailed) || _isSavingLabels)) {
       return AppStrings.checkInSavingLabels;
     }
-    if (!_currentStepLabelsResolved(draft)) return AppStrings.checkInVerifyLabels;
+    if (!_currentStepLabelsResolved(draft)) {
+      return AppStrings.checkInVerifyLabels;
+    }
     if (draft.currentStep != 4) return 'Continua';
     if (flow.publishedPendingClear) return AppStrings.checkInRetryCleanup;
-    if (flow.publicationFailedPendingClear) return AppStrings.checkInCompleteUnlock;
+    if (flow.publicationFailedPendingClear) {
+      return AppStrings.checkInCompleteUnlock;
+    }
     if (flow.publicationCallingPendingRetry) return AppStrings.retry;
     if (_friendsVerificationPending) return AppStrings.checkInRetryFriends;
     if (flow.failure?.kind == CheckInFlowFailureKind.publication) {
@@ -1549,148 +1558,4 @@ final class _PublishedMomentState extends State<_PublishedMoment> {
       },
     );
   }
-}
-
-final class _UnresolvedLabelsNotice extends StatelessWidget {
-  const _UnresolvedLabelsNotice();
-
-  @override
-  Widget build(BuildContext context) => const Card(
-    key: ValueKey<String>('check-in-page-4'),
-    margin: EdgeInsets.zero,
-    child: Padding(
-      padding: EdgeInsets.all(18),
-      child: Text(
-        AppStrings.checkInSummaryUnavailable,
-      ),
-    ),
-  );
-}
-
-final class _LabelRecoveryActions extends StatelessWidget {
-  const _LabelRecoveryActions({
-    required this.busy,
-    required this.onRetry,
-    required this.onRebuild,
-  });
-
-  final bool busy;
-  final VoidCallback onRetry;
-  final VoidCallback onRebuild;
-
-  @override
-  Widget build(BuildContext context) => Wrap(
-    spacing: 8,
-    runSpacing: 8,
-    children: <Widget>[
-      OutlinedButton(
-        onPressed: busy ? null : onRetry,
-        child: const Text(AppStrings.checkInRetryLabels),
-      ),
-      TextButton(
-        onPressed: busy ? null : onRebuild,
-        child: const Text(AppStrings.checkInRebuildCache),
-      ),
-    ],
-  );
-}
-
-final class _Header extends StatelessWidget {
-  const _Header({required this.onClose});
-
-  final VoidCallback? onClose;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(12, 8, 16, 4),
-    child: Row(
-      children: <Widget>[
-        IconButton(
-          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-          onPressed: onClose,
-          tooltip: AppStrings.checkInCloseTooltip,
-          icon: const Icon(CupertinoIcons.xmark),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            AppStrings.checkInTitle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-final class _PublishedRecovery extends StatelessWidget {
-  const _PublishedRecovery({
-    required this.busy,
-    required this.message,
-    required this.onRetry,
-  });
-
-  final bool busy;
-  final String? message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => PopScope<void>(
-    canPop: false,
-    child: Scaffold(
-      backgroundColor: Colors.transparent,
-      body: GelatoBackground(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const CircleAvatar(
-                    radius: 44,
-                    backgroundColor: AppTheme.mentaGlaciale,
-                    foregroundColor: AppTheme.fondenteExtra,
-                    child: Icon(CupertinoIcons.cloud_fill, size: 44),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    AppStrings.checkInAlreadyPublished,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    message ??
-                        AppStrings.checkInCompleteCleanupToClose,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: 48,
-                    child: FilledButton(
-                      onPressed: busy ? null : onRetry,
-                      child: busy
-                          ? const SizedBox.square(
-                              dimension: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text(AppStrings.checkInCompleteCleanup),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 }

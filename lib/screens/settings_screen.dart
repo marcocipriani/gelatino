@@ -13,8 +13,10 @@ import '../models/user_profile.dart';
 import '../models/user_settings.dart';
 import '../providers/auth_provider.dart';
 import '../providers/high_contrast_provider.dart';
+import '../providers/media_provider.dart';
 import '../providers/profile_providers.dart';
 import '../providers/theme_provider.dart';
+import '../services/media_cache/media_disk_cache.dart';
 import '../services/push_service.dart';
 import '../widgets/app_controls.dart';
 import '../widgets/app_page.dart';
@@ -121,6 +123,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } catch (error) {
       debugPrint('PushService.clearForSignOut failed: $error');
     }
+    // Cached photos were readable by this account only; the next one on the
+    // device must not see them.
+    await ref.read(mediaDiskCacheProvider).clear();
+    ref.invalidate(mediaBytesProvider);
     await ref.read(firebaseAuthProvider).signOut();
   }
 

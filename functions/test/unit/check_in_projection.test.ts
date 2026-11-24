@@ -101,3 +101,19 @@ test('rejects unexpected flavor snapshot fields', () => {
     /flavors\[0\]/,
   );
 });
+
+test('projects photo_color only when the check-in carries one', () => {
+  const flavors = [{id: 'pistacchio', name: 'Pistacchio'}];
+  const without = validateCheckIn(CHECK_IN_ID, checkIn(flavors));
+  assert.equal('photo_color' in without.feedItem, false);
+
+  const withColor = validateCheckIn(CHECK_IN_ID, {
+    ...checkIn(flavors),
+    photo_color: '#C81428',
+  });
+  assert.equal(withColor.feedItem.photo_color, '#C81428');
+
+  assert.throws(() =>
+    validateCheckIn(CHECK_IN_ID, {...checkIn(flavors), photo_color: 'red'}),
+  );
+});
