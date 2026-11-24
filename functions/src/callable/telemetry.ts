@@ -2,7 +2,13 @@ import {logger} from 'firebase-functions';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
 import {callableOptions} from './options';
 
-const KINDS = new Set(['media_load', 'media_decode', 'photo_upload']);
+const KINDS = new Set([
+  'media_load',
+  'media_decode',
+  'photo_upload',
+  // Uncaught client errors on the web, where Crashlytics is unavailable.
+  'uncaught_error',
+]);
 const PLATFORMS = new Set(['web', 'android', 'ios', 'other']);
 const CODE = /^[a-z0-9_/-]{1,64}$/;
 
@@ -36,9 +42,9 @@ export function underBudget(uid: string, counts = reportsByUid): boolean {
 }
 
 /**
- * Records a client-side image failure in Cloud Logging, where it can be
- * counted with a log-based metric. Carries no paths or messages: only the
- * failure kind, a short error code and the platform.
+ * Records a client-side image failure, or an uncaught web error, in Cloud
+ * Logging, where it can be counted with a log-based metric. Carries no paths
+ * or messages: only the failure kind, a short error code and the platform.
  */
 export const reportClientFailure = onCall(callableOptions, (request) => {
   if (!request.auth) {

@@ -6,7 +6,6 @@ void main() {
     final settings = UserSettings.fromMap(<String, dynamic>{
       'theme_mode': 'dark',
       'default_collection_view': 'map',
-      'reduced_motion': true,
       'notifications_enabled': false,
       'profile_visibility': 'friends',
       'searchable': false,
@@ -14,7 +13,6 @@ void main() {
 
     expect(settings.themeMode, 'dark');
     expect(settings.defaultCollectionView, 'map');
-    expect(settings.reducedMotion, isTrue);
     expect(settings.notificationsEnabled, isFalse);
     expect(settings.profileVisibility, 'friends');
     expect(settings.searchable, isFalse);
@@ -25,7 +23,6 @@ void main() {
 
     expect(settings.themeMode, 'system');
     expect(settings.defaultCollectionView, 'list');
-    expect(settings.reducedMotion, isFalse);
     expect(settings.notificationsEnabled, isTrue);
     expect(settings.profileVisibility, 'private');
     expect(settings.searchable, isFalse);
@@ -44,7 +41,6 @@ void main() {
       'theme_mode',
       'default_collection_view',
       'profile_visibility',
-      'reduced_motion',
       'notifications_enabled',
       'searchable',
     ]) {
@@ -62,7 +58,6 @@ void main() {
     expect(keys, <String>{
       'theme_mode',
       'default_collection_view',
-      'reduced_motion',
       'notifications_enabled',
       'profile_visibility',
       'searchable',

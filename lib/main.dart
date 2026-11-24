@@ -25,6 +25,7 @@ import 'providers/theme_provider.dart';
 import 'router.dart';
 import 'theme/app_theme.dart';
 import 'constants/app_strings.dart';
+import 'services/crash_reporting.dart';
 import 'services/media_cache/media_disk_cache.dart';
 import 'services/media_cache/platform_media_disk_cache.dart';
 import 'services/media_telemetry.dart';
@@ -71,6 +72,8 @@ void main() async {
   }
 
   final sharedPreferences = await SharedPreferences.getInstance();
+  final telemetry = CallableMediaTelemetry.forFunctions(functions);
+  installCrashReporting(telemetry);
 
   runApp(
     ProviderScope(
@@ -79,9 +82,7 @@ void main() async {
         mediaDiskCacheProvider.overrideWithValue(
           createPlatformMediaDiskCache(),
         ),
-        mediaTelemetryProvider.overrideWithValue(
-          CallableMediaTelemetry.forFunctions(functions),
-        ),
+        mediaTelemetryProvider.overrideWithValue(telemetry),
         checkInLabelRepositoryProvider.overrideWithValue(
           PersistentCheckInLabelRepository(
             SharedPreferencesDraftPreferences(sharedPreferences),

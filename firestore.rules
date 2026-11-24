@@ -27,6 +27,7 @@ service cloud.firestore {
         'searchable',
         'theme_mode',
         'default_collection_view',
+        // Legacy: no longer written, still allowed for beta 1.0.0+2 clients.
         'reduced_motion',
         'notifications_enabled',
         'avatar_path',

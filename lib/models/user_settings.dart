@@ -4,7 +4,6 @@ class UserSettings {
   const UserSettings({
     required this.themeMode,
     required this.defaultCollectionView,
-    required this.reducedMotion,
     required this.notificationsEnabled,
     required this.profileVisibility,
     required this.searchable,
@@ -12,7 +11,6 @@ class UserSettings {
 
   final String themeMode;
   final String defaultCollectionView;
-  final bool reducedMotion;
   final bool notificationsEnabled;
   final String profileVisibility;
   final bool searchable;
@@ -38,7 +36,6 @@ class UserSettings {
     return UserSettings(
       themeMode: themeMode,
       defaultCollectionView: collectionView,
-      reducedMotion: optionalBool(data, 'reduced_motion'),
       notificationsEnabled: optionalBool(
         data,
         'notifications_enabled',
@@ -52,7 +49,6 @@ class UserSettings {
   Map<String, dynamic> toMap() => <String, dynamic>{
     'theme_mode': themeMode,
     'default_collection_view': defaultCollectionView,
-    'reduced_motion': reducedMotion,
     'notifications_enabled': notificationsEnabled,
     'profile_visibility': profileVisibility,
     'searchable': searchable,
@@ -61,14 +57,12 @@ class UserSettings {
   UserSettings copyWith({
     String? themeMode,
     String? defaultCollectionView,
-    bool? reducedMotion,
     bool? notificationsEnabled,
     String? profileVisibility,
     bool? searchable,
   }) => UserSettings(
     themeMode: themeMode ?? this.themeMode,
     defaultCollectionView: defaultCollectionView ?? this.defaultCollectionView,
-    reducedMotion: reducedMotion ?? this.reducedMotion,
     notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     profileVisibility: profileVisibility ?? this.profileVisibility,
     searchable: searchable ?? this.searchable,

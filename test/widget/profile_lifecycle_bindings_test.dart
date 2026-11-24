@@ -307,7 +307,6 @@ void main() {
 UserSettings _settings({required String themeMode}) => UserSettings(
   themeMode: themeMode,
   defaultCollectionView: 'list',
-  reducedMotion: false,
   notificationsEnabled: true,
   profileVisibility: 'private',
   searchable: false,

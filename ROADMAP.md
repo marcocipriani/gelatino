@@ -10,14 +10,14 @@ Migliorie pianificate per Gelatino, in ordine di priorità. Stato al 24 novembre
 | 3 | Provider di tile per la mappa | I tile pubblici OSM non ammettono traffico di produzione | ½ giorno |
 | 4 | Build iOS e TestFlight | iOS non è mai stato compilato con Xcode | 1 giorno |
 | 5 | Play Console, test interno | Distribuzione Android senza installare APK a mano | ½ giorno |
-| 6 | Crash reporting | Oggi arrivano solo gli errori sulle immagini | ½ giorno |
+| 6 | ~~Crash reporting~~ | Fatto il 24/11, manca il deploy | ½ giorno |
 | 7 | Enforcement di App Check | Il client è pronto, l'enforcement no | ½ giorno + osservazione |
-| 8 | CI su GitHub Actions | Nessun controllo automatico sui push | ½ giorno |
+| 8 | ~~CI su GitHub Actions~~ | Fatto il 24/11 | ½ giorno |
 | 9 | Test end-to-end e prove su dispositivi | Mai eseguiti dopo il rinnovo dell'interfaccia | 1 giorno |
 | 10 | Link di invito che aprono l'app | Oggi aprono sempre il web | 1 giorno |
 | 11 | Inglese | Roma è piena di turisti; l'app parla solo italiano | 2-3 giorni |
 | 12 | Catalogo gelaterie curato | Solo Roma; le aggiunte non si possono correggere | da definire |
-| 13 | Piccole pulizie | Debito minore emerso dalla revisione | ½ giorno |
+| 13 | ~~Piccole pulizie~~ | Fatto il 24/11 | ½ giorno |
 
 Le voci 1-5 vanno chiuse prima della pubblicazione sugli store.
 
@@ -71,13 +71,19 @@ Firebase e nella restrizione della chiave API Android.
 
 ## Affidabilità
 
-### 6. Crash reporting
+### 6. Crash reporting (fatto)
 
-La telemetria attuale copre solo caricamento e upload delle immagini
-(`reportClientFailure`). Gli altri errori in produzione sono invisibili.
-Firebase Crashlytics copre Android e iOS; sul web servono
-`FlutterError.onError` e `PlatformDispatcher.onError` collegati alla stessa
-callable o a Cloud Logging.
+`lib/services/crash_reporting.dart` manda gli errori non gestiti a Crashlytics
+su Android e iOS e, sul web, alla callable `reportClientFailure` con il tipo
+`uncaught_error` (solo un codice breve, niente messaggio né stack). Nelle build
+di debug non parte nulla.
+
+Restano:
+
+- deploy delle Functions prima del prossimo deploy web, altrimenti la callable
+  rifiuta il nuovo tipo;
+- attivare Crashlytics nella console Firebase;
+- su iOS (voce 4), lo script di upload dei dSYM in Xcode.
 
 ### 7. App Check
 
@@ -87,16 +93,15 @@ delle metriche, poi enforcement su Firestore, Storage e callable. Attenzione:
 Play Integrity non riconosce gli APK installati fuori dal Play Store, quindi
 l'enforcement va attivato dopo il passaggio a Play Console (voce 5).
 
-### 8. CI
+### 8. CI (fatto)
 
-Non esiste una pipeline. Un workflow GitHub Actions su ogni push e pull request:
+`.github/workflows/ci.yml` gira su ogni push e pull request: `flutter analyze`,
+`flutter test`, i test web in Chrome, la build web e `npm test` in
+`functions/`. `lib/firebase_options.dart` è ignorato da git, quindi il workflow
+ne scrive uno con valori segnaposto.
 
-- `flutter analyze` e `flutter test`;
-- `npm test` in `functions/`;
-- build web, per intercettare errori di compilazione specifici del web.
-
-Il test end-to-end sugli emulatori (`tool/run_web_e2e.sh`) può girare in un
-secondo job, anche solo su `main`.
+Resta da aggiungere, se serve, il test end-to-end sugli emulatori
+(`tool/run_web_e2e.sh`) in un secondo job, anche solo su `main`.
 
 ### 9. Test end-to-end e dispositivi
 
@@ -140,11 +145,14 @@ e nessuno controlla i duplicati. Prima di aprire ad altre città:
 Il feed ordinato per data di consumo invece che di pubblicazione resta
 rimandato finché l'uso reale non lo giustifica.
 
-### 13. Piccole pulizie
+### 13. Piccole pulizie (fatto)
 
-- `UserSettings.reducedMotion` non è usato: l'app segue l'impostazione di
-  sistema. Rimuoverlo o esporlo in Impostazioni.
-- L'alto contrasto è salvato solo sul dispositivo. Sincronizzarlo tra
-  dispositivi richiede un campo in `UserSettings`.
-- Flutter web disabilita lo zoom a pizzico del browser; da valutare per chi
-  ingrandisce la pagina invece del testo.
+- `UserSettings.reducedMotion` è stato rimosso: l'app segue l'impostazione di
+  sistema. Le regole Firestore accettano ancora `reduced_motion` per i client
+  della beta 1.0.0+2; la chiave si può togliere quando nessuno li usa più.
+- L'alto contrasto resta salvato solo sul dispositivo. Sincronizzarlo richiede
+  un campo in `UserSettings` e la stessa logica di identità del tema: da fare
+  solo se qualcuno lo chiede.
+- Lo zoom a pizzico sul web resta disabilitato da Flutter, che sostituisce il
+  tag viewport di `web/index.html`. Nessuna modifica: da rivalutare se arrivano
+  segnalazioni.

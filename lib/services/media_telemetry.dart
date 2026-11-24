@@ -10,7 +10,11 @@ import 'storage_service.dart';
 enum MediaFailureKind {
   load('media_load'),
   decode('media_decode'),
-  upload('photo_upload');
+  upload('photo_upload'),
+
+  /// Not a media failure: uncaught errors on the web, where Crashlytics is
+  /// unavailable. Shares the dedupe and session cap. See `crash_reporting.dart`.
+  uncaught('uncaught_error');
 
   const MediaFailureKind(this.wireName);
 

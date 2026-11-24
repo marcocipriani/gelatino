@@ -39,6 +39,10 @@ test('client failure reports accept only the bounded shape', () => {
     parseClientFailureReport({kind: 'media_load', code: 'unauthorized', platform: 'web'}),
     {kind: 'media_load', code: 'unauthorized', platform: 'web'},
   );
+  assert.equal(
+    parseClientFailureReport({kind: 'uncaught_error', code: 'unknown', platform: 'web'}).kind,
+    'uncaught_error',
+  );
   for (const bad of [
     null,
     {kind: 'other', code: 'x', platform: 'web'},

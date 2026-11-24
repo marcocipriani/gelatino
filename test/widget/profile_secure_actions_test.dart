@@ -508,7 +508,6 @@ final class _FakeUser implements User {
 UserSettings _settings() => const UserSettings(
   themeMode: 'light',
   defaultCollectionView: 'list',
-  reducedMotion: false,
   notificationsEnabled: true,
   profileVisibility: 'private',
   searchable: false,

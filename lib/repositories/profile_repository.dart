@@ -248,7 +248,6 @@ final class ProfileRepositoryImpl implements ProfileRepository {
       'searchable': false,
       'theme_mode': 'system',
       'default_collection_view': 'list',
-      'reduced_motion': false,
       'notifications_enabled': true,
       'points': 0,
     });

@@ -114,7 +114,6 @@ void main() {
 const _privateSettings = UserSettings(
   themeMode: 'system',
   defaultCollectionView: 'list',
-  reducedMotion: false,
   notificationsEnabled: true,
   profileVisibility: 'private',
   searchable: false,
