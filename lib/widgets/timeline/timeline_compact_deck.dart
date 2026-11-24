@@ -545,7 +545,7 @@ final class _DeckPaginationError extends StatelessWidget {
         TextButton(
           key: const ValueKey<String>('timeline-retry-page'),
           onPressed: () => unawaited(onRetry()),
-          child: const Text(AppStrings.retry),
+          child: Text(AppStrings.retry),
         ),
       ],
     ),

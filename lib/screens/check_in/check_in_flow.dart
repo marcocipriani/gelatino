@@ -65,16 +65,16 @@ typedef _CheckInLifecycleSnapshot = ({
 });
 
 final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
-  static const _missingPlaceFields = AppStrings.checkInMissingPlace;
-  static const _missingType = AppStrings.checkInMissingType;
-  static const _invalidFlavors = AppStrings.checkInInvalidFlavors;
-  static const _missingRating = AppStrings.checkInInvalidRating;
-  static const _invalidPlaceLocation = AppStrings.checkInPlaceNoLocation;
-  static const _photoUploadFailure = AppStrings.checkInPhotoInterrupted;
-  static const _flavorCreationFailure = AppStrings.checkInFlavorCreateFailed;
-  static const _labelLoadFailureMessage = AppStrings.checkInLabelsRestoreFailed;
-  static const _unresolvedLabelsMessage = AppStrings.checkInLabelsUnavailable;
-  static const _friendsVerificationMessage =
+  static final _missingPlaceFields = AppStrings.checkInMissingPlace;
+  static final _missingType = AppStrings.checkInMissingType;
+  static final _invalidFlavors = AppStrings.checkInInvalidFlavors;
+  static final _missingRating = AppStrings.checkInInvalidRating;
+  static final _invalidPlaceLocation = AppStrings.checkInPlaceNoLocation;
+  static final _photoUploadFailure = AppStrings.checkInPhotoInterrupted;
+  static final _flavorCreationFailure = AppStrings.checkInFlavorCreateFailed;
+  static final _labelLoadFailureMessage = AppStrings.checkInLabelsRestoreFailed;
+  static final _unresolvedLabelsMessage = AppStrings.checkInLabelsUnavailable;
+  static final _friendsVerificationMessage =
       AppStrings.checkInAwaitFriendsVerify;
 
   final _placeNameController = TextEditingController();
@@ -538,7 +538,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
     _clearLocalErrorIf(
       _placeNameController.text.trim().isNotEmpty &&
           _addressController.text.trim().isNotEmpty,
-      const <String>[_missingPlaceFields],
+      <String>[_missingPlaceFields],
     );
     await _ignorePersistence(
       lifecycle.controller.setPendingPlace(
@@ -846,7 +846,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
       if (_rememberLabel(_flavorNames, flavor.id, flavor.name)) {
         _scheduleLabelSave();
       }
-      _clearLocalErrorIf(true, const <String>[_flavorCreationFailure]);
+      _clearLocalErrorIf(true, <String>[_flavorCreationFailure]);
       return flavor;
     } catch (_) {
       if (_isSnapshotCurrent(lifecycle)) {
@@ -864,7 +864,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
     final failure = ref.read(checkInFlowProvider(lifecycle.uid)).failure;
     _clearLocalErrorIf(
       failure?.kind != CheckInFlowFailureKind.photo,
-      const <String>[_photoUploadFailure],
+      <String>[_photoUploadFailure],
     );
   }
 
@@ -1245,7 +1245,7 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
         reviewController: _reviewController,
         enabled: !flow.isEditorLocked,
         onRatingChanged: (rating) {
-          _clearLocalErrorIf(true, const <String>[_missingRating]);
+          _clearLocalErrorIf(true, <String>[_missingRating]);
           _persistCurrentMutation((controller) => controller.setRating(rating));
         },
         onReviewChanged: (review) {
@@ -1345,13 +1345,13 @@ final class _CheckInFlowState extends ConsumerState<CheckInFlow> {
           : null,
       enabled: !flow.isEditorLocked,
       onTypeSelected: (type) {
-        _clearLocalErrorIf(true, const <String>[_missingType]);
+        _clearLocalErrorIf(true, <String>[_missingType]);
         _persistCurrentMutation(
           (controller) => controller.setGelatoType(type.id),
         );
       },
       onFlavorsChanged: (ids) {
-        _clearLocalErrorIf(ids.isNotEmpty && ids.length <= 4, const <String>[
+        _clearLocalErrorIf(ids.isNotEmpty && ids.length <= 4, <String>[
           _invalidFlavors,
           AppStrings.checkInMaxFlavors,
         ]);

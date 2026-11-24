@@ -7,6 +7,7 @@ import '../models/place_state.dart';
 import '../repositories/place_repository.dart';
 import '../repositories/place_state_repository.dart';
 import 'auth_provider.dart';
+import '../constants/app_strings.dart';
 
 final placeDataSourceProvider = Provider<PlaceDataSource>((ref) {
   return FirestorePlaceDataSource(ref.watch(firestoreProvider));
@@ -442,12 +443,13 @@ final class PlaceStateController
       left.note == right.note &&
       left.updatedAt == right.updatedAt;
 
-  String _failureMessage(PlaceStateField field) => switch (field) {
-    PlaceStateField.saved => 'Impossibile aggiornare le gelaterie salvate.',
-    PlaceStateField.favorite =>
-      'Impossibile aggiornare la gelateria preferita.',
-    PlaceStateField.liked => 'Impossibile aggiornare il Mi piace.',
-  };
+  String _failureMessage(PlaceStateField field) =>
+      AppStrings.translated(switch (field) {
+        PlaceStateField.saved => 'Impossibile aggiornare le gelaterie salvate.',
+        PlaceStateField.favorite =>
+          'Impossibile aggiornare la gelateria preferita.',
+        PlaceStateField.liked => 'Impossibile aggiornare il Mi piace.',
+      });
 }
 
 final class _UnauthenticatedPlaceStateCause {

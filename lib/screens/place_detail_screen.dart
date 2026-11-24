@@ -49,7 +49,7 @@ class PlaceDetailScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const AppBackButton(fallback: '/places'),
-        title: const Text(AppStrings.placeDetailTitle),
+        title: Text(AppStrings.placeDetailTitle),
         actions: [ReportButton(target: ReportTarget.place, targetId: placeId)],
       ),
       body: catalog.when(
@@ -328,13 +328,13 @@ final class _AggregateRow extends StatelessWidget {
           child: TextButton.icon(
             onPressed: onRetry,
             icon: const Icon(CupertinoIcons.refresh),
-            label: const Text(AppStrings.placeDetailRetryRatings),
+            label: Text(AppStrings.placeDetailRetryRatings),
           ),
         ),
         data: (value) {
           final count = value?.checkInCount ?? 0;
           if (value == null || count == 0) {
-            return const Row(
+            return Row(
               children: <Widget>[
                 Icon(CupertinoIcons.star),
                 SizedBox(width: AppSpacing.xs),
@@ -364,7 +364,7 @@ final class _AggregateRow extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
               const SizedBox(width: AppSpacing.xxs),
-              const Text(AppStrings.placeDetailVisits),
+              Text(AppStrings.placeDetailVisits),
             ],
           );
         },
@@ -518,7 +518,7 @@ final class _StateActionWithFailure extends StatelessWidget {
               key: errorKey,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
-            TextButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
+            TextButton(onPressed: onRetry, child: Text(AppStrings.retry)),
           ],
         ],
       ),
@@ -549,7 +549,7 @@ final class _NavigationActions extends StatelessWidget {
             ).toString(),
           ),
           icon: const Icon(CupertinoIcons.plus_circle_fill),
-          label: const Text(AppStrings.placeCheckinButton),
+          label: Text(AppStrings.placeCheckinButton),
         ),
         OutlinedButton.icon(
           key: const ValueKey<String>('place-maps-action'),
@@ -558,7 +558,7 @@ final class _NavigationActions extends StatelessWidget {
           ),
           onPressed: () => unawaited(_openMap(context, place)),
           icon: const Icon(CupertinoIcons.map),
-          label: const Text(AppStrings.placeOpenInMaps),
+          label: Text(AppStrings.placeOpenInMaps),
         ),
       ],
     );
@@ -572,7 +572,7 @@ final class _NavigationActions extends StatelessWidget {
     if (!launched && context.mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppStrings.placeMapsError)));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.placeMapsError)));
     }
   }
 }

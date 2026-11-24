@@ -32,13 +32,13 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   Widget build(BuildContext context) {
     final targetUid = widget.userId;
     if (!_validUid(targetUid)) {
-      return const _InviteScaffold(
+      return _InviteScaffold(
         child: _InviteMessage(AppStrings.inviteLinkInvalid),
       );
     }
     final currentUid = ref.watch(currentUidProvider);
     if (targetUid == currentUid) {
-      return const _InviteScaffold(
+      return _InviteScaffold(
         child: _InviteMessage(AppStrings.inviteSelf),
       );
     }
@@ -47,9 +47,9 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     return _InviteScaffold(
       child: profile.when(
         loading: () => const CircularProgressIndicator(),
-        error: (_, _) => const _InviteMessage(AppStrings.inviteProfileInaccessible),
+        error: (_, _) => _InviteMessage(AppStrings.inviteProfileInaccessible),
         data: (value) => value == null
-            ? const _InviteMessage(AppStrings.inviteProfileNotFound)
+            ? _InviteMessage(AppStrings.inviteProfileNotFound)
             : _buildProfile(value, currentUid),
       ),
     );
@@ -57,11 +57,11 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
   Widget _buildProfile(PublicProfile profile, String? currentUid) {
     if (currentUid == null) {
-      return const _InviteMessage(AppStrings.inviteLoginToContinue);
+      return _InviteMessage(AppStrings.inviteLoginToContinue);
     }
     final relationships = ref.watch(friendshipsProvider);
     return relationships.when(
-      loading: () => const Column(
+      loading: () => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           CircularProgressIndicator(),
@@ -69,7 +69,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           Text(AppStrings.inviteCheckingFriendship),
         ],
       ),
-      error: (_, _) => const _InviteMessage(
+      error: (_, _) => _InviteMessage(
         AppStrings.inviteVerifyError,
       ),
       data: (values) {
@@ -122,22 +122,22 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                           profile.uid,
                           acceptReverse: reversePending,
                         ),
-                  child: const Text(AppStrings.retry),
+                  child: Text(AppStrings.retry),
                 ),
               ] else if (_completed && _accepted) ...[
-                const Text(AppStrings.inviteNowFriends),
+                Text(AppStrings.inviteNowFriends),
                 const SizedBox(height: 12),
                 _profileButton(profile.uid),
               ] else if (accepted) ...[
-                const Text(AppStrings.inviteAlreadyFriends),
+                Text(AppStrings.inviteAlreadyFriends),
                 const SizedBox(height: 12),
                 _profileButton(profile.uid),
               ] else if (_completed) ...[
-                const Text(AppStrings.inviteRequestSent),
+                Text(AppStrings.inviteRequestSent),
                 const SizedBox(height: 12),
                 _profileButton(profile.uid),
               ] else if (outgoingPending) ...[
-                const Text(AppStrings.inviteRequestPending),
+                Text(AppStrings.inviteRequestPending),
                 const SizedBox(height: 12),
                 _profileButton(profile.uid),
               ] else if (reversePending) ...[
@@ -154,7 +154,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(CupertinoIcons.person_add_solid),
-                  label: const Text(AppStrings.inviteAcceptRequest),
+                  label: Text(AppStrings.inviteAcceptRequest),
                 ),
               ] else
                 FilledButton.icon(
@@ -168,7 +168,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(CupertinoIcons.person_add_solid),
-                  label: const Text(AppStrings.inviteSendRequest),
+                  label: Text(AppStrings.inviteSendRequest),
                 ),
             ],
           ),
@@ -185,7 +185,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         queryParameters: <String, String>{'userId': uid},
       ).toString(),
     ),
-    child: const Text(AppStrings.inviteOpenProfile),
+    child: Text(AppStrings.inviteOpenProfile),
   );
 
   Future<void> _perform(String targetUid, {required bool acceptReverse}) async {
@@ -257,7 +257,7 @@ class _InviteScaffold extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       leading: const AppBackButton(fallback: '/collection'),
-      title: const Text(AppStrings.inviteTitle),
+      title: Text(AppStrings.inviteTitle),
     ),
     body: Center(
       child: SingleChildScrollView(

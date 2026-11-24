@@ -63,7 +63,7 @@ class ProfileScreen extends ConsumerWidget {
           child: profile.when(
             data: (value) {
               if (value == null) {
-                return const Center(
+                return Center(
                   child: ProfileStatePanel(
                     title: AppStrings.profileNotFound,
                     message: AppStrings.profileNotAvailableMessage,
@@ -209,7 +209,7 @@ final class _ProfileIdentity extends StatelessWidget {
                           EditProfileDialog(profile: ownProfile),
                     ),
                     icon: const Icon(CupertinoIcons.pencil),
-                    label: const Text(AppStrings.profileEditButton),
+                    label: Text(AppStrings.profileEditButton),
                   ),
               ],
             ),
@@ -331,7 +331,7 @@ final class _ProfilePreferences extends ConsumerWidget {
       _ => null,
     };
     if (flavorIds.isEmpty && placeId == null) {
-      return const ProfileStatePanel(
+      return ProfileStatePanel(
         title: AppStrings.profilePreferencesTitle,
         message: AppStrings.profilePrefsNonePublic,
         icon: CupertinoIcons.heart,
@@ -341,7 +341,7 @@ final class _ProfilePreferences extends ConsumerWidget {
     final flavors = ref.watch(flavorsProvider);
     final places = ref.watch(placesProvider);
     if (flavors.hasError || places.hasError) {
-      return const ProfileStatePanel(
+      return ProfileStatePanel(
         title: AppStrings.profilePreferencesUnavailable,
         message: AppStrings.profilePrefsNamesUnavailable,
         icon: CupertinoIcons.heart,
@@ -368,7 +368,7 @@ final class _ProfilePreferences extends ConsumerWidget {
         .map((place) => place.name)
         .firstOrNull;
     if (flavorNames.isEmpty && placeName == null) {
-      return const ProfileStatePanel(
+      return ProfileStatePanel(
         title: AppStrings.profilePreferencesUpdating,
         message: AppStrings.profilePrefsNamesPending,
         icon: CupertinoIcons.arrow_2_circlepath,
@@ -486,7 +486,7 @@ final class _OwnerSavedPlaces extends ConsumerWidget {
           const SizedBox(height: AppSpacing.md),
           savedPlaces.when(
             data: (places) => places.isEmpty
-                ? const Text(AppStrings.profileWishlistEmpty)
+                ? Text(AppStrings.profileWishlistEmpty)
                 : Column(
                     children: [
                       for (final place in places)
@@ -518,13 +518,13 @@ final class _OwnerSavedPlaces extends ConsumerWidget {
                 key: const ValueKey('profile-open-wishlist'),
                 onPressed: () => context.push('/wishlist'),
                 icon: const Icon(CupertinoIcons.bookmark),
-                label: const Text(AppStrings.profileSeeAll),
+                label: Text(AppStrings.profileSeeAll),
               ),
               OutlinedButton.icon(
                 key: const ValueKey('profile-open-favorite-flavors'),
                 onPressed: () => context.push('/favorite-flavors'),
                 icon: const Icon(CupertinoIcons.heart),
-                label: const Text(AppStrings.profileManageFlavors),
+                label: Text(AppStrings.profileManageFlavors),
               ),
             ],
           ),
@@ -583,7 +583,7 @@ class _ProfileRecentActivityListState
         .take(5)
         .toList(growable: false);
     if (items.isEmpty) {
-      return const Text(AppStrings.profileNoCheckInsPage);
+      return Text(AppStrings.profileNoCheckInsPage);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -651,7 +651,7 @@ class _ProfileRecentActivityListState
               TextButton(
                 key: ValueKey<String>('profile-delete-retry-$id'),
                 onPressed: isPending ? null : () => _delete(item),
-                child: const Text(AppStrings.retry),
+                child: Text(AppStrings.retry),
               ),
             ],
           ),

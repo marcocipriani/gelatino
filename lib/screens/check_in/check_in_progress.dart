@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_strings.dart';
 import '../../design/motion.dart';
 
-const checkInStepLabels = AppStrings.checkInStepLabels;
+final checkInStepLabels = AppStrings.checkInStepLabels;
 
 final class CheckInProgress extends StatelessWidget {
   const CheckInProgress({required this.currentStep, super.key});

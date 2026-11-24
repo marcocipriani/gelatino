@@ -34,7 +34,7 @@ final class PlaceSearchBar extends StatelessWidget {
               onChanged('');
               focusNode.unfocus();
             },
-            child: const Text(AppStrings.cancel, maxLines: 1),
+            child: Text(AppStrings.cancel, maxLines: 1),
           )
         : trailing;
     return Row(

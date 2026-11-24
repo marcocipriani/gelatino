@@ -12,7 +12,7 @@ final class CheckInUnresolvedLabelsNotice extends StatelessWidget {
   const CheckInUnresolvedLabelsNotice({super.key});
 
   @override
-  Widget build(BuildContext context) => const Card(
+  Widget build(BuildContext context) => Card(
     key: ValueKey<String>('check-in-page-4'),
     margin: EdgeInsets.zero,
     child: Padding(
@@ -41,11 +41,11 @@ final class CheckInLabelRecoveryActions extends StatelessWidget {
     children: <Widget>[
       OutlinedButton(
         onPressed: busy ? null : onRetry,
-        child: const Text(AppStrings.checkInRetryLabels),
+        child: Text(AppStrings.checkInRetryLabels),
       ),
       TextButton(
         onPressed: busy ? null : onRebuild,
-        child: const Text(AppStrings.checkInRebuildCache),
+        child: Text(AppStrings.checkInRebuildCache),
       ),
     ],
   );
@@ -138,7 +138,7 @@ final class CheckInPublishedRecovery extends StatelessWidget {
                               dimension: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text(AppStrings.checkInCompleteCleanup),
+                          : Text(AppStrings.checkInCompleteCleanup),
                     ),
                   ),
                 ],

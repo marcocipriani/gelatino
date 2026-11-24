@@ -91,7 +91,7 @@ class _SavedPlaceControlState extends ConsumerState<SavedPlaceControl> {
           ),
           TextButton(
             onPressed: () => _toggle(canonical),
-            child: const Text(AppStrings.retry),
+            child: Text(AppStrings.retry),
           ),
         ],
       ],

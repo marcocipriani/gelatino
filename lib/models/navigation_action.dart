@@ -23,7 +23,7 @@ final class NavigationAction {
   bool isSelected(String location) => location == route;
 }
 
-const primaryNavigationActions = <NavigationAction>[
+final primaryNavigationActions = <NavigationAction>[
   NavigationAction(
     route: '/collection',
     label: AppStrings.navCollection,

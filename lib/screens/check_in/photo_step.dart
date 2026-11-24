@@ -80,7 +80,7 @@ final class PhotoStep extends StatelessWidget {
               height: 48,
               child: FilledButton(
                 onPressed: onRetryUpload,
-                child: const Text(AppStrings.checkInRetryUpload),
+                child: Text(AppStrings.checkInRetryUpload),
               ),
             ),
           SizedBox(
@@ -88,7 +88,7 @@ final class PhotoStep extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: onCamera,
               icon: const Icon(CupertinoIcons.camera),
-              label: const Text(AppStrings.checkInCamera),
+              label: Text(AppStrings.checkInCamera),
             ),
           ),
           SizedBox(
@@ -96,7 +96,7 @@ final class PhotoStep extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: onGallery,
               icon: const Icon(CupertinoIcons.photo_on_rectangle),
-              label: const Text(AppStrings.checkInGallery),
+              label: Text(AppStrings.checkInGallery),
             ),
           ),
           if (e2eControlsEnabled)
@@ -107,7 +107,7 @@ final class PhotoStep extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: onRemove,
                 icon: const Icon(CupertinoIcons.trash),
-                label: const Text(AppStrings.remove),
+                label: Text(AppStrings.remove),
               ),
             ),
         ],
@@ -116,7 +116,7 @@ final class PhotoStep extends StatelessWidget {
       if (isUploading && uploadProgress != null)
         _UploadProgress(fraction: uploadProgress!)
       else if (isUploading)
-        const Row(
+        Row(
           children: <Widget>[
             SizedBox.square(
               dimension: 18,
@@ -127,18 +127,18 @@ final class PhotoStep extends StatelessWidget {
           ],
         )
       else if (uploadFailed)
-        const Text(AppStrings.checkInUploadInterrupted)
+        Text(AppStrings.checkInUploadInterrupted)
       else if (photoMissing)
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           spacing: 8,
           children: <Widget>[
-            const Text(AppStrings.checkInPrivatePhotoNotFound),
-            TextButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
+            Text(AppStrings.checkInPrivatePhotoNotFound),
+            TextButton(onPressed: onRetry, child: Text(AppStrings.retry)),
           ],
         )
       else if (hasStagedPhoto)
-        const Row(
+        Row(
           children: <Widget>[
             Icon(CupertinoIcons.lock, size: 18),
             SizedBox(width: 8),

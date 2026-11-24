@@ -34,7 +34,7 @@ final class ExperienceStep extends StatelessWidget {
     key: const ValueKey<String>('check-in-page-3'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const Text(
+      Text(
         AppStrings.checkInRatingTitle,
         style: TextStyle(fontWeight: FontWeight.w800),
       ),
@@ -87,14 +87,14 @@ final class ExperienceStep extends StatelessWidget {
         inputFormatters: <TextInputFormatter>[
           LengthLimitingTextInputFormatter(500),
         ],
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           labelText: AppStrings.checkInNoteLabel,
           alignLabelWithHint: true,
         ),
         onChanged: onReviewChanged,
       ),
       const SizedBox(height: 16),
-      const Text(
+      Text(
         AppStrings.checkInWhenTitle,
         style: TextStyle(fontWeight: FontWeight.w800),
       ),
@@ -191,7 +191,7 @@ final class ExperienceStep extends StatelessWidget {
                 child: TextButton(
                   key: const ValueKey('check-in-consumed-at-done'),
                   onPressed: () => Navigator.pop(sheetContext, true),
-                  child: const Text(AppStrings.done),
+                  child: Text(AppStrings.done),
                 ),
               ),
               SizedBox(

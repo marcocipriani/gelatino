@@ -83,7 +83,7 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
                   controller: _nameController,
                   enabled: !_submitting,
                   textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: AppStrings.addPlaceNameLabel,
                   ),
                   validator: (value) => value == null || value.trim().isEmpty
@@ -95,7 +95,7 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
                   controller: _addressController,
                   enabled: !_submitting,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: AppStrings.addPlaceAddressLabel,
                   ),
                   validator: (value) => value == null || value.trim().isEmpty
@@ -157,25 +157,25 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
           onPressed: _submitting
               ? null
               : () => setState(() => _choosingOnMap = false),
-          child: const Text(AppStrings.back),
+          child: Text(AppStrings.back),
         ),
         FilledButton(
           onPressed: _submitting || _selectedCoordinate == null
               ? null
               : () => _submitAt(_selectedCoordinate!),
-          child: const Text(AppStrings.addPlaceConfirmPoint),
+          child: Text(AppStrings.addPlaceConfirmPoint),
         ),
       ];
     }
     return <Widget>[
       TextButton(
         onPressed: _submitting ? null : () => Navigator.pop(context),
-        child: const Text(AppStrings.cancel),
+        child: Text(AppStrings.cancel),
       ),
       if (_failure != null) ...<Widget>[
         FilledButton(
           onPressed: _submitting ? null : _useGps,
-          child: const Text(AppStrings.addPlaceRetryLocation),
+          child: Text(AppStrings.addPlaceRetryLocation),
         ),
         OutlinedButton(
           onPressed: _submitting
@@ -184,13 +184,13 @@ final class _AddPlaceDialogState extends ConsumerState<AddPlaceDialog> {
                   _choosingOnMap = true;
                   _failure = null;
                 }),
-          child: const Text(AppStrings.chooseOnMap),
+          child: Text(AppStrings.chooseOnMap),
         ),
       ] else
         FilledButton.icon(
           onPressed: _submitting ? null : _useGps,
           icon: const Icon(CupertinoIcons.location_fill),
-          label: const Text(AppStrings.useLocation),
+          label: Text(AppStrings.useLocation),
         ),
     ];
   }

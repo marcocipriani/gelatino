@@ -144,7 +144,7 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
               const SizedBox(height: AppSpacing.md),
               FilledButton(
                 onPressed: () => ref.invalidate(flavorsProvider),
-                child: const Text(AppStrings.retry),
+                child: Text(AppStrings.retry),
               ),
             ],
           ),
@@ -236,7 +236,7 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
       button: true,
       selected: isFav,
       customSemanticsActions: <CustomSemanticsAction, VoidCallback>{
-        const CustomSemanticsAction(label: AppStrings.reportTooltip): () =>
+        CustomSemanticsAction(label: AppStrings.reportTooltip): () =>
             showReportSheet(context, ref, ReportTarget.flavor, flavor.id),
       },
       enabled: onTap != null,
@@ -297,14 +297,14 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
       AppSegmented<String>(
         value: _sort,
         onChanged: (value) => setState(() => _sort = value),
-        segments: const {
+        segments: {
           'az': AppStrings.flavorSortAZ,
           'favorites': AppStrings.flavorSortFavorites,
         },
       ),
       const SizedBox(height: AppSpacing.xs),
       FilterChip(
-        label: const Text(AppStrings.flavorFavorites),
+        label: Text(AppStrings.flavorFavorites),
         showCheckmark: false,
         avatar: Icon(
           _onlyFavorites ? CupertinoIcons.star_fill : CupertinoIcons.star,
@@ -332,7 +332,7 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
               Expanded(
                 child: TextField(
                   controller: _newCtrl,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: AppStrings.flavorCreateHint,
                     hintMaxLines: 1,
                   ),
@@ -535,7 +535,7 @@ final class _FlavorSelectionFieldState extends State<FlavorSelectionField> {
         TextField(
           controller: _searchController,
           enabled: widget.enabled,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: AppStrings.flavorSearchLabel,
             prefixIcon: Icon(CupertinoIcons.search),
             border: OutlineInputBorder(),
@@ -544,7 +544,7 @@ final class _FlavorSelectionFieldState extends State<FlavorSelectionField> {
         ),
         const SizedBox(height: 10),
         if (visible.isEmpty)
-          const Text(AppStrings.flavorNoneFound)
+          Text(AppStrings.flavorNoneFound)
         else
           Wrap(
             spacing: 8,
@@ -573,7 +573,7 @@ final class _FlavorSelectionFieldState extends State<FlavorSelectionField> {
               child: TextField(
                 controller: _newController,
                 enabled: widget.enabled && !_creating,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppStrings.flavorNewLabel,
                   border: OutlineInputBorder(),
                 ),

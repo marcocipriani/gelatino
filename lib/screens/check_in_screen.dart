@@ -26,7 +26,7 @@ final class CheckInScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uid = ref.watch(currentUidProvider);
     if (uid == null) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(child: Text(AppStrings.checkInLoginRequired)),
       );
     }

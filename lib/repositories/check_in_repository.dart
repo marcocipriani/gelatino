@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 
 import '../models/check_in_draft.dart';
+import '../constants/app_strings.dart';
 
 enum PublishCheckInStatus { created, existing }
 
@@ -141,9 +142,10 @@ PublishCheckInResult _parseResult(Object? value, String expectedId) {
 }
 
 sealed class CheckInFailure implements Exception {
-  const CheckInFailure(this.message);
+  const CheckInFailure(this._message);
 
-  final String message;
+  final String _message;
+  String get message => AppStrings.translated(_message);
 
   @override
   String toString() => message;

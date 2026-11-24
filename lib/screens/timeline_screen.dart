@@ -316,7 +316,7 @@ final class _TimelineFailure extends StatelessWidget {
           FilledButton.tonal(
             key: const ValueKey<String>('timeline-retry'),
             onPressed: () => unawaited(onRetry()),
-            child: const Text(AppStrings.retry),
+            child: Text(AppStrings.retry),
           ),
         ],
       ),
@@ -342,7 +342,7 @@ final class _PaginationFooter extends StatelessWidget {
           TextButton(
             key: const ValueKey<String>('timeline-retry-page'),
             onPressed: () => unawaited(onLoadMore()),
-            child: const Text(AppStrings.retry),
+            child: Text(AppStrings.retry),
           ),
         ],
       );
@@ -352,7 +352,7 @@ final class _PaginationFooter extends StatelessWidget {
       child: TextButton(
         key: const ValueKey<String>('timeline-load-more'),
         onPressed: () => unawaited(onLoadMore()),
-        child: const Text(AppStrings.timelineLoadMore),
+        child: Text(AppStrings.timelineLoadMore),
       ),
     );
   }

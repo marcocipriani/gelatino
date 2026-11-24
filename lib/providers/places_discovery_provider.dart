@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../constants/app_strings.dart';
 import '../models/place.dart';
 import '../utils/search_text.dart';
 import 'auth_provider.dart';
@@ -7,15 +8,17 @@ import 'flavor_search_provider.dart';
 import 'place_providers.dart';
 
 enum PlacesFilter {
-  all('Tutte'),
-  liked('Mi piace'),
-  favorites('Preferite'),
-  saved('Salvate'),
-  addedByMe('Aggiunte da me');
+  all('Tutte', 'All'),
+  liked('Mi piace', 'Liked'),
+  favorites('Preferite', 'Favourites'),
+  saved('Salvate', 'Saved'),
+  addedByMe('Aggiunte da me', 'Added by me');
 
-  const PlacesFilter(this.label);
+  const PlacesFilter(this._it, this._en);
 
-  final String label;
+  final String _it;
+  final String _en;
+  String get label => AppStrings.pick(_it, _en);
 }
 
 enum PlacesViewMode { list, map }

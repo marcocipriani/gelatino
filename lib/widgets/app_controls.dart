@@ -168,7 +168,7 @@ Future<bool> showAppConfirmation(
             ? [
                 CupertinoDialogAction(
                   onPressed: () => close(false),
-                  child: const Text(AppStrings.cancel),
+                  child: Text(AppStrings.cancel),
                 ),
                 CupertinoDialogAction(
                   key: confirmKey,
@@ -182,7 +182,7 @@ Future<bool> showAppConfirmation(
             : [
                 TextButton(
                   onPressed: () => close(false),
-                  child: const Text(AppStrings.cancel),
+                  child: Text(AppStrings.cancel),
                 ),
                 FilledButton(
                   key: confirmKey,

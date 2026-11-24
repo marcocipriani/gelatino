@@ -276,7 +276,7 @@ final class _ShareCheckInPreviewDialogState
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.shareCardFailed)),
+          SnackBar(content: Text(AppStrings.shareCardFailed)),
         );
       }
     } finally {
@@ -333,7 +333,7 @@ final class _ShareCheckInPreviewDialogState
                   onPressed: _sharing
                       ? null
                       : () => Navigator.of(context).pop(),
-                  child: const Text(AppStrings.cancel),
+                  child: Text(AppStrings.cancel),
                 ),
                 FilledButton(
                   onPressed: _sharing ? null : _share,
@@ -348,7 +348,7 @@ final class _ShareCheckInPreviewDialogState
                             color: AppTheme.fondenteExtra,
                           ),
                         )
-                      : const Text(AppStrings.shareCardPreviewConfirm),
+                      : Text(AppStrings.shareCardPreviewConfirm),
                 ),
               ],
             ),

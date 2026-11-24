@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/firestore_parsing.dart';
 import '../models/gelato_invite.dart';
 import 'friendship_repository.dart';
+import '../constants/app_strings.dart';
 
 final class InviteDocument {
   const InviteDocument({required this.id, required this.data});
@@ -249,9 +250,10 @@ final class GelatoInviteRepositoryImpl implements GelatoInviteRepository {
 }
 
 sealed class GelatoInviteFailure implements Exception {
-  const GelatoInviteFailure(this.message);
+  const GelatoInviteFailure(this._message);
 
-  final String message;
+  final String _message;
+  String get message => AppStrings.translated(_message);
 
   @override
   String toString() => message;

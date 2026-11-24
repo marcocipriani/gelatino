@@ -19,7 +19,7 @@ final class PlaceActionBar extends StatelessWidget {
     key: const ValueKey<String>('places-view-toggle'),
     value: mode,
     onChanged: onChanged,
-    segments: const {
+    segments: {
       PlacesViewMode.list: AppStrings.placeActionList,
       PlacesViewMode.map: AppStrings.placeActionMap,
     },

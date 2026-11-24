@@ -153,12 +153,12 @@ class _PlacePickerSheetState extends State<_PlacePickerSheet> {
                       iconColor: colors.accentInk,
                       textColor: colors.accentInk,
                       leading: const Icon(CupertinoIcons.plus_circle_fill),
-                      title: const Text(AppStrings.checkInAddNewPlace),
+                      title: Text(AppStrings.checkInAddNewPlace),
                       onTap: () => Navigator.pop(context, widget.newPlaceValue),
                     ),
                     const Divider(),
                     if (_results.isEmpty)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.all(AppSpacing.lg),
                         child: Text(
                           AppStrings.checkInPlaceNoMatch,

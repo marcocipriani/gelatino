@@ -86,7 +86,7 @@ final class PlaceStep extends StatelessWidget {
             controller: nameController,
             enabled: enabled,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: AppStrings.checkInNewPlaceLabel,
             ),
             onChanged: (_) => onInputChanged(),
@@ -97,7 +97,7 @@ final class PlaceStep extends StatelessWidget {
             controller: addressController,
             enabled: enabled,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: AppStrings.checkInAddressFieldLabel,
             ),
             onChanged: (_) => onInputChanged(),
@@ -119,7 +119,7 @@ final class PlaceStep extends StatelessWidget {
                 child: FilledButton.tonalIcon(
                   onPressed: enabled ? onUseGps : null,
                   icon: const Icon(CupertinoIcons.location_fill),
-                  label: const Text(AppStrings.useLocation),
+                  label: Text(AppStrings.useLocation),
                 ),
               ),
               SizedBox(
@@ -127,7 +127,7 @@ final class PlaceStep extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: enabled ? onShowMap : null,
                   icon: const Icon(CupertinoIcons.map),
-                  label: const Text(AppStrings.chooseOnMap),
+                  label: Text(AppStrings.chooseOnMap),
                 ),
               ),
             ],

@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import '../constants/app_strings.dart';
 
 class ErrorHandler {
   /// Converte un'eccezione tecnica in un messaggio amichevole per l'utente in italiano.
-  static String getReadableError(dynamic error) {
+  static String getReadableError(dynamic error) =>
+      AppStrings.translated(_italian(error));
+
+  static String _italian(dynamic error) {
     if (error == null) return 'Errore sconosciuto';
 
     final String message = error.toString();
@@ -29,7 +33,10 @@ class ErrorHandler {
         case 'invalid-credential':
           return 'Credenziali non valide o scadute.';
         default:
-          return 'Errore Firebase (${error.code}): ${error.message ?? error.toString()}';
+          return AppStrings.pick(
+            'Errore Firebase (${error.code}): ${error.message ?? error.toString()}',
+            'Firebase error (${error.code}): ${error.message ?? error.toString()}',
+          );
       }
     }
 
@@ -50,7 +57,7 @@ class ErrorHandler {
       return 'Devi prima effettuare l\'accesso con Google!';
     }
 
-    return 'Errore: $message';
+    return AppStrings.pick('Errore: $message', 'Error: $message');
   }
 
   /// Mostra un Toast di errore fluttuante personalizzato nello stile Creamy Flat dell'app.

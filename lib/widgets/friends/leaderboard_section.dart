@@ -67,7 +67,7 @@ class _PeriodToggle extends StatelessWidget {
       key: const ValueKey('leaderboard-period-toggle'),
       value: period,
       onChanged: onChanged,
-      segments: const {
+      segments: {
         LeaderboardPeriod.month: AppStrings.leaderboardPeriodMonth,
         LeaderboardPeriod.allTime: AppStrings.leaderboardPeriodAll,
       },

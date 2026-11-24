@@ -140,7 +140,7 @@ class _BrandContent extends StatelessWidget {
                       )
                     : const Icon(CupertinoIcons.square_arrow_right, size: 20),
               ),
-              label: const Text(AppStrings.loginButton),
+              label: Text(AppStrings.loginButton),
             ),
           ),
         ),

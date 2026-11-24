@@ -219,8 +219,8 @@ class _FavoriteFlavorsSection extends StatelessWidget {
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
           child: const Icon(Icons.icecream_outlined),
         ),
-        title: const Text(AppStrings.collectionFavoriteFlavorsTitle),
-        subtitle: const Text(AppStrings.collectionFavoriteFlavorsSubtitle),
+        title: Text(AppStrings.collectionFavoriteFlavorsTitle),
+        subtitle: Text(AppStrings.collectionFavoriteFlavorsSubtitle),
         trailing: const Icon(CupertinoIcons.chevron_forward),
         onTap: onOpen,
       ),
@@ -242,7 +242,7 @@ class _EmptyCollection extends StatelessWidget {
       action: FilledButton.icon(
         onPressed: onExplore,
         icon: const Icon(CupertinoIcons.compass),
-        label: const Text(AppStrings.collectionExploreButton),
+        label: Text(AppStrings.collectionExploreButton),
       ),
     );
   }
@@ -263,7 +263,7 @@ class _CollectionError extends StatelessWidget {
       action: TextButton.icon(
         onPressed: onRetry,
         icon: const Icon(CupertinoIcons.refresh),
-        label: const Text(AppStrings.retry),
+        label: Text(AppStrings.retry),
       ),
     );
   }
@@ -280,7 +280,7 @@ class _UnauthenticatedCollection extends StatelessWidget {
       icon: CupertinoIcons.lock,
       title: AppStrings.collectionUnauthTitle,
       description: AppStrings.collectionUnauthDesc,
-      action: FilledButton(onPressed: onLogin, child: const Text(AppStrings.login)),
+      action: FilledButton(onPressed: onLogin, child: Text(AppStrings.login)),
     );
   }
 }

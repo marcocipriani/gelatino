@@ -12,13 +12,13 @@ final class FriendsRemotePersonCard extends ConsumerWidget {
     required this.fallbackTitle,
     required this.actions,
     required this.onOpen,
-    this.subtitle = AppStrings.profileGelatinoFallback,
+    this.subtitle,
     this.failure,
   });
 
   final String uid;
   final String fallbackTitle;
-  final String subtitle;
+  final String? subtitle;
   final List<Widget> actions;
   final VoidCallback onOpen;
   final Widget? failure;
@@ -31,7 +31,7 @@ final class FriendsRemotePersonCard extends ConsumerWidget {
           data: (profile) => FriendsPersonCard(
             uid: uid,
             name: profile?.displayName ?? fallbackTitle,
-            subtitle: subtitle,
+            subtitle: subtitle ?? AppStrings.profileGelatinoFallback,
             avatarPath: profile?.avatarPath,
             actions: actions,
             onOpen: onOpen,

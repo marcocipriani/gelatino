@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import '../constants/app_strings.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -377,7 +378,7 @@ final class FriendshipRepositoryImpl implements FriendshipRepository {
 }
 
 sealed class FriendshipFailure implements Exception {
-  const FriendshipFailure(this.code, this.message);
+  const FriendshipFailure(this.code, this._message);
 
   factory FriendshipFailure.fromCode(String code) => switch (code) {
     'invalid-argument' => const InvalidFriendshipFailure(),
@@ -390,7 +391,8 @@ sealed class FriendshipFailure implements Exception {
   };
 
   final String code;
-  final String message;
+  final String _message;
+  String get message => AppStrings.translated(_message);
 
   @override
   String toString() => message;

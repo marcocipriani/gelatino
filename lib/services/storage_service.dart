@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img;
 import '../firebase/firebase_providers.dart';
+import '../constants/app_strings.dart';
 
 abstract interface class StorageObjectGateway {
   Future<String> put(String path, Uint8List bytes, SettableMetadata metadata);
@@ -223,7 +224,8 @@ final class StorageImageFailure implements Exception {
   const StorageImageFailure();
 
   @override
-  String toString() => 'La foto selezionata non è un’immagine valida.';
+  String toString() =>
+      AppStrings.translated('La foto selezionata non è un’immagine valida.');
 }
 
 class StorageService {

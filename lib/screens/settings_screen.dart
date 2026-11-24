@@ -80,7 +80,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     required String field,
     required Object value,
     required Future<void> Function(String uid) operation,
-    String failureMessage = AppStrings.settingsEditNotSaved,
+    String? failureMessage,
     bool terminalOnSuccess = false,
   }) async {
     if (_pendingFields.contains(field)) return;
@@ -114,7 +114,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (!_isCurrentField(generation, uid, field, version)) return;
       setState(() {
         _pendingFields.remove(field);
-        _fieldFailures[field] = failureMessage;
+        _fieldFailures[field] =
+            failureMessage ?? AppStrings.settingsEditNotSaved;
         _fieldRetries[field] = retry;
       });
     }
@@ -191,7 +192,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             key: ValueKey('settings-retry-$field'),
             onPressed: _pendingFields.contains(field) ? null : retry,
             icon: const Icon(CupertinoIcons.refresh),
-            label: const Text(AppStrings.retry),
+            label: Text(AppStrings.retry),
           ),
         ],
       ),
@@ -226,7 +227,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return settings.when(
       data: (value) {
         if (value == null) {
-          return const _SettingsStatePanel(
+          return _SettingsStatePanel(
             title: AppStrings.settingsNotFound,
             message: AppStrings.settingsCompleteProfile,
             icon: CupertinoIcons.settings,
@@ -296,7 +297,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           onDeleteAccount: () => unawaited(_confirmDeleteAccount()),
         );
       },
-      loading: () => const _SettingsStatePanel(
+      loading: () => _SettingsStatePanel(
         title: AppStrings.settingsLoading,
         message: AppStrings.settingsLoadingPrefs,
         icon: CupertinoIcons.arrow_2_circlepath,
@@ -533,7 +534,7 @@ final class _SettingsSections extends StatelessWidget {
                 CupertinoIcons.person,
                 AppColors.puffo,
               ),
-              title: const Text(AppStrings.settingsEditPersonal),
+              title: Text(AppStrings.settingsEditPersonal),
               subtitle: Text(editSubtitle),
               trailing: const Icon(CupertinoIcons.chevron_forward),
               enabled: owner != null,
@@ -548,7 +549,7 @@ final class _SettingsSections extends StatelessWidget {
                 CupertinoIcons.heart,
                 AppColors.fragola,
               ),
-              title: const Text(AppStrings.settingsFavoriteFlavors),
+              title: Text(AppStrings.settingsFavoriteFlavors),
               trailing: const Icon(CupertinoIcons.chevron_forward),
               onTap: onFavoriteFlavors,
             ),
@@ -558,7 +559,7 @@ final class _SettingsSections extends StatelessWidget {
                 CupertinoIcons.bookmark,
                 AppColors.menta,
               ),
-              title: const Text(AppStrings.settingsSavedPlaces),
+              title: Text(AppStrings.settingsSavedPlaces),
               trailing: const Icon(CupertinoIcons.chevron_forward),
               onTap: onSavedCollection,
             ),
@@ -575,7 +576,7 @@ final class _SettingsSections extends StatelessWidget {
                 key: const ValueKey('settings-theme'),
                 value: themeMode,
                 onChanged: themePending ? null : onThemeChanged,
-                segments: const {
+                segments: {
                   ThemeMode.system: AppStrings.settingsThemeAuto,
                   ThemeMode.light: AppStrings.settingsThemeLight,
                   ThemeMode.dark: AppStrings.settingsThemeDark,
@@ -587,8 +588,8 @@ final class _SettingsSections extends StatelessWidget {
                 key: const ValueKey('settings-high-contrast'),
                 value: ref.watch(highContrastProvider),
                 onChanged: ref.read(highContrastProvider.notifier).set,
-                title: const Text(AppStrings.settingsHighContrast),
-                subtitle: const Text(AppStrings.settingsHighContrastSubtitle),
+                title: Text(AppStrings.settingsHighContrast),
+                subtitle: Text(AppStrings.settingsHighContrastSubtitle),
                 secondary: const _SettingsIcon(
                   CupertinoIcons.circle_lefthalf_fill,
                   AppColors.puffo,
@@ -610,7 +611,7 @@ final class _SettingsSections extends StatelessWidget {
                 key: const ValueKey('settings-default-view'),
                 value: normalizedDefaultView,
                 onChanged: defaultViewPending ? null : onDefaultViewChanged,
-                segments: const {
+                segments: {
                   'list': AppStrings.settingsPlacesViewList,
                   'map': AppStrings.settingsPlacesViewMap,
                 },
@@ -631,8 +632,8 @@ final class _SettingsSections extends StatelessWidget {
               key: const ValueKey('settings-private-profile'),
               value: isPrivate,
               onChanged: privacyPending ? null : onPrivacyChanged,
-              title: const Text(AppStrings.settingsPrivateProfile),
-              subtitle: const Text(AppStrings.settingsPrivateProfileSubtitle),
+              title: Text(AppStrings.settingsPrivateProfile),
+              subtitle: Text(AppStrings.settingsPrivateProfileSubtitle),
               secondary: const _SettingsIcon(
                 CupertinoIcons.lock,
                 AppColors.sorbetto,
@@ -653,7 +654,7 @@ final class _SettingsSections extends StatelessWidget {
                 CupertinoIcons.doc_text,
                 AppColors.sorbetto,
               ),
-              title: const Text(AppStrings.settingsPrivacyPolicy),
+              title: Text(AppStrings.settingsPrivacyPolicy),
               trailing: const Icon(CupertinoIcons.arrow_up_right_square),
               onTap: () => launchUrl(
                 privacyPolicyUrl,
@@ -677,7 +678,7 @@ final class _SettingsSections extends StatelessWidget {
                 ),
                 onPressed: logoutPending ? null : onLogout,
                 icon: const Icon(CupertinoIcons.square_arrow_right),
-                label: const Text(AppStrings.logout),
+                label: Text(AppStrings.logout),
               ),
             ),
             if (logoutFailure != null)
@@ -699,7 +700,7 @@ final class _SettingsSections extends StatelessWidget {
                 ),
                 onPressed: deletePending ? null : onDeleteAccount,
                 icon: const Icon(CupertinoIcons.trash),
-                label: const Text(AppStrings.settingsDeleteAccount),
+                label: Text(AppStrings.settingsDeleteAccount),
               ),
             ),
             if (deleteFailure != null)

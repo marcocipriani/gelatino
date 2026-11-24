@@ -62,17 +62,17 @@ final class _ProfileRelationshipActionState
         final kind = _optimistic ?? _kind(relationship, uid);
         return _content(context, kind);
       },
-      loading: () => const Chip(label: Text(AppStrings.relationshipChecking)),
+      loading: () => Chip(label: Text(AppStrings.relationshipChecking)),
       error: (error, stackTrace) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(AppStrings.relationshipUnavailable),
+          Text(AppStrings.relationshipUnavailable),
           TextButton.icon(
             onPressed: _pending
                 ? null
                 : () => ref.read(retryFriendshipSourcesProvider)(),
             icon: const Icon(CupertinoIcons.refresh),
-            label: const Text(AppStrings.retry),
+            label: Text(AppStrings.retry),
           ),
         ],
       ),
@@ -82,44 +82,44 @@ final class _ProfileRelationshipActionState
   Widget _content(BuildContext context, _RelationshipKind kind) {
     final actions = switch (kind) {
       _RelationshipKind.accepted => <Widget>[
-        const Chip(label: Text(AppStrings.relationshipFriend)),
+        Chip(label: Text(AppStrings.relationshipFriend)),
         OutlinedButton.icon(
           key: ValueKey('profile-relationship-remove-${widget.targetUid}'),
           onPressed: _pending ? null : _confirmRemove,
           icon: const Icon(CupertinoIcons.person_badge_minus),
-          label: const Text(AppStrings.remove),
+          label: Text(AppStrings.remove),
         ),
       ],
       _RelationshipKind.incoming => <Widget>[
-        const Chip(label: Text(AppStrings.relationshipToAccept)),
+        Chip(label: Text(AppStrings.relationshipToAccept)),
         FilledButton(
           key: ValueKey('profile-relationship-accept-${widget.targetUid}'),
           onPressed: _pending ? null : () => _respond(FriendResponse.accepted),
-          child: const Text(AppStrings.accept),
+          child: Text(AppStrings.accept),
         ),
         OutlinedButton(
           key: ValueKey('profile-relationship-decline-${widget.targetUid}'),
           onPressed: _pending ? null : () => _respond(FriendResponse.declined),
-          child: const Text(AppStrings.reject),
+          child: Text(AppStrings.reject),
         ),
       ],
       _RelationshipKind.outgoing => <Widget>[
-        const Chip(label: Text(AppStrings.relationshipPending)),
+        Chip(label: Text(AppStrings.relationshipPending)),
       ],
       _RelationshipKind.available => <Widget>[
         FilledButton.icon(
           key: ValueKey('profile-relationship-send-${widget.targetUid}'),
           onPressed: _pending ? null : _send,
           icon: const Icon(CupertinoIcons.person_add),
-          label: const Text(AppStrings.add),
+          label: Text(AppStrings.add),
         ),
       ],
       _RelationshipKind.blocked => <Widget>[
-        const Chip(label: Text(AppStrings.relationshipBlocked)),
+        Chip(label: Text(AppStrings.relationshipBlocked)),
         OutlinedButton(
           key: ValueKey('profile-relationship-unblock-${widget.targetUid}'),
           onPressed: _pending ? null : _unblock,
-          child: const Text(AppStrings.unblock),
+          child: Text(AppStrings.unblock),
         ),
       ],
     };
@@ -132,7 +132,7 @@ final class _ProfileRelationshipActionState
           ),
           onPressed: _pending ? null : _confirmBlock,
           icon: const Icon(CupertinoIcons.nosign),
-          label: const Text(AppStrings.block),
+          label: Text(AppStrings.block),
         ),
       );
     }
@@ -160,7 +160,7 @@ final class _ProfileRelationshipActionState
             key: ValueKey('profile-relationship-retry-${widget.targetUid}'),
             onPressed: _pending ? null : _retry,
             icon: const Icon(CupertinoIcons.refresh),
-            label: const Text(AppStrings.retry),
+            label: Text(AppStrings.retry),
           ),
         ],
       ],

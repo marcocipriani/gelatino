@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../constants/app_strings.dart';
 import '../models/check_in_draft.dart';
 
 enum CheckInFlowFailureKind {
@@ -13,12 +14,13 @@ enum CheckInFlowFailureKind {
 final class CheckInFlowFailure implements Exception {
   const CheckInFlowFailure({
     required this.kind,
-    required this.message,
+    required this._message,
     required this.cause,
   });
 
   final CheckInFlowFailureKind kind;
-  final String message;
+  final String _message;
+  String get message => AppStrings.translated(_message);
   final Object cause;
 
   @override

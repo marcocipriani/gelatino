@@ -107,14 +107,14 @@ final class ShareStep extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 22),
-      const Text(
+      Text(
         AppStrings.checkInShareWithFriends,
         style: TextStyle(fontWeight: FontWeight.w800),
       ),
       const SizedBox(height: 8),
       friends.when(
         data: (profiles) => profiles.isEmpty
-            ? const Text(AppStrings.checkInNoFriendsToAdd)
+            ? Text(AppStrings.checkInNoFriendsToAdd)
             : Column(
                 children: <Widget>[
                   for (final profile in profiles)
@@ -134,7 +134,7 @@ final class ShareStep extends StatelessWidget {
                     ),
                 ],
               ),
-        loading: () => const Column(
+        loading: () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             LinearProgressIndicator(),
@@ -145,7 +145,7 @@ final class ShareStep extends StatelessWidget {
         error: (_, _) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Text(AppStrings.checkInFriendsLoadError),
+            Text(AppStrings.checkInFriendsLoadError),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -153,12 +153,12 @@ final class ShareStep extends StatelessWidget {
               children: <Widget>[
                 OutlinedButton(
                   onPressed: enabled ? onRetryFriends : null,
-                  child: const Text(AppStrings.checkInReloadFriends),
+                  child: Text(AppStrings.checkInReloadFriends),
                 ),
                 if (selectedFriendIds.isNotEmpty)
                   TextButton(
                     onPressed: enabled ? onClearSelectedFriends : null,
-                    child: const Text(AppStrings.checkInRemoveTag),
+                    child: Text(AppStrings.checkInRemoveTag),
                   ),
               ],
             ),
@@ -167,7 +167,7 @@ final class ShareStep extends StatelessWidget {
       ),
       if (publicationFailed) ...<Widget>[
         const SizedBox(height: 12),
-        const Text(AppStrings.checkInDraftRetryNote),
+        Text(AppStrings.checkInDraftRetryNote),
       ],
       if (hasPrivatePhoto && photoBytes != null) ...<Widget>[
         const SizedBox(height: 16),
@@ -180,7 +180,7 @@ final class ShareStep extends StatelessWidget {
             photo: Image.memory(photoBytes!, fit: BoxFit.cover),
           ),
           icon: const Icon(CupertinoIcons.share),
-          label: const Text(AppStrings.checkInShareCardCta),
+          label: Text(AppStrings.checkInShareCardCta),
         ),
       ],
     ],

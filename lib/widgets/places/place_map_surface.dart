@@ -422,7 +422,7 @@ final class _MapAttribution extends StatelessWidget {
                 color: AppColors.fiorDiPanna,
                 borderRadius: BorderRadius.circular(AppRadii.pill),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 child: Text(
                   AppStrings.mapAttribution,

@@ -21,7 +21,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  static const _safeAuthError = AppStrings.loginFailed;
+  static final _safeAuthError = AppStrings.loginFailed;
 
   var _isSigningIn = false;
   String? _authError;

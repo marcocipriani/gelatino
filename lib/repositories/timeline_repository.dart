@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/feed_item.dart';
 import '../models/firestore_parsing.dart';
+import '../constants/app_strings.dart';
 
 final class FeedDocument {
   const FeedDocument({
@@ -225,7 +226,7 @@ void _validateRequest(String uid, int limit) {
 }
 
 sealed class TimelineFailure implements Exception {
-  const TimelineFailure(this.code, this.message, {required this.retryable});
+  const TimelineFailure(this.code, this._message, {required this.retryable});
 
   factory TimelineFailure.fromCode(String code) => switch (code) {
     'permission-denied' => const TimelinePermissionFailure(),
@@ -236,7 +237,8 @@ sealed class TimelineFailure implements Exception {
   };
 
   final String code;
-  final String message;
+  final String _message;
+  String get message => AppStrings.translated(_message);
   final bool retryable;
 
   @override

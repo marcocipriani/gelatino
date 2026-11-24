@@ -3,7 +3,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:flutter/foundation.dart'
+    show PlatformDispatcher, kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -32,6 +33,9 @@ import 'services/media_telemetry.dart';
 
 void main() async {
   GelatinoBinding.ensureInitialized();
+  AppStrings.useDeviceLocale(
+    PlatformDispatcher.instance.locale.languageCode,
+  );
 
   final firebaseOptions = firebaseOptionsForRuntime(
     base: DefaultFirebaseOptions.currentPlatform,
@@ -115,8 +119,8 @@ class GelatinoApp extends ConsumerWidget {
         highContrastTheme: AppTheme.highContrastLightTheme,
         highContrastDarkTheme: AppTheme.highContrastDarkTheme,
         themeAnimationDuration: AppMotion.standard,
-        locale: const Locale('it'),
-        supportedLocales: const [Locale('it')],
+        locale: Locale(AppStrings.english ? 'en' : 'it'),
+        supportedLocales: const [Locale('it'), Locale('en')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
           value: AppTheme.systemBars(Theme.of(context)),

@@ -304,7 +304,7 @@ class _PlacesTabState extends ConsumerState<PlacesTab> {
             ),
             onPressed: add,
             icon: icon,
-            label: const Text(AppStrings.add),
+            label: Text(AppStrings.add),
           );
   }
 

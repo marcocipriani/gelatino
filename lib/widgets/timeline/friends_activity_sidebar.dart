@@ -37,7 +37,7 @@ final class FriendsActivitySidebar extends StatelessWidget {
           Expanded(
             child: activities.when(
               data: (items) => items.isEmpty
-                  ? const _SidebarMessage(
+                  ? _SidebarMessage(
                       icon: CupertinoIcons.person_2,
                       text: AppStrings.activityEmptyDesc,
                     )
@@ -149,14 +149,14 @@ final class _SidebarError extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     children: <Widget>[
-      const _SidebarMessage(
+      _SidebarMessage(
         icon: CupertinoIcons.exclamationmark_circle,
         text: AppStrings.activityUnavailable,
       ),
       TextButton(
         key: const ValueKey<String>('timeline-sidebar-retry'),
         onPressed: onRetry,
-        child: const Text(AppStrings.retry),
+        child: Text(AppStrings.retry),
       ),
     ],
   );

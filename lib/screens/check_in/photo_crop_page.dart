@@ -105,7 +105,7 @@ final class _PhotoCropPageState extends State<PhotoCropPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text(AppStrings.checkInCropTitle),
+      title: Text(AppStrings.checkInCropTitle),
       leading: IconButton(
         tooltip: AppStrings.cancel,
         icon: const Icon(Icons.close),
@@ -166,7 +166,7 @@ final class _PhotoCropPageState extends State<PhotoCropPage> {
                   height: 48,
                   child: FilledButton(
                     onPressed: () => Navigator.of(context).pop(_currentCrop()),
-                    child: const Text(AppStrings.checkInCropConfirm),
+                    child: Text(AppStrings.checkInCropConfirm),
                   ),
                 ),
               ],

@@ -85,11 +85,11 @@ Future<void> showReportSheet(
       'created_at': FieldValue.serverTimestamp(),
     });
     messenger.showSnackBar(
-      const SnackBar(content: Text(AppStrings.reportSent)),
+      SnackBar(content: Text(AppStrings.reportSent)),
     );
   } catch (_) {
     messenger.showSnackBar(
-      const SnackBar(content: Text(AppStrings.operationFailed)),
+      SnackBar(content: Text(AppStrings.operationFailed)),
     );
   }
 }

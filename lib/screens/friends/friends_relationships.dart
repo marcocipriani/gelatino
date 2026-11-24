@@ -4,14 +4,19 @@ Uri buildExternalInviteUri(String uid) =>
     Uri.https('gelatino.web.app', '/join', <String, String>{'by': uid});
 
 enum FriendSearchRelationshipStatus {
-  accepted('Amico', false),
-  incomingPending(AppStrings.relationshipToAccept, false),
-  outgoingPending(AppStrings.relationshipPending, false),
-  available(AppStrings.add, true);
+  accepted(false),
+  incomingPending(false),
+  outgoingPending(false),
+  available(true);
 
-  const FriendSearchRelationshipStatus(this.label, this.canSendRequest);
+  const FriendSearchRelationshipStatus(this.canSendRequest);
 
-  final String? label;
+  String? get label => switch (this) {
+    accepted => AppStrings.relationshipFriend,
+    incomingPending => AppStrings.relationshipToAccept,
+    outgoingPending => AppStrings.relationshipPending,
+    available => AppStrings.add,
+  };
   final bool canSendRequest;
 }
 

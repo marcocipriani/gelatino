@@ -376,7 +376,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               child: profile.when(
                 data: (value) {
                   if (uid == null || value == null) {
-                    return const FriendsStatePanel(
+                    return FriendsStatePanel(
                       title: AppStrings.friendsLoginTitle,
                       message:
                           AppStrings.friendsLoginSubtitle,
@@ -456,7 +456,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               .where((profile) => !_removedFriendUids.contains(profile.uid))
               .toList(growable: false);
           if (visibleProfiles.isEmpty) {
-            return const FriendsStatePanel(
+            return FriendsStatePanel(
               title: AppStrings.friendsEmptyTitle,
               message: AppStrings.friendsEmptySubtitle,
               icon: CupertinoIcons.person_2,
@@ -498,7 +498,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                           ? null
                           : () => _confirmRemoveFriend(profile),
                       icon: const Icon(CupertinoIcons.person_badge_minus),
-                      label: const Text(AppStrings.remove),
+                      label: Text(AppStrings.remove),
                     ),
                   ],
                   onOpen: () => _openProfile(profile.uid),
@@ -525,7 +525,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               .where((request) => !_resolvedRequestIds.contains(request.id))
               .toList(growable: false);
           if (visibleValues.isEmpty) {
-            return const FriendsStatePanel(
+            return FriendsStatePanel(
               title: AppStrings.friendsRequestsEmpty,
               message: AppStrings.friendsRequestsEmptySubtitle,
               icon: CupertinoIcons.person_add,
@@ -556,7 +556,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                                   request,
                                   FriendResponse.accepted,
                                 ),
-                          child: const Text(AppStrings.accept),
+                          child: Text(AppStrings.accept),
                         ),
                         OutlinedButton(
                           key: ValueKey(
@@ -571,7 +571,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                                   request,
                                   FriendResponse.declined,
                                 ),
-                          child: const Text(AppStrings.reject),
+                          child: Text(AppStrings.reject),
                         ),
                       ],
                       onOpen: () => _openProfile(request.requesterUid),
@@ -604,7 +604,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               .where((invite) => !_resolvedInviteIds.contains(invite.id))
               .toList(growable: false);
           if (visibleValues.isEmpty) {
-            return const FriendsStatePanel(
+            return FriendsStatePanel(
               title: AppStrings.friendsInvitesEmpty,
               message: AppStrings.friendsInvitesEmptySubtitle,
               icon: Icons.icecream_outlined,
@@ -631,7 +631,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                               )
                               ? null
                               : () => _acceptPing(invite),
-                          child: const Text(AppStrings.friendsInviteAccept),
+                          child: Text(AppStrings.friendsInviteAccept),
                         ),
                         OutlinedButton(
                           key: ValueKey('friend-invite-decline-${invite.id}'),
@@ -641,7 +641,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                               )
                               ? null
                               : () => _declinePing(invite),
-                          child: const Text(AppStrings.friendsInviteDecline),
+                          child: Text(AppStrings.friendsInviteDecline),
                         ),
                       ],
                       onOpen: () => _openProfile(invite.senderId),
@@ -712,7 +712,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           bottom: AppSpacing.display,
         ),
         children: [
-          const EditorialHeader(
+          EditorialHeader(
             title: AppStrings.friendsGelatoWithWhom,
             description:
                 AppStrings.friendsGelatoWithWhomSubtitle,
@@ -865,7 +865,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           ),
         ] else if (_lastSearchQuery.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.md),
-          const FriendsStatePanel(
+          FriendsStatePanel(
             title: AppStrings.friendsNoResults,
             message: AppStrings.friendsNoResultsSubtitle,
             icon: CupertinoIcons.search,
@@ -877,7 +877,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
 
   Widget _relationshipLookupPanel(_RelationshipLookupState state) {
     return switch (state) {
-      _RelationshipLookupState.loading => const FriendsStatePanel(
+      _RelationshipLookupState.loading => FriendsStatePanel(
         title: AppStrings.relationshipChecking,
         message: AppStrings.relationshipCheckingMessage,
         icon: CupertinoIcons.arrow_2_circlepath,
@@ -906,7 +906,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           ? null
           : () => _addFriend(uid),
       icon: const Icon(CupertinoIcons.person_add),
-      label: const Text(AppStrings.add),
+      label: Text(AppStrings.add),
     );
   }
 
@@ -944,7 +944,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             key: ValueKey(retryKey),
             onPressed: _pendingActions.contains(key) ? null : retry,
             icon: const Icon(CupertinoIcons.refresh),
-            label: const Text(AppStrings.retry),
+            label: Text(AppStrings.retry),
           ),
         ],
       ),

@@ -62,7 +62,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.editProfileEmptyName)),
+        SnackBar(content: Text(AppStrings.editProfileEmptyName)),
       );
       return;
     }
@@ -97,7 +97,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
+            content: Text(
               AppStrings.editProfileUpdated,
               style: TextStyle(
                 color: AppTheme.fondenteExtra,
@@ -176,14 +176,14 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
               // Campo Nome
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppStrings.editProfileDisplayName,
                   prefixIcon: Icon(CupertinoIcons.person),
                 ),
               ),
               const SizedBox(height: 16),
 
-              const ListTile(
+              ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(Icons.icecream_outlined),
                 title: Text(AppStrings.editProfileFavoritesTitle),
@@ -199,7 +199,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
                     onPressed: _isLoading
                         ? null
                         : () => Navigator.of(context).pop(),
-                    child: const Text(AppStrings.cancel),
+                    child: Text(AppStrings.cancel),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
@@ -210,7 +210,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
                             height: 20,
                             child: CircularProgressIndicator.adaptive(),
                           )
-                        : const Text(AppStrings.save),
+                        : Text(AppStrings.save),
                   ),
                 ],
               ),

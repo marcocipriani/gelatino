@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import '../constants/app_strings.dart';
 
 final class DeviceLocation {
   const DeviceLocation({required this.latitude, required this.longitude});
@@ -18,9 +19,10 @@ final class DeviceLocation {
 }
 
 final class LocationFailure implements Exception {
-  const LocationFailure(this.message);
+  const LocationFailure(this._message);
 
-  final String message;
+  final String _message;
+  String get message => AppStrings.translated(_message);
 
   @override
   String toString() => message;
