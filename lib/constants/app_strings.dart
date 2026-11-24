@@ -408,6 +408,14 @@ class AppStrings {
   static const String settingsCompleteProfile =
       'Completa il profilo per personalizzare l’app.';
   static const String settingsLogoutFailed = 'Uscita non riuscita. Riprova.';
+  static const String settingsPrivacyPolicy = 'Informativa sulla privacy';
+  static const String settingsDeleteAccount = 'Elimina account';
+  static const String settingsDeleteAccountTitle = 'Eliminare l’account?';
+  static const String settingsDeleteAccountBody =
+      'Cancelliamo profilo, check-in, foto e amicizie. Non si può annullare. '
+      'Ti chiederemo di accedere di nuovo con Google per confermare.';
+  static const String settingsDeleteAccountFailed =
+      'Eliminazione non riuscita. Riprova.';
   static const String settingsLoadingPrefs =
       'Stiamo recuperando le tue preferenze.';
   static const String settingsLoadError =

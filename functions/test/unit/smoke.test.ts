@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as exported from '../../src/index';
 import {appCheckEnforced} from '../../src/callable/options';
+import {signedInRecently} from '../../src/callable/account';
 import {
   parseClientFailureReport,
   underBudget,
@@ -13,6 +14,7 @@ test('exports the complete trusted API', () => {
     [
       'cleanupAbandonedMedia',
       'createCheckIn',
+      'deleteAccount',
       'deleteCheckIn',
       'onCheckInCreated',
       'onCheckInDeleted',
@@ -54,4 +56,10 @@ test('client failure reports accept only the bounded shape', () => {
   const counts = new Map<string, number>();
   const results = Array.from({length: 51}, () => underBudget('alice', counts));
   assert.equal(results.filter(Boolean).length, 50);
+});
+
+test('account deletion requires a sign-in from the last five minutes', () => {
+  assert.equal(signedInRecently(1000, 1000 + 299), true);
+  assert.equal(signedInRecently(1000, 1000 + 301), false);
+  assert.equal(signedInRecently(undefined, 1000), false);
 });

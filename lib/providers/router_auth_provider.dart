@@ -45,6 +45,18 @@ final class FirebaseRouterAuthSession extends ChangeNotifier
   }
 }
 
+/// Account deletion needs a fresh sign-in; Google is the only provider.
+Future<void> reauthenticateWithGoogle(User user) async {
+  if (kIsWeb) {
+    await user.reauthenticateWithPopup(GoogleAuthProvider());
+    return;
+  }
+  final googleUser = await GoogleSignIn.instance.authenticate();
+  await user.reauthenticateWithCredential(
+    GoogleAuthProvider.credential(idToken: googleUser.authentication.idToken),
+  );
+}
+
 final routerAuthSessionProvider = Provider<RouterAuthSession>((ref) {
   final session = FirebaseRouterAuthSession(ref.watch(firebaseAuthProvider));
   ref.onDispose(session.dispose);

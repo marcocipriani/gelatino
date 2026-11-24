@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../design/app_tokens.dart';
 import '../design/responsive.dart';
@@ -15,6 +17,7 @@ import '../providers/auth_provider.dart';
 import '../providers/high_contrast_provider.dart';
 import '../providers/media_provider.dart';
 import '../providers/profile_providers.dart';
+import '../providers/router_auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/media_cache/media_disk_cache.dart';
 import '../services/push_service.dart';
@@ -130,6 +133,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await ref.read(firebaseAuthProvider).signOut();
   }
 
+  Future<void> _deleteAccount(String uid) async {
+    final auth = ref.read(firebaseAuthProvider);
+    final user = auth.currentUser;
+    if (user == null || user.uid != uid) return;
+    await reauthenticateWithGoogle(user);
+    await ref
+        .read(functionsProvider)
+        .httpsCallable(
+          'deleteAccount',
+          options: HttpsCallableOptions(timeout: const Duration(minutes: 5)),
+        )
+        .call<void>();
+    await ref.read(mediaDiskCacheProvider).clear();
+    ref.invalidate(mediaBytesProvider);
+    await auth.signOut();
+  }
+
+  Future<void> _confirmDeleteAccount() async {
+    final confirmed = await showAppConfirmation(
+      context,
+      title: AppStrings.settingsDeleteAccountTitle,
+      message: AppStrings.settingsDeleteAccountBody,
+      confirmLabel: AppStrings.delete,
+      confirmKey: const ValueKey('settings-delete-account-confirm'),
+    );
+    if (!confirmed || !mounted) return;
+    await _runFieldAction(
+      field: 'delete-account',
+      value: true,
+      operation: _deleteAccount,
+      failureMessage: AppStrings.settingsDeleteAccountFailed,
+      terminalOnSuccess: true,
+    );
+  }
+
   bool _isCurrentField(int generation, String uid, String field, int version) =>
       mounted &&
       generation == _generation &&
@@ -212,10 +250,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           defaultViewPending: _pendingFields.contains('default-view'),
           privacyPending: _pendingFields.contains('privacy'),
           logoutPending: _pendingFields.contains('logout'),
+          deletePending: _pendingFields.contains('delete-account'),
           themeFailure: _fieldFailure('theme'),
           defaultViewFailure: _fieldFailure('default-view'),
           privacyFailure: _fieldFailure('privacy'),
           logoutFailure: _fieldFailure('logout'),
+          deleteFailure: _fieldFailure('delete-account'),
           onEdit: (owner) => _pushOnce(
             () => showDialog<void>(
               context: context,
@@ -253,6 +293,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             failureMessage: AppStrings.settingsLogoutFailed,
             terminalOnSuccess: true,
           ),
+          onDeleteAccount: () => unawaited(_confirmDeleteAccount()),
         );
       },
       loading: () => const _SettingsStatePanel(
@@ -423,10 +464,12 @@ final class _SettingsSections extends StatelessWidget {
     required this.defaultViewPending,
     required this.privacyPending,
     required this.logoutPending,
+    required this.deletePending,
     required this.themeFailure,
     required this.defaultViewFailure,
     required this.privacyFailure,
     required this.logoutFailure,
+    required this.deleteFailure,
     required this.onEdit,
     required this.onFavoriteFlavors,
     required this.onSavedCollection,
@@ -434,6 +477,7 @@ final class _SettingsSections extends StatelessWidget {
     required this.onDefaultViewChanged,
     required this.onPrivacyChanged,
     required this.onLogout,
+    required this.onDeleteAccount,
   });
 
   final AsyncValue<UserProfile?> profile;
@@ -444,10 +488,12 @@ final class _SettingsSections extends StatelessWidget {
   final bool defaultViewPending;
   final bool privacyPending;
   final bool logoutPending;
+  final bool deletePending;
   final Widget? themeFailure;
   final Widget? defaultViewFailure;
   final Widget? privacyFailure;
   final Widget? logoutFailure;
+  final Widget? deleteFailure;
   final ValueChanged<UserProfile> onEdit;
   final VoidCallback onFavoriteFlavors;
   final VoidCallback onSavedCollection;
@@ -455,6 +501,7 @@ final class _SettingsSections extends StatelessWidget {
   final ValueChanged<String> onDefaultViewChanged;
   final ValueChanged<bool> onPrivacyChanged;
   final VoidCallback onLogout;
+  final VoidCallback onDeleteAccount;
 
   @override
   Widget build(BuildContext context) {
@@ -600,6 +647,19 @@ final class _SettingsSections extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: privacyFailure,
               ),
+            ListTile(
+              key: const ValueKey('settings-privacy-policy'),
+              leading: const _SettingsIcon(
+                CupertinoIcons.doc_text,
+                AppColors.sorbetto,
+              ),
+              title: const Text(AppStrings.settingsPrivacyPolicy),
+              trailing: const Icon(CupertinoIcons.arrow_up_right_square),
+              onTap: () => launchUrl(
+                privacyPolicyUrl,
+                mode: LaunchMode.externalApplication,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -630,12 +690,36 @@ final class _SettingsSections extends StatelessWidget {
                 ),
                 child: logoutFailure,
               ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: TextButton.icon(
+                key: const ValueKey('settings-delete-account'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: deletePending ? null : onDeleteAccount,
+                icon: const Icon(CupertinoIcons.trash),
+                label: const Text(AppStrings.settingsDeleteAccount),
+              ),
+            ),
+            if (deleteFailure != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                  AppSpacing.md,
+                ),
+                child: deleteFailure,
+              ),
           ],
         ),
       ],
     );
   }
 }
+
+final privacyPolicyUrl = Uri.parse('https://gelatino.web.app/privacy.html');
 
 final class _SettingsSection extends StatelessWidget {
   const _SettingsSection({required this.label, required this.children});

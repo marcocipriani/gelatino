@@ -165,13 +165,14 @@ void main() {
       'settings-default-view',
       'settings-private-profile',
       'settings-logout',
+      'settings-delete-account',
+      'settings-privacy-policy',
     ]) {
       expect(find.byKey(ValueKey(key)), findsOneWidget, reason: key);
     }
     expect(find.textContaining('non comparire nelle ricerche'), findsOneWidget);
     for (final unsupported in <String>[
       'Esporta dati',
-      'Elimina account',
       'Notifiche',
       'Movimento ridotto',
     ]) {

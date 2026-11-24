@@ -25,4 +25,5 @@ export {
   respondToFriendRequest,
   sendFriendRequest,
 } from './callable/friendships';
+export {deleteAccount} from './callable/account';
 export {reportClientFailure} from './callable/telemetry';
