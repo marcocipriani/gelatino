@@ -13,6 +13,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'design/motion.dart';
+import 'e2e/e2e_config.dart';
 import 'firebase/app_check.dart';
 import 'firebase/emulator_config.dart';
 import 'firebase/firebase_providers.dart';
@@ -33,8 +34,9 @@ import 'services/media_telemetry.dart';
 
 void main() async {
   GelatinoBinding.ensureInitialized();
+  // The E2E journey asserts Italian copy whatever the browser language.
   AppStrings.useDeviceLocale(
-    PlatformDispatcher.instance.locale.languageCode,
+    e2eTestingEnabled ? 'it' : PlatformDispatcher.instance.locale.languageCode,
   );
 
   final firebaseOptions = firebaseOptionsForRuntime(
