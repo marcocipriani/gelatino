@@ -24,6 +24,8 @@
 4.  [💻 Comandi Tecnici & Guida Sviluppatori](#-comandi-tecnici--guida-sviluppatori)
 5.  [📄 Licenza](#-licenza)
 
+Prossimi passi e migliorie pianificate: [ROADMAP.md](ROADMAP.md).
+
 ---
 
 ## ✨ Core Highlights
@@ -36,6 +38,8 @@ Gelatino non è una directory di gelaterie o un database caotico. È un prodotto
 *   📍 **Mappa con marker semantici**: Le gelaterie sul Melt Pin colorato per stato (preferite, salvate, mi piace, aggiunte da te).
 *   🎯 **The Melt Pin Philosophy**: L'identità ruota attorno al **Melt Pin**, fusione tra pin geografico e gelato mantecato. Nell'header è anche scorciatoia al check-in veloce.
 *   📳 **Tactile & Haptic Feedbacks**: Micro-interazioni con feedback aptico calibrato (chip, voto, check-in, successo).
+*   ♿ **Accessibile**: etichette per screen reader, testo fino al 200%, "Riduci movimento" rispettato, temi ad alto contrasto, area di tocco minima di 44 pt.
+*   📱 **Una sola app su iOS, Android e web**: stessa grafica, temi, icona e schermata di avvio; controlli di sistema nativi per ogni piattaforma (alert, date picker, transizioni).
 *   🇮🇹 **Copy in italiano naturale**: Niente gergo da startup; tono caldo e concreto.
 
 ---
@@ -101,7 +105,7 @@ Mi piace → **Fragola** · Preferiti → **Sorbetto** · Salvati/da provare →
 *   **Formato del gelato:** catalogo Firestore con chip personalizzate, selezione singola obbligatoria e lista espandibile.
 
 ### 7. Apri in Mappe (`PlaceDetailScreen`)
-*   **Apertura esterna:** Web → Google Maps in nuova scheda; iOS → Apple Maps; Android → `geo:`/Google Maps in app esterna.
+*   **Apertura esterna:** iOS → Apple Maps; Android e web → URL di Google Maps, aperto nell'app Maps se installata o in una nuova scheda.
 
 ### 8. Da provare (`WishlistScreen`) & Amici (`FriendsScreen`)
 *   **Da provare:** swipe-to-delete con annulla.
@@ -112,7 +116,7 @@ Mi piace → **Fragola** · Preferiti → **Sorbetto** · Salvati/da provare →
 *   **Formato preferito:** stat sintetica calcolata dai check-in con spareggio sull'utilizzo più recente.
 *   **Il mio livello goloso:** barra di avanzamento gamificata coi livelli "Formati" e i Punti gusto.
 *   **Gestione gusti** (in Collezione e schermata dedicata): catalogo condiviso (~40 gusti di default), aggiunta con **palette colori**, pill colorate, **preferito** con stella, ricerca, ordine A-Z / Ultimo assaggiato, filtro Preferiti.
-*   **Impostazioni:** modifica profilo, tema (Chiaro/Scuro/Sistema).
+*   **Impostazioni:** modifica profilo, tema (Chiaro/Scuro/Sistema), interruttore "Alto contrasto" salvato sul dispositivo.
 
 ---
 
@@ -130,14 +134,21 @@ gelatino/
 │   └── images/          # Solo asset in uso: logo.svg, logo-white.png, simple-pin.svg, pin-*.svg
 ├── lib/
 │   ├── constants/       # Stringhe statiche
+│   ├── e2e/             # Supporto ai test end-to-end (emulatori)
+│   ├── design/          # Token di layout, movimento, focus, layout responsive
+│   ├── firebase/        # Provider Firebase, emulatori, App Check
 │   ├── models/          # CheckIn, Place, UserProfile, Flavor, GelatoLevel
 │   ├── providers/       # Riverpod (places, flavors, navigation, ...)
+│   ├── repositories/    # Accesso a Firestore
+│   ├── services/        # Storage e compressione foto, cache media, push, condivisione
 │   ├── screens/         # Pagine UI (collection_screen, ...)
-│   ├── theme/           # Temi e token
+│   ├── theme/           # Temi (chiaro, scuro, alto contrasto) e colori
+│   ├── utils/           # Ricerca testuale, validazione check-in, errori
 │   ├── widgets/         # Riutilizzabili (FlavorsManager, CreamyCard, ...)
 │   └── main.dart
-├── functions/           # Cloud Functions (TypeScript): callable, trigger, regole
-└── test/
+├── functions/           # Cloud Functions (TypeScript): callable, trigger
+├── integration_test/    # Test end-to-end a due utenti sugli emulatori
+└── test/                # Unit e widget test
 ```
 
 ### Setup (obbligatorio al primo clone)
@@ -154,6 +165,14 @@ flutterfire configure --project=IL_TUO_PROGETTO
 
 Il comando scrive `lib/firebase_options.dart`,
 `android/app/google-services.json` e `ios/Runner/GoogleService-Info.plist`.
+
+Le chiavi API client non sono segrete, ma vanno ristrette in Google Cloud
+Console › APIs & Services › Credentials: Android per package e SHA-1 (debug e
+release), iOS per bundle ID, web per referrer HTTP; su tutte, solo le API
+Firebase che l'app usa (Identity Toolkit, Token Service, Firestore, Firebase
+Storage, Installations, FCM, FCM Registrations, App Check). Dopo
+`flutterfire configure` controlla che i file generati contengano le chiavi
+ristrette e non quelle create automaticamente da Firebase.
 
 Solo per il web, il service worker delle notifiche va compilato a mano:
 
@@ -193,6 +212,40 @@ cd functions && npm install && npm test   # test delle Cloud Functions
 ```bash
 flutter build web --release --dart-define=APP_CHECK_WEB_KEY=LA_TUA_SITE_KEY
 firebase deploy --only hosting --project IL_TUO_PROGETTO
+```
+
+### Android: firma release e beta
+
+Le build release leggono `android/key.properties` (gitignorato). Senza il file
+restano firmate con la chiave di debug, quindi `flutter run --release` funziona
+comunque.
+
+```bash
+keytool -genkeypair -v -keystore ~/gelatino-upload.jks -keyalg RSA \
+  -keysize 2048 -validity 10000 -alias upload
+```
+
+```properties
+# android/key.properties
+storePassword=...
+keyPassword=...
+keyAlias=upload
+storeFile=/percorso/assoluto/gelatino-upload.jks
+```
+
+Conserva keystore e password fuori dal repo, con un backup: senza, non puoi più
+aggiornare l'app già installata. Registra SHA-1 e SHA-256 del keystore
+(`keytool -list -v -keystore ~/gelatino-upload.jks -alias upload`) nell'app
+Android su Firebase, necessari per Google Sign-In, e nella restrizione della
+chiave API Android.
+
+Beta per i tester con Firebase App Distribution (alza il numero di build in
+`pubspec.yaml` a ogni invio):
+
+```bash
+flutter build apk --release
+firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+  --app ID_APP_ANDROID --testers "email@esempio.it" --release-notes "..."
 ```
 
 **Ordine di deploy:** client prima, poi Functions. I check-in nuovi hanno il
