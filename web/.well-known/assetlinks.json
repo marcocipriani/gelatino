@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.gelatino.gelatino",
+      "sha256_cert_fingerprints": [
+        "64:ED:76:D4:A9:E6:8E:0D:0B:E5:54:E2:FB:90:76:96:37:55:6C:4C:C9:A7:FA:C7:F3:53:10:5D:73:67:F3:17"
+      ]
+    }
+  }
+]
