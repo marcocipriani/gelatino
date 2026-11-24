@@ -146,6 +146,26 @@ class AppStrings {
   static const String relationshipChecking = 'Verifica relazione…';
   static const String relationshipUnavailable = 'Relazione non disponibile';
   static const String relationshipFriend = 'Amico';
+  static const String relationshipBlocked = 'Bloccato';
+  static const String block = 'Blocca';
+  static const String unblock = 'Sblocca';
+  static const String blockConfirmTitle = 'Bloccare questo utente?';
+  static const String blockConfirmBody =
+      'L’amicizia finisce, sparite dalle rispettive bacheche e nessuno dei '
+      'due potrà mandare richieste. Puoi sbloccarlo quando vuoi.';
+
+  // ---------------------------------------------------------------------------
+  // Reports
+  // ---------------------------------------------------------------------------
+  static const String reportTooltip = 'Segnala';
+  static const String reportTitle = 'Perché lo segnali?';
+  static const String reportSent = 'Grazie, la segnalazione è arrivata.';
+  static String reportReason(String reason) => switch (reason) {
+    'spam' => 'Spam o pubblicità',
+    'offensive' => 'Contenuto offensivo o inappropriato',
+    'wrong' => 'Informazioni sbagliate o duplicate',
+    _ => 'Altro',
+  };
   static const String relationshipToAccept = 'Da accettare';
   static const String relationshipPending = 'In attesa';
   static const String removeFriendshipTitle = 'Rimuovere questa amicizia?';

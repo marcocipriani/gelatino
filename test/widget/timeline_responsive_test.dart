@@ -1138,6 +1138,12 @@ final class _RetryFriendshipRepository implements FriendshipRepository {
   Future<bool> isAcceptedFriend(String uid, String otherUid) async => false;
 
   @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
+
+  @override
   Future<void> remove(String otherUid) async {}
 
   @override

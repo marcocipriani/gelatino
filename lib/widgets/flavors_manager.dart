@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show CustomSemanticsAction;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +17,7 @@ import '../utils/error_handler.dart';
 import 'app_controls.dart';
 import 'app_search_field.dart';
 import 'creamy_card.dart';
+import 'report_button.dart';
 import 'gelato_loader.dart';
 import '../constants/app_strings.dart';
 
@@ -233,18 +235,22 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
     return Semantics(
       button: true,
       selected: isFav,
+      customSemanticsActions: <CustomSemanticsAction, VoidCallback>{
+        const CustomSemanticsAction(label: AppStrings.reportTooltip): () =>
+            showReportSheet(context, ref, ReportTarget.flavor, flavor.id),
+      },
       enabled: onTap != null,
       child: AppFocusRing(
         borderRadius: AppRadii.pill,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadii.pill),
           onTap: onTap,
+          onLongPress: () =>
+              showReportSheet(context, ref, ReportTarget.flavor, flavor.id),
           child: AnimatedContainer(
             duration: AppMotion.of(context, AppMotion.standard),
             curve: AppMotion.glide,
-            constraints: const BoxConstraints(
-              minHeight: AppLayout.touchTarget,
-            ),
+            constraints: const BoxConstraints(minHeight: AppLayout.touchTarget),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: bg,
@@ -382,7 +388,11 @@ class _FlavorsManagerState extends ConsumerState<FlavorsManager> {
                             ),
                           ),
                           child: selected
-                              ? Icon(CupertinoIcons.check_mark, size: 16, color: inkOn(color))
+                              ? Icon(
+                                  CupertinoIcons.check_mark,
+                                  size: 16,
+                                  color: inkOn(color),
+                                )
                               : null,
                         ),
                       ),

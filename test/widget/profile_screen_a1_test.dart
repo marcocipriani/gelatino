@@ -147,6 +147,29 @@ void main() {
             label: 'Aggiungi',
             actionKey: 'profile-relationship-send-bob',
           ),
+          (
+            relationships: <Friendship>[
+              _friendship(
+                requester: 'alice',
+                recipient: 'bob',
+                state: FriendshipState.blocked,
+              ),
+            ],
+            label: 'Bloccato',
+            actionKey: 'profile-relationship-unblock-bob',
+          ),
+          // Whoever is blocked sees a stranger.
+          (
+            relationships: <Friendship>[
+              _friendship(
+                requester: 'bob',
+                recipient: 'alice',
+                state: FriendshipState.blocked,
+              ),
+            ],
+            label: 'Aggiungi',
+            actionKey: 'profile-relationship-send-bob',
+          ),
         ];
 
     for (final testCase in cases) {
@@ -645,6 +668,12 @@ final class _Friendships implements FriendshipRepository {
   Future<void> respond(String otherUid, FriendResponse response) async {}
 
   @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
+
+  @override
   Future<void> remove(String otherUid) async {}
 }
 
@@ -659,6 +688,12 @@ final class _ActionFriendships extends _Friendships {
     final gate = sendGate;
     if (gate != null) await gate.future;
   }
+
+  @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
 
   @override
   Future<void> remove(String otherUid) async {
@@ -698,6 +733,7 @@ Friendship _friendship({
   final members = <String>[requester, recipient]..sort();
   final now = DateTime(2026, 7, 15);
   final accepted = state == FriendshipState.accepted;
+  final blocked = state == FriendshipState.blocked;
   return Friendship.fromMap(
     <String, dynamic>{
       'member_uids': members,
@@ -705,9 +741,9 @@ Friendship _friendship({
       'recipient_uid': recipient,
       'state': state.name,
       'requested_at': Timestamp.fromDate(now),
-      'responded_at': accepted ? Timestamp.fromDate(now) : null,
+      'responded_at': accepted || blocked ? Timestamp.fromDate(now) : null,
       'accepted_at': accepted ? Timestamp.fromDate(now) : null,
-      'removed_at': null,
+      'removed_at': blocked ? Timestamp.fromDate(now) : null,
       'affinity_score': accepted ? 2 : 0,
       'updated_at': Timestamp.fromDate(now),
     },

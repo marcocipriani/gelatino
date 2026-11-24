@@ -301,6 +301,12 @@ final class _Friendships implements FriendshipRepository {
       _complete('respond:$otherUid:${response.name}');
 
   @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
+
+  @override
   Future<void> remove(String otherUid) => _complete('remove:$otherUid');
 
   @override

@@ -10,8 +10,9 @@ import '../../providers/profile_providers.dart';
 import '../../repositories/friendship_repository.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_controls.dart';
+import '../../widgets/report_button.dart';
 
-enum _RelationshipKind { accepted, incoming, outgoing, available }
+enum _RelationshipKind { accepted, incoming, outgoing, available, blocked }
 
 final class ProfileRelationshipAction extends ConsumerStatefulWidget {
   const ProfileRelationshipAction({required this.targetUid, super.key});
@@ -102,8 +103,8 @@ final class _ProfileRelationshipActionState
           child: const Text(AppStrings.reject),
         ),
       ],
-      _RelationshipKind.outgoing => const <Widget>[
-        Chip(label: Text(AppStrings.relationshipPending)),
+      _RelationshipKind.outgoing => <Widget>[
+        const Chip(label: Text(AppStrings.relationshipPending)),
       ],
       _RelationshipKind.available => <Widget>[
         FilledButton.icon(
@@ -113,7 +114,31 @@ final class _ProfileRelationshipActionState
           label: const Text(AppStrings.add),
         ),
       ],
+      _RelationshipKind.blocked => <Widget>[
+        const Chip(label: Text(AppStrings.relationshipBlocked)),
+        OutlinedButton(
+          key: ValueKey('profile-relationship-unblock-${widget.targetUid}'),
+          onPressed: _pending ? null : _unblock,
+          child: const Text(AppStrings.unblock),
+        ),
+      ],
     };
+    if (kind != _RelationshipKind.blocked) {
+      actions.add(
+        TextButton.icon(
+          key: ValueKey('profile-relationship-block-${widget.targetUid}'),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.error,
+          ),
+          onPressed: _pending ? null : _confirmBlock,
+          icon: const Icon(CupertinoIcons.nosign),
+          label: const Text(AppStrings.block),
+        ),
+      );
+    }
+    actions.add(
+      ReportButton(target: ReportTarget.user, targetId: widget.targetUid),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -165,6 +190,36 @@ final class _ProfileRelationshipActionState
     success: _RelationshipKind.available,
     retry: _remove,
   );
+
+  Future<void> _unblock() => _perform(
+    operation: () =>
+        ref.read(friendshipRepositoryProvider).unblock(widget.targetUid),
+    success: _RelationshipKind.available,
+    retry: _unblock,
+  );
+
+  Future<void> _block() => _perform(
+    operation: () =>
+        ref.read(friendshipRepositoryProvider).block(widget.targetUid),
+    success: _RelationshipKind.blocked,
+    retry: _block,
+  );
+
+  Future<void> _confirmBlock() async {
+    final uid = ref.read(currentUidProvider);
+    final targetUid = widget.targetUid;
+    final generation = _generation;
+    final confirmed = await showAppConfirmation(
+      context,
+      title: AppStrings.blockConfirmTitle,
+      message: AppStrings.blockConfirmBody,
+      confirmLabel: AppStrings.block,
+      confirmKey: ValueKey('profile-relationship-block-confirm-$targetUid'),
+    );
+    if (confirmed && _isCurrent(generation, uid, targetUid)) {
+      await _block();
+    }
+  }
 
   Future<void> _confirmRemove() async {
     final uid = ref.read(currentUidProvider);
@@ -249,6 +304,12 @@ _RelationshipKind _kind(Friendship? relationship, String uid) {
   if (relationship == null) return _RelationshipKind.available;
   if (relationship.state == FriendshipState.accepted) {
     return _RelationshipKind.accepted;
+  }
+  if (relationship.state == FriendshipState.blocked) {
+    // Whoever is blocked just sees a stranger; requests fail on the server.
+    return relationship.requesterUid == uid
+        ? _RelationshipKind.blocked
+        : _RelationshipKind.available;
   }
   if (relationship.state == FriendshipState.pending) {
     return relationship.recipientUid == uid

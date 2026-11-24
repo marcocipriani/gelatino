@@ -3,9 +3,11 @@ import {getFirestore} from 'firebase-admin/firestore';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
 import {callableOptions} from './options';
 import {
+  blockUser as blockPair,
   removeAcceptedFriendship,
   respondToRequest,
   sendRequest,
+  unblockUser as unblockPair,
 } from '../services/friendships';
 
 const options = callableOptions;
@@ -71,4 +73,14 @@ export const removeFriendship = onCall(options, async (request) => {
     uid,
     otherUid(request.data),
   );
+});
+
+export const blockUser = onCall(options, async (request) => {
+  const uid = callerUid(request.auth);
+  return blockPair(database(), uid, otherUid(request.data));
+});
+
+export const unblockUser = onCall(options, async (request) => {
+  const uid = callerUid(request.auth);
+  return unblockPair(database(), uid, otherUid(request.data));
 });

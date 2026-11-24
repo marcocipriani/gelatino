@@ -532,3 +532,24 @@ test('avatars are public to authenticated users but owner-written JPEGs only', a
     ),
   );
 });
+
+test('reports are create-only, bounded and attributed to the reporter', async () => {
+  const report = {
+    reporter_uid: 'alice',
+    target_type: 'check_in',
+    target_id: CHECK_IN_ID,
+    reason: 'offensive',
+    created_at: serverTimestamp(),
+  };
+  await assertSucceeds(setDoc(doc(harness.aliceDb, 'reports/r1'), report));
+  await assertFails(getDoc(doc(harness.aliceDb, 'reports/r1')));
+  await assertFails(
+    setDoc(doc(harness.aliceDb, 'reports/r2'), {...report, reporter_uid: 'bob'}),
+  );
+  await assertFails(
+    setDoc(doc(harness.aliceDb, 'reports/r3'), {...report, reason: 'boring'}),
+  );
+  await assertFails(
+    setDoc(doc(harness.aliceDb, 'reports/r4'), {...report, note: 'x'}),
+  );
+});

@@ -22,6 +22,7 @@ const friendshipStates = new Set<FriendshipState>([
   'accepted',
   'declined',
   'removed',
+  'blocked',
 ]);
 
 function validatePair(callerUid: string, otherUid: string): void {
@@ -126,6 +127,9 @@ export async function sendRequest(
     const current = friendshipResult(friendshipId, data);
     if (current.state === 'pending' || current.state === 'accepted') {
       return current;
+    }
+    if (current.state === 'blocked') {
+      throw new HttpsError('permission-denied', 'Friend requests are blocked');
     }
 
     const timestamp = FieldValue.serverTimestamp();
@@ -269,5 +273,100 @@ export async function removeAcceptedFriendship(
       db.doc(`friend_access/${higherUid}/members/${lowerUid}`),
     );
     return {...current, state: 'removed'};
+  });
+}
+
+function deleteEdges(
+  db: Firestore,
+  transaction: FirebaseFirestore.Transaction,
+  callerUid: string,
+  otherUid: string,
+): void {
+  const [lowerUid, higherUid] = members(callerUid, otherUid);
+  transaction.delete(db.doc(`friend_access/${lowerUid}/members/${higherUid}`));
+  transaction.delete(db.doc(`friend_access/${higherUid}/members/${lowerUid}`));
+}
+
+/**
+ * Ends any friendship or request and stops new ones in both directions. The
+ * projection trigger then removes each other's posts from the two feeds.
+ */
+export async function blockUser(
+  db: Firestore,
+  callerUid: string,
+  otherUid: string,
+): Promise<FriendshipResult> {
+  validatePair(callerUid, otherUid);
+  const friendshipId = pairId(callerUid, otherUid);
+  const friendshipRef = db.doc(`friendships/${friendshipId}`);
+
+  return db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(friendshipRef);
+    const timestamp = FieldValue.serverTimestamp();
+    const blocked = {
+      requester_uid: callerUid,
+      recipient_uid: otherUid,
+      state: 'blocked',
+      responded_at: timestamp,
+      accepted_at: null,
+      removed_at: timestamp,
+      updated_at: timestamp,
+    };
+    const result: FriendshipResult = {
+      friendshipId,
+      state: 'blocked',
+      requesterUid: callerUid,
+      recipientUid: otherUid,
+    };
+    if (!snapshot.exists) {
+      transaction.create(friendshipRef, {
+        ...blocked,
+        member_uids: members(callerUid, otherUid),
+        requested_at: timestamp,
+        affinity_score: 0,
+      });
+      return result;
+    }
+    const data = snapshot.data()!;
+    requireMembers(data, callerUid, otherUid);
+    const current = friendshipResult(friendshipId, data);
+    // Already blocked, by either side: the pair is blocked either way.
+    if (current.state === 'blocked') return current;
+    transaction.update(friendshipRef, blocked);
+    deleteEdges(db, transaction, callerUid, otherUid);
+    return result;
+  });
+}
+
+export async function unblockUser(
+  db: Firestore,
+  callerUid: string,
+  otherUid: string,
+): Promise<FriendshipResult> {
+  validatePair(callerUid, otherUid);
+  const friendshipId = pairId(callerUid, otherUid);
+  const friendshipRef = db.doc(`friendships/${friendshipId}`);
+
+  return db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(friendshipRef);
+    if (!snapshot.exists) {
+      throw new HttpsError('not-found', 'Friendship not found');
+    }
+    const data = snapshot.data()!;
+    requireMembers(data, callerUid, otherUid);
+    const current = friendshipResult(friendshipId, data);
+    if (current.state !== 'blocked' || current.requesterUid !== callerUid) {
+      throw new HttpsError('failed-precondition', 'Caller has not blocked this user');
+    }
+    // Declined is the existing "no relationship, may ask again" state.
+    const timestamp = FieldValue.serverTimestamp();
+    transaction.update(friendshipRef, {
+      state: 'declined',
+      responded_at: timestamp,
+      accepted_at: null,
+      removed_at: null,
+      updated_at: timestamp,
+    });
+    return {...current, state: 'declined'};
   });
 }

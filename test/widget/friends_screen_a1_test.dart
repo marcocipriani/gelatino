@@ -564,9 +564,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final declineBob = find.byKey(
-      const ValueKey('friend-request-decline-bob'),
-    );
+    final declineBob = find.byKey(const ValueKey('friend-request-decline-bob'));
     await tester.ensureVisible(declineBob);
     await tester.pump();
     await tester.tap(declineBob);
@@ -1059,6 +1057,12 @@ final class _FriendsRepository implements FriendshipRepository {
   Future<void> respond(String otherUid, FriendResponse response) async {}
 
   @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
+
+  @override
   Future<void> remove(String otherUid) async {}
 }
 
@@ -1118,6 +1122,12 @@ final class _ActionFriendships implements FriendshipRepository {
       throw const FriendshipUnavailableFailure();
     }
   }
+
+  @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
 
   @override
   Future<void> remove(String otherUid) async {

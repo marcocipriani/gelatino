@@ -16,14 +16,15 @@ void main() {
       repository = FriendshipRepositoryImpl(source);
     });
 
-    test('uses the two exact index-aligned relationship queries', () async {
+    test('uses the three exact index-aligned relationship queries', () async {
       final subscription = repository.watchForUser('alice').listen((_) {});
       addTearDown(subscription.cancel);
 
-      expect(source.queries, hasLength(2));
+      expect(source.queries, hasLength(3));
       expect(source.queries.map((query) => query.state).toSet(), {
         'accepted',
         'pending',
+        'blocked',
       });
       for (final query in source.queries) {
         expect(query.collectionPath, 'friendships');
@@ -36,7 +37,7 @@ void main() {
     });
 
     test(
-      'waits for both queries then merges, deduplicates and stays live',
+      'waits for every query then merges, deduplicates and stays live',
       () async {
         final errors = _captureFlutterErrors();
         final emissions = <List<String>>[];
@@ -51,6 +52,7 @@ void main() {
           _friendship('alice', 'carol', minute: 12),
           const FriendshipDocument(id: 'bad', data: <String, dynamic>{}),
         ]);
+        source.emit('blocked', const <FriendshipDocument>[]);
         expect(emissions, isEmpty);
 
         source.emit('accepted', <FriendshipDocument>[
@@ -68,14 +70,18 @@ void main() {
       },
     );
 
-    test('cancelling merged stream cancels both source listeners', () async {
+    test('cancelling merged stream cancels every source listener', () async {
       final subscription = repository.watchForUser('alice').listen((_) {});
-      expect(source.activeStates, <String>{'accepted', 'pending'});
+      expect(source.activeStates, <String>{'accepted', 'pending', 'blocked'});
 
       await subscription.cancel();
 
       expect(source.activeStates, isEmpty);
-      expect(source.cancelledStates, <String>{'accepted', 'pending'});
+      expect(source.cancelledStates, <String>{
+        'accepted',
+        'pending',
+        'blocked',
+      });
     });
 
     test('hydrates only public profiles in batches of at most 30', () async {

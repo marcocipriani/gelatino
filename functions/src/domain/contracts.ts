@@ -1,6 +1,12 @@
 import type * as FirebaseFirestore from 'firebase-admin/firestore';
 
-export type FriendshipState = 'pending' | 'accepted' | 'declined' | 'removed';
+export type FriendshipState =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'removed'
+  // requester_uid is the blocker; only they can unblock.
+  | 'blocked';
 
 export type CreateCheckInInput = {
   checkInId: string;

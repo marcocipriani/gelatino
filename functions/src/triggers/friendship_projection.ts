@@ -44,7 +44,7 @@ function validateFriendship(
   if (pairId(members[0], members[1]) !== friendshipId) {
     invalid('friendshipId: does not match member_uids');
   }
-  if (!['pending', 'accepted', 'declined', 'removed'].includes(data.state as string)) {
+  if (!['pending', 'accepted', 'declined', 'removed', 'blocked'].includes(data.state as string)) {
     invalid('state: is invalid');
   }
   return {members, accepted: data.state === 'accepted'};

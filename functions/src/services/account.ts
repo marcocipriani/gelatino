@@ -58,7 +58,6 @@ export async function deleteAccountData(
     db.recursiveDelete(db.doc(`users/${uid}`)),
     db.recursiveDelete(db.doc(`feeds/${uid}`)),
     db.recursiveDelete(db.doc(`friend_access/${uid}`)),
-    db.recursiveDelete(db.doc(`blocks/${uid}`)),
   ]);
 
   await Promise.all(

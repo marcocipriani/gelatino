@@ -176,6 +176,10 @@ abstract interface class FriendshipRepository {
   Future<void> respond(String otherUid, FriendResponse response);
 
   Future<void> remove(String otherUid);
+
+  Future<void> block(String otherUid);
+
+  Future<void> unblock(String otherUid);
 }
 
 final class FriendshipRepositoryImpl implements FriendshipRepository {
@@ -190,6 +194,7 @@ final class FriendshipRepositoryImpl implements FriendshipRepository {
     final values = <String, Map<String, Friendship>>{
       'accepted': <String, Friendship>{},
       'pending': <String, Friendship>{},
+      'blocked': <String, Friendship>{},
     };
     final initializedStates = <String>{};
     final subscriptions = <StreamSubscription<List<FriendshipDocument>>>[];
@@ -248,7 +253,7 @@ final class FriendshipRepositoryImpl implements FriendshipRepository {
               onError: controller.addError,
               onDone: () {
                 completedStreams++;
-                if (completedStreams == 2) controller.close();
+                if (completedStreams == values.length) controller.close();
               },
             ),
       );
@@ -259,6 +264,7 @@ final class FriendshipRepositoryImpl implements FriendshipRepository {
       onListen: () {
         listenTo('accepted');
         listenTo('pending');
+        listenTo('blocked');
       },
       onCancel: () async {
         await Future.wait(
@@ -319,10 +325,9 @@ final class FriendshipRepositoryImpl implements FriendshipRepository {
 
   @override
   Future<void> send(String otherUid) async {
-    await _call(
-      'sendFriendRequest',
-      <String, Object?>{'otherUid': _validOtherUid(otherUid)},
-    );
+    await _call('sendFriendRequest', <String, Object?>{
+      'otherUid': _validOtherUid(otherUid),
+    });
     // The request is already sent; a broken hook must never fail send() itself.
     try {
       _onSent?.call();
@@ -343,6 +348,17 @@ final class FriendshipRepositoryImpl implements FriendshipRepository {
   @override
   Future<void> remove(String otherUid) => _call(
     'removeFriendship',
+    <String, Object?>{'otherUid': _validOtherUid(otherUid)},
+  );
+
+  @override
+  Future<void> block(String otherUid) => _call('blockUser', <String, Object?>{
+    'otherUid': _validOtherUid(otherUid),
+  });
+
+  @override
+  Future<void> unblock(String otherUid) => _call(
+    'unblockUser',
     <String, Object?>{'otherUid': _validOtherUid(otherUid)},
   );
 

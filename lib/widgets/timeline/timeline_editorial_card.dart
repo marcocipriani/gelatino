@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_tokens.dart';
 import '../../models/feed_item.dart';
+import '../../providers/auth_provider.dart';
 import '../authenticated_check_in_photo.dart';
 import '../avatar_image_provider.dart';
 import '../editorial_card.dart';
+import '../report_button.dart';
 import '../share/share_check_in_card.dart';
 import '../../constants/app_strings.dart';
 
@@ -90,6 +93,16 @@ final class TimelineEditorialCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xxs),
+                Consumer(
+                  builder: (context, ref, _) =>
+                      ref.watch(currentUidProvider) == item.authorUid
+                      ? const SizedBox.shrink()
+                      : ReportButton(
+                          target: ReportTarget.checkIn,
+                          targetId: item.checkInId,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                ),
                 _ShareIconButton(
                   placeName: placeName,
                   rating: item.rating,
@@ -118,9 +131,9 @@ final class TimelineEditorialCard extends StatelessWidget {
             )
           else ...<Widget>[
             AspectRatio(
-                      aspectRatio: AppLayout.checkInPhotoAspectRatio,
-                      child: photo,
-                    ),
+              aspectRatio: AppLayout.checkInPhotoAspectRatio,
+              child: photo,
+            ),
             metadata,
           ],
         ],

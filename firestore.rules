@@ -274,6 +274,26 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Moderation queue: anyone signed in can file, nobody reads it from a
+    // client. Review it in the console.
+    match /reports/{reportId} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll([
+          'reporter_uid', 'target_type', 'target_id', 'reason', 'created_at',
+        ])
+        && request.resource.data.keys().hasOnly([
+          'reporter_uid', 'target_type', 'target_id', 'reason', 'created_at',
+        ])
+        && request.resource.data.reporter_uid == request.auth.uid
+        && request.resource.data.target_type in ['place', 'flavor', 'check_in', 'user']
+        && request.resource.data.target_id is string
+        && request.resource.data.target_id.size() > 0
+        && request.resource.data.target_id.size() <= 128
+        && request.resource.data.reason in ['spam', 'offensive', 'wrong', 'other']
+        && request.resource.data.created_at == request.time;
+      allow read, update, delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

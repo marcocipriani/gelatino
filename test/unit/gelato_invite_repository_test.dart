@@ -212,6 +212,12 @@ final class FakeFriendships implements FriendshipRepository {
   @override
   Future<List<PublicProfile>> readPublicProfiles(List<String> uids) async => [];
   @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
+
+  @override
   Future<void> remove(String otherUid) async {}
   @override
   Future<void> respond(String otherUid, FriendResponse response) async {}

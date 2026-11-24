@@ -21,9 +21,11 @@ export {
   deleteCheckIn,
 } from './callable/check_ins';
 export {
+  blockUser,
   removeFriendship,
   respondToFriendRequest,
   sendFriendRequest,
+  unblockUser,
 } from './callable/friendships';
 export {deleteAccount} from './callable/account';
 export {reportClientFailure} from './callable/telemetry';

@@ -195,6 +195,7 @@ test('check-in projection fans out only to accepted friends and is idempotent', 
   assert.deepEqual(Object.keys(aliceItem.data()!).sort(), [
     'author_uid',
     'check_in_id',
+    'consumed_at',
     'created_at',
     'flavors',
     'gelato_type',

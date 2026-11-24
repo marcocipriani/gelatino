@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'firestore_parsing.dart';
 
-enum FriendshipState { pending, accepted, declined, removed }
+/// In `blocked`, [Friendship.requesterUid] is the user who blocked.
+enum FriendshipState { pending, accepted, declined, removed, blocked }
 
 class Friendship {
   const Friendship._({
@@ -139,6 +140,7 @@ void _validateTimestamps(
       respondedAt != null && acceptedAt == null && removedAt == null,
     FriendshipState.removed =>
       respondedAt != null && acceptedAt != null && removedAt != null,
+    FriendshipState.blocked => respondedAt != null && removedAt != null,
   };
   if (!valid) throw FormatException('${state.name}: invalid timestamps');
 }

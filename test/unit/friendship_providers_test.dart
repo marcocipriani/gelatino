@@ -269,6 +269,7 @@ void main() {
       unawaited(profilesFuture.then((_) => completed = true));
 
       source.emit('pending', const <FriendshipDocument>[]);
+      source.emit('blocked', const <FriendshipDocument>[]);
       await container.pump();
       expect(completed, isFalse);
 
@@ -589,6 +590,12 @@ final class FakeFriendshipRepository implements FriendshipRepository {
 
   @override
   Future<bool> isAcceptedFriend(String uid, String otherUid) async => false;
+
+  @override
+  Future<void> block(String otherUid) async {}
+
+  @override
+  Future<void> unblock(String otherUid) async {}
 
   @override
   Future<void> remove(String otherUid) async {}

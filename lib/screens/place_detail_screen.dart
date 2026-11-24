@@ -17,6 +17,7 @@ import '../providers/place_aggregate_providers.dart';
 import '../providers/place_providers.dart';
 import '../utils/error_handler.dart';
 import '../widgets/app_controls.dart';
+import '../widgets/report_button.dart';
 import '../widgets/collection/place_editorial_cover.dart';
 import '../widgets/semantic_state_button.dart';
 import '../constants/app_strings.dart';
@@ -49,6 +50,7 @@ class PlaceDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: const AppBackButton(fallback: '/places'),
         title: const Text(AppStrings.placeDetailTitle),
+        actions: [ReportButton(target: ReportTarget.place, targetId: placeId)],
       ),
       body: catalog.when(
         loading: () => const _PlaceDetailLoading(),

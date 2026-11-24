@@ -12,6 +12,7 @@ test('exports the complete trusted API', () => {
   assert.deepEqual(
     Object.keys(exported).sort(),
     [
+      'blockUser',
       'cleanupAbandonedMedia',
       'createCheckIn',
       'deleteAccount',
@@ -26,6 +27,7 @@ test('exports the complete trusted API', () => {
       'reportClientFailure',
       'respondToFriendRequest',
       'sendFriendRequest',
+      'unblockUser',
     ],
   );
 });
