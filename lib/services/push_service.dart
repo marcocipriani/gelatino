@@ -24,10 +24,10 @@ class PushService {
   @visibleForTesting
   bool get hasAttachedRefreshListener => _refreshListenerUid != null;
 
-  static const _vapidKey = String.fromEnvironment(
-    'GELATINO_VAPID_KEY',
-    defaultValue: '<incolla la chiave della console>',
-  );
+  // ponytail: empty define -> null -> the Firebase JS SDK falls back to its
+  // built-in default VAPID key. Pass the project's own key from the console
+  // (Cloud Messaging -> Web Push certificates) with --dart-define when ready.
+  static const _vapidKey = String.fromEnvironment('GELATINO_VAPID_KEY');
 
   static Map<String, Object> tokenPayload({required String platform}) => {
     'platform': platform,
@@ -40,7 +40,7 @@ class PushService {
     final settings = await _messaging.requestPermission();
     if (settings.authorizationStatus != AuthorizationStatus.authorized) return;
     final token = await _messaging.getToken(
-      vapidKey: kIsWeb ? _vapidKey : null,
+      vapidKey: kIsWeb && _vapidKey.isNotEmpty ? _vapidKey : null,
     );
     if (token == null) return;
     await _saveToken(uid, token);
@@ -83,7 +83,8 @@ class PushService {
 }
 
 final pushServiceProvider = Provider<PushService>(
-  (ref) => PushService(ref.watch(firestoreProvider), FirebaseMessaging.instance),
+  (ref) =>
+      PushService(ref.watch(firestoreProvider), FirebaseMessaging.instance),
 );
 
 /// Fire-and-forget hook for social-action call sites (ping sent, friend
