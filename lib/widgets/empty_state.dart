@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../design/app_tokens.dart';
+import '../design/motion.dart';
 
 class EmptyState extends StatelessWidget {
   final IconData? icon;
@@ -39,13 +40,13 @@ class EmptyState extends StatelessWidget {
                 icon,
                 size: AppSpacing.display,
                 color: Theme.of(context).colorScheme.accentInk,
-              ),
+              ).entrance(context),
             const SizedBox(height: AppSpacing.md),
             Text(
               title,
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
-            ),
+            ).entrance(context, order: 1),
             const SizedBox(height: AppSpacing.sm),
             Text(
               description,
@@ -54,7 +55,7 @@ class EmptyState extends StatelessWidget {
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
-            ),
+            ).entrance(context, order: 2),
             if (action != null) ...[
               const SizedBox(height: AppSpacing.md),
               ConstrainedBox(
@@ -63,7 +64,7 @@ class EmptyState extends StatelessWidget {
                   minHeight: AppLayout.touchTarget,
                 ),
                 child: action!,
-              ),
+              ).entrance(context, order: 3),
             ],
           ],
         ),

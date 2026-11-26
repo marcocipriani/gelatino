@@ -31,6 +31,7 @@ import '../widgets/editorial_header.dart';
 import 'profile/profile_a1_layout.dart';
 import 'profile/profile_relationship_action.dart';
 import '../constants/app_strings.dart';
+import '../widgets/app_icon.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key, this.userId});
@@ -75,8 +76,7 @@ class ProfileScreen extends ConsumerWidget {
               return ListView(
                 padding: EdgeInsets.only(
                   top: AppSpacing.xs,
-                  bottom:
-                      AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
+                  bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
                 ),
                 children: [
                   Row(
@@ -378,17 +378,17 @@ final class _ProfilePreferences extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.profilePreferencesTitle, style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            AppStrings.profilePreferencesTitle,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: AppSpacing.xs,
             runSpacing: AppSpacing.xs,
             children: [
               for (final name in flavorNames)
-                Chip(
-                  avatar: const Icon(Icons.icecream_outlined, size: 18),
-                  label: Text(name),
-                ),
+                Chip(avatar: const GelatoIcon(size: 18), label: Text(name)),
               if (placeName != null)
                 Chip(
                   avatar: const Icon(CupertinoIcons.map_pin_ellipse, size: 18),
@@ -437,10 +437,18 @@ final class _ProfileActivity extends StatelessWidget {
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
                 children: [
-                  Chip(label: Text(AppStrings.profileGelatiCount(items.length))),
-                  Chip(label: Text(AppStrings.profilePlacesCount(uniquePlaces))),
+                  Chip(
+                    label: Text(AppStrings.profileGelatiCount(items.length)),
+                  ),
+                  Chip(
+                    label: Text(AppStrings.profilePlacesCount(uniquePlaces)),
+                  ),
                   if (average != null)
-                    Chip(label: Text(AppStrings.profileAverage(average.toStringAsFixed(1)))),
+                    Chip(
+                      label: Text(
+                        AppStrings.profileAverage(average.toStringAsFixed(1)),
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
@@ -475,7 +483,10 @@ final class _OwnerSavedPlaces extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.profileWishlistTitle, style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            AppStrings.profileWishlistTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             AppStrings.profileSavedPlacesSubtitle,
@@ -609,7 +620,7 @@ class _ProfileRecentActivityListState
       children: [
         ListTile(
           contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.icecream_outlined),
+          leading: const GelatoIcon(),
           title: Text(item.placeSnapshot['name'] as String),
           subtitle: Text(
             '${item.createdAt.day.toString().padLeft(2, '0')}/'
@@ -669,8 +680,7 @@ class _ProfileRecentActivityListState
       message: AppStrings.profileDeleteCheckInBody,
       confirmLabel: AppStrings.delete,
     );
-    if (confirmed &&
-        _isCurrentBinding(generation, historyUid, canDelete)) {
+    if (confirmed && _isCurrentBinding(generation, historyUid, canDelete)) {
       await _delete(item);
     }
   }

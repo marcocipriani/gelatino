@@ -19,6 +19,14 @@ const double timelineDeckFlingThreshold = 450;
 const double timelineDeckOvershoot = 10;
 const double timelineDeckNextPeek = 40;
 
+/// How far a card one slot away shrinks: the deck reads as a stack.
+// ponytail: scale only. A fade would need Opacity, a saveLayer under the
+// always-visible next card on every frame.
+const double timelineDeckDepthScale = 0.05;
+
+/// Past the last card the drag follows the finger at this rate.
+const double timelineDeckEdgeResistance = 0.35;
+
 int timelineDeckNavigationDirection({
   required double dragOffset,
   required double velocity,
@@ -149,8 +157,21 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
     return target >= 0 && target < widget.items.length;
   }
 
+  /// Settling onto a new card, as opposed to springing back to rest.
+  bool get _changingCard =>
+      _settleController.isAnimating && _pendingIndex != null;
+
+  /// A spring-back never blocks the next gesture: it stops where it is.
+  void _interruptSpringBack() {
+    if (_settleController.isAnimating && _pendingIndex == null) {
+      _settleController.stop();
+      _settleAnimation = null;
+    }
+  }
+
   void _move(int direction) {
-    if (_settleController.isAnimating) return;
+    if (_changingCard) return;
+    _interruptSpringBack();
     if (!_canMove(direction)) {
       if (direction > 0 && widget.hasMore && !widget.isLoadingMore) {
         unawaited(widget.onLoadMore());
@@ -173,11 +194,17 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
     _pendingIndex = targetIndex;
     _settleAnimation = TweenSequence<double>(<TweenSequenceItem<double>>[
       TweenSequenceItem<double>(
-        tween: Tween<double>(begin: _dragOffset, end: overshoot),
+        tween: Tween<double>(
+          begin: _dragOffset,
+          end: overshoot,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 84,
       ),
       TweenSequenceItem<double>(
-        tween: Tween<double>(begin: overshoot, end: destination),
+        tween: Tween<double>(
+          begin: overshoot,
+          end: destination,
+        ).chain(CurveTween(curve: Curves.easeInOutSine)),
         weight: 16,
       ),
     ]).animate(_settleController);
@@ -186,12 +213,22 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
 
   void _resetDrag() {
     if (!mounted || _dragOffset == 0) return;
-    setState(() => _dragOffset = 0);
+    if (MediaQuery.disableAnimationsOf(context)) {
+      setState(() => _dragOffset = 0);
+      return;
+    }
+    _pendingIndex = null;
+    _settleAnimation = Tween<double>(
+      begin: _dragOffset,
+      end: 0,
+    ).chain(CurveTween(curve: Curves.easeOutBack)).animate(_settleController);
+    _settleController.forward(from: 0);
   }
 
   void _trackPointerDown(PointerDownEvent event) {
     _dragVelocityTracker = null;
     _dragAccepted = false;
+    _interruptSpringBack();
     _pointerEligibleForDrag = !_settleController.isAnimating;
     if (!_pointerEligibleForDrag) return;
     _dragVelocityTracker = VelocityTracker.withKind(event.kind)
@@ -206,10 +243,18 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
   void _trackPointerUp(PointerUpEvent event) {
     final tracker = _dragVelocityTracker;
     scheduleMicrotask(() {
+      _settleStrandedCard();
       if (!identical(_dragVelocityTracker, tracker)) return;
       _pointerEligibleForDrag = false;
       _dragVelocityTracker = null;
     });
+  }
+
+  /// A tap that stopped a spring-back never became a drag, so nothing else
+  /// would bring the card home.
+  void _settleStrandedCard() {
+    if (_dragAccepted || _settleController.isAnimating) return;
+    _resetDrag();
   }
 
   void _trackPointerCancel(PointerCancelEvent event) {
@@ -217,6 +262,7 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
     _dragAccepted = false;
     final tracker = _dragVelocityTracker;
     scheduleMicrotask(() {
+      _settleStrandedCard();
       if (identical(_dragVelocityTracker, tracker)) {
         _dragVelocityTracker = null;
       }
@@ -225,13 +271,16 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
 
   void _onVerticalDragStart(DragStartDetails details) {
     _dragAccepted = _pointerEligibleForDrag && !_settleController.isAnimating;
-    if (!_dragAccepted) return;
-    _resetDrag();
   }
 
   void _onVerticalDragUpdate(DragUpdateDetails details) {
     if (!_dragAccepted || _settleController.isAnimating) return;
-    final offset = _dragOffset + (details.primaryDelta ?? 0);
+    var delta = details.primaryDelta ?? 0;
+    // Nothing below the last card: the drag goes heavy instead of stopping.
+    if (_dragOffset + delta < 0 && !_canMove(1)) {
+      delta *= timelineDeckEdgeResistance;
+    }
+    final offset = _dragOffset + delta;
     final bounded = offset.clamp(-_cardExtent * 0.4, _cardExtent * 0.4);
     setState(() => _dragOffset = bounded);
   }
@@ -423,6 +472,8 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
     final relative = index - _currentIndex;
     final top = 8 + relative * _cardExtent + _dragOffset;
     final current = index == _currentIndex;
+    // 0 in the resting slot, 1 one slot away, live while dragging.
+    final distance = ((top - 8) / _cardExtent).abs().clamp(0.0, 1.0);
     final card = TimelineEditorialCard(
       item: item,
       compact: true,
@@ -447,15 +498,26 @@ final class _TimelineCompactDeckState extends State<TimelineCompactDeck>
                 ),
                 container: true,
                 explicitChildNodes: true,
-                label: AppStrings.timelineCardPosition(index + 1, widget.items.length),
+                label: AppStrings.timelineCardPosition(
+                  index + 1,
+                  widget.items.length,
+                ),
                 selected: true,
-                child: card,
+                child: _depth(card, distance),
               )
-            : ExcludeSemantics(child: card),
+            : ExcludeSemantics(child: _depth(card, distance)),
       ),
     );
   }
 }
+
+/// Shrinks toward the top edge, so the next card's peek stays put. Always
+/// wrapped, so a card never remounts as it reaches its slot.
+Widget _depth(Widget card, double distance) => Transform.scale(
+  scale: 1 - timelineDeckDepthScale * distance,
+  alignment: Alignment.topCenter,
+  child: card,
+);
 
 final class _DeckControls extends StatelessWidget {
   const _DeckControls({
@@ -483,7 +545,9 @@ final class _DeckControls extends StatelessWidget {
       children: <Widget>[
         IconButton.filledTonal(
           style: IconButton.styleFrom(
-            disabledBackgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+            disabledBackgroundColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainer,
           ),
           key: const ValueKey<String>('timeline-previous'),
           constraints: const BoxConstraints(

@@ -13,6 +13,7 @@ import '../services/storage_service.dart';
 import '../utils/error_handler.dart';
 import 'avatar_image_provider.dart';
 import '../constants/app_strings.dart';
+import 'app_icon.dart';
 
 class EditProfileDialog extends ConsumerStatefulWidget {
   final UserProfile profile;
@@ -61,9 +62,9 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
   Future<void> _save() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.editProfileEmptyName)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.editProfileEmptyName)));
       return;
     }
 
@@ -185,7 +186,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
 
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.icecream_outlined),
+                leading: const GelatoIcon(),
                 title: Text(AppStrings.editProfileFavoritesTitle),
                 subtitle: Text(AppStrings.editProfileFavoritesSubtitle),
               ),

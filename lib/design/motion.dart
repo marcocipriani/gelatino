@@ -8,6 +8,9 @@ abstract final class AppMotion {
   static const standard = Duration(milliseconds: 240);
   static const emphasized = Duration(milliseconds: 360);
 
+  /// Gap between siblings entering one after another.
+  static const stagger = Duration(milliseconds: 50);
+
   static const enter = Curves.easeOutCubic;
   static const exit = Curves.easeInCubic;
 
@@ -20,6 +23,82 @@ abstract final class AppMotion {
   /// [duration], or zero when the user asked for less motion.
   static Duration of(BuildContext context, Duration duration) =>
       reduced(context) ? Duration.zero : duration;
+}
+
+extension AppEntrance on Widget {
+  /// Fades and lifts in once, on first build. [order] staggers siblings;
+  /// capped so a long list never waits on its tail.
+  Widget entrance(BuildContext context, {int order = 0, double lift = 12}) =>
+      _Entrance(order: order.clamp(0, 6), lift: lift, child: this);
+}
+
+// ponytail: not flutter_animate, whose Animate always schedules a Timer that
+// widget tests then report as pending.
+class _Entrance extends StatefulWidget {
+  const _Entrance({
+    required this.order,
+    required this.lift,
+    required this.child,
+  });
+
+  final int order;
+  final double lift;
+  final Widget child;
+
+  @override
+  State<_Entrance> createState() => _EntranceState();
+}
+
+class _EntranceState extends State<_Entrance>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<double> _lift;
+
+  @override
+  void initState() {
+    super.initState();
+    final delay = AppMotion.stagger * widget.order;
+    final total = delay + AppMotion.emphasized;
+    final start = delay.inMicroseconds / total.inMicroseconds;
+    final fadeEnd =
+        (delay + AppMotion.standard).inMicroseconds / total.inMicroseconds;
+    _controller = AnimationController(vsync: this, duration: total);
+    _fade = CurvedAnimation(
+      parent: _controller,
+      curve: Interval(start, fadeEnd, curve: AppMotion.enter),
+    );
+    _lift = CurvedAnimation(
+      parent: _controller,
+      curve: Interval(start, 1, curve: AppMotion.glide),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_controller.status != AnimationStatus.dismissed) return;
+    AppMotion.reduced(context) ? _controller.value = 1 : _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+    opacity: _fade,
+    child: AnimatedBuilder(
+      animation: _lift,
+      builder: (context, child) => Transform.translate(
+        offset: Offset(0, widget.lift * (1 - _lift.value)),
+        child: child,
+      ),
+      child: widget.child,
+    ),
+  );
 }
 
 /// [ReducedMotionScope] only reaches code that asks MediaQuery. Sheets,

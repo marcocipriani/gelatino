@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/app_strings.dart';
@@ -108,7 +109,7 @@ final class _PhotoCropPageState extends State<PhotoCropPage> {
       title: Text(AppStrings.checkInCropTitle),
       leading: IconButton(
         tooltip: AppStrings.cancel,
-        icon: const Icon(Icons.close),
+        icon: const Icon(CupertinoIcons.xmark),
         onPressed: () => Navigator.of(context).pop(),
       ),
     ),

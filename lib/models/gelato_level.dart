@@ -1,13 +1,9 @@
-import 'package:flutter/material.dart';
-
 /// A "Formato" tier in the gelato leveling system. Tiers progress by serving
 /// size: a quick lick all the way up to a full gelato cart.
 class GelatoTier {
   final String name;
   final int threshold; // Punti gusto needed to reach this tier.
-  final IconData icon;
-
-  const GelatoTier(this.name, this.threshold, this.icon);
+  const GelatoTier(this.name, this.threshold);
 }
 
 /// Computed level state for a user, derived from their "Punti gusto".
@@ -36,11 +32,11 @@ class GelatoLevel {
 
   /// Progression by serving size (Formati).
   static const List<GelatoTier> tiers = [
-    GelatoTier('Leccata', 0, Icons.water_drop_rounded),
-    GelatoTier('Coppetta', 50, Icons.local_cafe_rounded),
-    GelatoTier('Cono', 150, Icons.icecream_rounded),
-    GelatoTier('Vaschetta', 350, Icons.inventory_2_rounded),
-    GelatoTier('Carretto', 700, Icons.storefront_rounded),
+    GelatoTier('Leccata', 0),
+    GelatoTier('Coppetta', 50),
+    GelatoTier('Cono', 150),
+    GelatoTier('Vaschetta', 350),
+    GelatoTier('Carretto', 700),
   ];
 
   factory GelatoLevel.forPoints(int points) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 final class EmulatorPhotoFixture {
@@ -36,7 +37,7 @@ final class EmulatorPhotoFixtureButton extends StatelessWidget {
     child: OutlinedButton.icon(
       key: const ValueKey('e2e-photo-fixture'),
       onPressed: onPressed,
-      icon: const Icon(Icons.science_outlined),
+      icon: const Icon(CupertinoIcons.lab_flask),
       label: const Text('Usa foto E2E'),
     ),
   );

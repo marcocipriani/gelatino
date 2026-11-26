@@ -26,6 +26,7 @@ import 'friends/friends_relationships.dart';
 import 'friends/friends_remote_person_card.dart';
 import 'friends/friends_sections.dart';
 import '../constants/app_strings.dart';
+import '../widgets/app_icon.dart';
 
 enum _RelationshipLookupState { ready, loading, error }
 
@@ -378,9 +379,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                   if (uid == null || value == null) {
                     return FriendsStatePanel(
                       title: AppStrings.friendsLoginTitle,
-                      message:
-                          AppStrings.friendsLoginSubtitle,
-                      icon: CupertinoIcons.lock,
+                      message: AppStrings.friendsLoginSubtitle,
+                      icon: const Icon(CupertinoIcons.lock),
                     );
                   }
                   return _buildA1Friends(context, uid, responsive);
@@ -459,7 +459,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             return FriendsStatePanel(
               title: AppStrings.friendsEmptyTitle,
               message: AppStrings.friendsEmptySubtitle,
-              icon: CupertinoIcons.person_2,
+              icon: const Icon(CupertinoIcons.person_2),
             );
           }
           return FriendsResponsiveCards(
@@ -484,7 +484,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                               _sentInviteUids.contains(profile.uid)
                           ? null
                           : () => _sendPing(profile),
-                      icon: const Icon(Icons.icecream_outlined),
+                      icon: const GelatoIcon(),
                       label: Text(
                         _sentInviteUids.contains(profile.uid)
                             ? AppStrings.friendsInviteSent
@@ -528,7 +528,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             return FriendsStatePanel(
               title: AppStrings.friendsRequestsEmpty,
               message: AppStrings.friendsRequestsEmptySubtitle,
-              icon: CupertinoIcons.person_add,
+              icon: const Icon(CupertinoIcons.person_add),
             );
           }
           return Column(
@@ -607,7 +607,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             return FriendsStatePanel(
               title: AppStrings.friendsInvitesEmpty,
               message: AppStrings.friendsInvitesEmptySubtitle,
-              icon: Icons.icecream_outlined,
+              icon: const GelatoIcon(),
             );
           }
           return Column(
@@ -714,8 +714,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         children: [
           EditorialHeader(
             title: AppStrings.friendsGelatoWithWhom,
-            description:
-                AppStrings.friendsGelatoWithWhomSubtitle,
+            description: AppStrings.friendsGelatoWithWhomSubtitle,
           ),
           const SizedBox(height: AppSpacing.xl),
           LayoutBuilder(
@@ -868,7 +867,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           FriendsStatePanel(
             title: AppStrings.friendsNoResults,
             message: AppStrings.friendsNoResultsSubtitle,
-            icon: CupertinoIcons.search,
+            icon: const Icon(CupertinoIcons.search),
           ),
         ],
       ],
@@ -880,7 +879,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       _RelationshipLookupState.loading => FriendsStatePanel(
         title: AppStrings.relationshipChecking,
         message: AppStrings.relationshipCheckingMessage,
-        icon: CupertinoIcons.arrow_2_circlepath,
+        icon: const Icon(CupertinoIcons.arrow_2_circlepath),
       ),
       _RelationshipLookupState.error => FriendsStatePanel(
         title: AppStrings.relationshipUnavailable,

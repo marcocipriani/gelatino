@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../design/app_tokens.dart';
+import '../design/motion.dart';
 import '../design/responsive.dart';
 import '../providers/friendship_providers.dart';
 import '../providers/timeline_providers.dart';
@@ -199,7 +200,9 @@ final class _TimelineScrollFeed extends StatelessWidget {
               itemCount: state.items.length,
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                child: TimelineEditorialCard(item: state.items[index]),
+                child: TimelineEditorialCard(
+                  item: state.items[index],
+                ).entrance(context, order: index, lift: 24),
               ),
             ),
           ),

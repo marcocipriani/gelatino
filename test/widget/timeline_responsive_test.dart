@@ -459,6 +459,41 @@ void main() {
     );
   });
 
+  testWidgets('compact last card resists the drag and springs back', (
+    tester,
+  ) async {
+    await _pumpTimeline(tester, size: const Size(390, 844), items: _items(1));
+    final card = find.byKey(
+      const ValueKey('timeline-deck-card-checkin00000000000000001'),
+    );
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const ValueKey('timeline-compact-deck'))),
+    );
+    for (var step = 0; step < 10; step++) {
+      await gesture.moveBy(const Offset(0, -20));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    final dragged = tester.getTopLeft(card).dy;
+    // Without resistance 200 px of finger would move the card 200 px.
+    expect(dragged, closeTo(8 - 200 * timelineDeckEdgeResistance, 1));
+
+    await gesture.up();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 120));
+    final springing = tester.getTopLeft(card).dy;
+    expect(springing, greaterThan(dragged));
+
+    // A tap stops the spring where it is; the card must still come home.
+    final tap = await tester.startGesture(
+      tester.getCenter(find.byKey(const ValueKey('timeline-compact-deck'))),
+    );
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(tester.getTopLeft(card).dy, closeTo(springing, 0.1));
+    await tap.up();
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(card).dy, closeTo(8, 0.1));
+  });
+
   testWidgets(
     'compact settles through a 10 px overshoot and reduced motion does not',
     (tester) async {

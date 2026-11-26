@@ -8,6 +8,7 @@ import '../../models/place.dart';
 import '../../models/place_state.dart';
 import '../../providers/place_providers.dart';
 import '../../constants/app_strings.dart';
+import '../app_icon.dart';
 
 class SavedPlaceControl extends ConsumerStatefulWidget {
   const SavedPlaceControl({required this.place, super.key});
@@ -54,17 +55,15 @@ class _SavedPlaceControlState extends ConsumerState<SavedPlaceControl> {
               dimension: AppLayout.touchTarget,
               child: IconButton(
                 onPressed: pending ? null : () => _toggle(canonical),
-                tooltip: selected ? AppStrings.savedPlaceSavedTooltip : AppStrings.savedPlaceSaveTooltip,
-                icon: pending
-                    ? const SizedBox.square(
-                        dimension: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Icon(
-                        selected
-                            ? CupertinoIcons.bookmark_fill
-                            : CupertinoIcons.bookmark,
-                      ),
+                tooltip: selected
+                    ? AppStrings.savedPlaceSavedTooltip
+                    : AppStrings.savedPlaceSaveTooltip,
+                icon: AppIconSwap(
+                  busy: pending,
+                  icon: selected
+                      ? CupertinoIcons.bookmark_fill
+                      : CupertinoIcons.bookmark,
+                ),
                 style: IconButton.styleFrom(
                   backgroundColor: selected
                       ? AppColors.menta

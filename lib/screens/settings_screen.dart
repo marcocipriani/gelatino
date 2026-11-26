@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../design/app_tokens.dart';
+import '../design/motion.dart';
 import '../design/responsive.dart';
 import '../firebase/firebase_providers.dart';
 import '../models/user_profile.dart';
@@ -22,6 +23,7 @@ import '../providers/theme_provider.dart';
 import '../services/media_cache/media_disk_cache.dart';
 import '../services/push_service.dart';
 import '../widgets/app_controls.dart';
+import '../widgets/app_icon.dart';
 import '../widgets/app_page.dart';
 import '../widgets/avatar_image_provider.dart';
 import '../widgets/edit_profile_dialog.dart';
@@ -526,14 +528,12 @@ final class _SettingsSections extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SettingsSection(
+          order: 0,
           label: AppStrings.settingsSectionProfile,
           children: [
             ListTile(
               key: const ValueKey('settings-edit-profile'),
-              leading: const _SettingsIcon(
-                CupertinoIcons.person,
-                AppColors.puffo,
-              ),
+              leading: const AppIconBadge(icon: CupertinoIcons.person),
               title: Text(AppStrings.settingsEditPersonal),
               subtitle: Text(editSubtitle),
               trailing: const Icon(CupertinoIcons.chevron_forward),
@@ -545,20 +545,14 @@ final class _SettingsSections extends StatelessWidget {
             ),
             ListTile(
               key: const ValueKey('settings-favorite-flavors'),
-              leading: const _SettingsIcon(
-                CupertinoIcons.heart,
-                AppColors.fragola,
-              ),
+              leading: const AppIconBadge(icon: CupertinoIcons.heart),
               title: Text(AppStrings.settingsFavoriteFlavors),
               trailing: const Icon(CupertinoIcons.chevron_forward),
               onTap: onFavoriteFlavors,
             ),
             ListTile(
               key: const ValueKey('settings-saved-collection'),
-              leading: const _SettingsIcon(
-                CupertinoIcons.bookmark,
-                AppColors.menta,
-              ),
+              leading: const AppIconBadge(icon: CupertinoIcons.bookmark),
               title: Text(AppStrings.settingsSavedPlaces),
               trailing: const Icon(CupertinoIcons.chevron_forward),
               onTap: onSavedCollection,
@@ -567,6 +561,7 @@ final class _SettingsSections extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         _SettingsSection(
+          order: 1,
           label: AppStrings.settingsSectionApp,
           children: [
             _SettingsChoice(
@@ -590,9 +585,8 @@ final class _SettingsSections extends StatelessWidget {
                 onChanged: ref.read(highContrastProvider.notifier).set,
                 title: Text(AppStrings.settingsHighContrast),
                 subtitle: Text(AppStrings.settingsHighContrastSubtitle),
-                secondary: const _SettingsIcon(
-                  CupertinoIcons.circle_lefthalf_fill,
-                  AppColors.puffo,
+                secondary: const AppIconBadge(
+                  icon: CupertinoIcons.circle_lefthalf_fill,
                 ),
                 activeTrackColor: AppColors.fragola,
                 inactiveTrackColor: Theme.of(context).colorScheme.outline,
@@ -626,6 +620,7 @@ final class _SettingsSections extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         _SettingsSection(
+          order: 2,
           label: AppStrings.settingsSectionPrivacy,
           children: [
             SwitchListTile.adaptive(
@@ -634,10 +629,7 @@ final class _SettingsSections extends StatelessWidget {
               onChanged: privacyPending ? null : onPrivacyChanged,
               title: Text(AppStrings.settingsPrivateProfile),
               subtitle: Text(AppStrings.settingsPrivateProfileSubtitle),
-              secondary: const _SettingsIcon(
-                CupertinoIcons.lock,
-                AppColors.sorbetto,
-              ),
+              secondary: const AppIconBadge(icon: CupertinoIcons.lock),
               activeTrackColor: AppColors.fragola,
               // The iOS switch ignores switchTheme; its grey is near invisible.
               inactiveTrackColor: Theme.of(context).colorScheme.outline,
@@ -650,10 +642,7 @@ final class _SettingsSections extends StatelessWidget {
               ),
             ListTile(
               key: const ValueKey('settings-privacy-policy'),
-              leading: const _SettingsIcon(
-                CupertinoIcons.doc_text,
-                AppColors.sorbetto,
-              ),
+              leading: const AppIconBadge(icon: CupertinoIcons.doc_text),
               title: Text(AppStrings.settingsPrivacyPolicy),
               trailing: const Icon(CupertinoIcons.arrow_up_right_square),
               onTap: () => launchUrl(
@@ -665,6 +654,7 @@ final class _SettingsSections extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         _SettingsSection(
+          order: 3,
           label: AppStrings.settingsSectionAccount,
           children: [
             Padding(
@@ -723,8 +713,13 @@ final class _SettingsSections extends StatelessWidget {
 final privacyPolicyUrl = Uri.parse('https://gelatino.web.app/privacy.html');
 
 final class _SettingsSection extends StatelessWidget {
-  const _SettingsSection({required this.label, required this.children});
+  const _SettingsSection({
+    required this.order,
+    required this.label,
+    required this.children,
+  });
 
+  final int order;
   final String label;
   final List<Widget> children;
 
@@ -764,26 +759,7 @@ final class _SettingsSection extends StatelessWidget {
         ),
       ),
     ],
-  );
-}
-
-/// iOS Settings glyph tile: bright fill, Fondente ink.
-final class _SettingsIcon extends StatelessWidget {
-  const _SettingsIcon(this.icon, this.fill);
-
-  final IconData icon;
-  final Color fill;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 32,
-    height: 32,
-    decoration: BoxDecoration(
-      color: fill,
-      borderRadius: BorderRadius.circular(9),
-    ),
-    child: Icon(icon, size: 19, color: AppColors.fondente),
-  );
+  ).entrance(context, order: order);
 }
 
 /// Title, explanation, then a full-width control: never squeezed beside it.

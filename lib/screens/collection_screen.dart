@@ -14,6 +14,7 @@ import '../widgets/collection/saved_place_cards.dart';
 import '../widgets/editorial_header.dart';
 import '../widgets/skeleton_loader.dart';
 import '../constants/app_strings.dart';
+import '../widgets/app_icon.dart';
 
 /// Personal collection of saved gelaterie, with favorite flavors secondary.
 class CollectionScreen extends ConsumerWidget {
@@ -84,8 +85,7 @@ class CollectionScreen extends ConsumerWidget {
   }
 }
 
-String _savedCount(int count) =>
-    AppStrings.savedPlacesCount(count);
+String _savedCount(int count) => AppStrings.savedPlacesCount(count);
 
 class _SavedPlacesLayout extends StatelessWidget {
   const _SavedPlacesLayout({required this.places, required this.onOpen});
@@ -217,7 +217,7 @@ class _FavoriteFlavorsSection extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          child: const Icon(Icons.icecream_outlined),
+          child: const GelatoIcon(),
         ),
         title: Text(AppStrings.collectionFavoriteFlavorsTitle),
         subtitle: Text(AppStrings.collectionFavoriteFlavorsSubtitle),

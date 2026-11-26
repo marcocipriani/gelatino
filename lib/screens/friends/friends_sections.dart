@@ -47,7 +47,7 @@ final class FriendsStatePanel extends StatelessWidget {
   const FriendsStatePanel({
     required this.title,
     required this.message,
-    this.icon = CupertinoIcons.info,
+    this.icon = const Icon(CupertinoIcons.info),
     this.actionLabel,
     this.actionKey,
     this.onAction,
@@ -56,7 +56,7 @@ final class FriendsStatePanel extends StatelessWidget {
 
   final String title;
   final String message;
-  final IconData icon;
+  final Widget icon;
   final String? actionLabel;
   final Key? actionKey;
   final VoidCallback? onAction;
@@ -75,7 +75,10 @@ final class FriendsStatePanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: theme.colorScheme.accentInk),
+            IconTheme.merge(
+              data: IconThemeData(color: theme.colorScheme.accentInk),
+              child: icon,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(title, style: theme.textTheme.titleMedium),
             const SizedBox(height: AppSpacing.xs),

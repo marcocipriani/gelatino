@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 
 import '../design/app_tokens.dart';
 import '../design/focus_ring.dart';
-import '../design/motion.dart';
 import '../models/navigation_action.dart';
+import 'app_icon.dart';
 import 'melt_pin.dart';
 import '../constants/app_strings.dart';
 
@@ -119,7 +119,6 @@ class _BottomDestination extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final color = selected ? colors.accentInk : colors.onSurfaceVariant;
-    final duration = AppMotion.of(context, AppMotion.standard);
 
     return Expanded(
       child: Semantics(
@@ -145,29 +144,13 @@ class _BottomDestination extends StatelessWidget {
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        AnimatedContainer(
-                          duration: duration,
-                          curve: AppMotion.glide,
+                        AppIconBadge(
+                          icon: selected
+                              ? action.selectedIcon
+                              : action.unselectedIcon,
+                          active: selected,
                           width: selected ? 48 : 36,
-                          height: 28,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? colors.primaryContainer
-                                : colors.primaryContainer.withValues(alpha: 0),
-                            borderRadius: BorderRadius.circular(AppRadii.pill),
-                          ),
-                          child: AnimatedSwitcher(
-                            duration: duration,
-                            child: Icon(
-                              selected
-                                  ? action.selectedIcon
-                                  : action.unselectedIcon,
-                              key: ValueKey(selected),
-                              color: color,
-                              size: 23,
-                            ),
-                          ),
+                          size: 23,
                         ),
                         if (badgeCount > 0)
                           PositionedDirectional(

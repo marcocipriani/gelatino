@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../design/app_tokens.dart';
-import '../design/motion.dart';
+import 'app_icon.dart';
 
 final class SemanticStateButton extends StatelessWidget {
   const SemanticStateButton({
@@ -57,13 +57,7 @@ final class SemanticStateButton extends StatelessWidget {
             ),
           ),
           onPressed: press,
-          icon: AnimatedSwitcher(
-            duration: AppMotion.of(context, AppMotion.standard),
-            switchInCurve: AppMotion.glide,
-            transitionBuilder: (child, animation) =>
-                ScaleTransition(scale: animation, child: child),
-            child: Icon(icon, key: ValueKey(selected)),
-          ),
+          icon: AppIconSwap(icon: icon),
           label: Text(label),
         ),
       ),

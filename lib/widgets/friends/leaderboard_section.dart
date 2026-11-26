@@ -7,6 +7,7 @@ import '../../screens/friends/friends_sections.dart';
 import '../app_controls.dart';
 import '../avatar_image_provider.dart';
 import '../../constants/app_strings.dart';
+import '../app_icon.dart';
 
 /// First section of the Amici tab: taste-points leaderboard among the
 /// current user and their accepted friends, toggled between this month and
@@ -15,8 +16,7 @@ final class LeaderboardSection extends ConsumerStatefulWidget {
   const LeaderboardSection({super.key});
 
   @override
-  ConsumerState<LeaderboardSection> createState() =>
-      _LeaderboardSectionState();
+  ConsumerState<LeaderboardSection> createState() => _LeaderboardSectionState();
 }
 
 class _LeaderboardSectionState extends ConsumerState<LeaderboardSection> {
@@ -86,7 +86,7 @@ class _LeaderboardEmpty extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.icecream_outlined, color: theme.colorScheme.accentInk),
+          GelatoIcon(color: theme.colorScheme.accentInk),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
@@ -218,9 +218,7 @@ class _LeaderboardRow extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: entry.isCurrentUser
-            ? theme.colorScheme.primaryContainer
-            : null,
+        color: entry.isCurrentUser ? theme.colorScheme.primaryContainer : null,
         borderRadius: BorderRadius.circular(AppRadii.control),
       ),
       child: Row(
